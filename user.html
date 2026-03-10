@@ -1,0 +1,102 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profilo Utente | VIP Lounge</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/user.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<header>
+    <h1>PROFILO UTENTE</h1>
+    <nav>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="giochi.html">Giochi</a></li>
+            <li><a href="promozioni.html">Promozioni</a></li>
+            <li><a href="#" id="logoutBtn">Esci</a></li>
+        </ul>
+    </nav>
+</header>
+
+<main class="dashboard">
+
+    <section class="chart-box">
+        <div class="profile-info">
+            <img src="images/casinotipa.png" class="avatar" alt="Avatar">
+            <div class="user-details">
+                <h2>Bentornato, <span id="userName">[Nome Utente]</span></h2>
+                <p>Status: <strong class="vip">💎 VIP GOLD</strong></p>
+            </div>
+        </div>
+        <div class="balance-card">
+            <span id="userBalance">€ 0,00</span>
+            <p><a href="ricarica.html" class="btn">Ricarica</a></p>
+            
+        </div>
+    </section>
+
+    
+
+    <section class="chart-box">
+        <h3 class="section-title">Le Tue Statistiche</h3>
+            <div class="stats-grid">
+            <div class="stat-card">
+                <h4>Partite Giocate</h4>
+                <p id="gamesPlayed">0</p>
+            </div>
+            <div class="stat-card">
+                <h4>Partite Vinte</h4>
+                <p id="gamesWon">0</p>
+            </div>
+            <div class="stat-card">
+                <h4>Win Rate</h4>
+                <p id="winRate">0%</p>
+            </div>
+            <div class="stat-card">
+                <h4>Totale Vinto</h4>
+                <p id="totalWon">€ 0</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="transaction-history">
+        <h3 class="section-title">Cronologia Transazioni</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Tipo</th>
+                    <th>Importo</th>
+                    <th>Stato</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Le righe verranno popolate dinamicamente -->
+                <tr>
+                    <td>2024-07-21</td>
+                    <td>Ricarica</td>
+                    <td>€ 50,00</td>
+                    <td class="completed">Completato</td>
+                </tr>
+                <tr>
+                    <td>2024-07-20</td>
+                    <td>Prelievo</td>
+                    <td>€ 25,00</td>
+                    <td class="pending">In attesa</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+</main>
+
+<script type="module" src="/scripts/supabase-client.js"></script>
+<script src="scripts/auth.js"></script>
+<script src="scripts/statistiche.js"></script>
+</body>
+</html>

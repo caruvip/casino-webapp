@@ -1,0 +1,133 @@
+/* ================================================
+   NUOVO FILE styles/ricarica.css - STILE "LAS VEGAS"
+   ================================================
+*/
+
+/* 1. IMPORTAZIONE FONT DI LUSSO (DA GOOGLE FONTS) */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Lato:wght@400;700&display=swap');
+
+body {
+    font-family: 'Lato', sans-serif;
+    background: radial-gradient(ellipse at center, #3a0000 0%, #000000 70%), #000000;
+    color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.card {
+    background: rgba(15, 15, 15, 0.85);
+    border: 1.5px solid #ffcc33;
+    border-radius: 22px;
+    box-shadow: 0 0 25px #ffcc33; /* Glow d'impatto */
+    padding: 25px 30px;
+    width: 100%;
+    max-width: 450px;
+    backdrop-filter: blur(5px);
+}
+
+.card__header h1 {
+    font-family: 'Cinzel', serif;
+    color: #ffcc33;
+    text-align: center;
+    margin-top: 0;
+    font-size: 2.2rem;
+    text-shadow: 0 0 8px #ffcc33;
+}
+
+.form-group, .icon-group-container, .row-group {
+    margin-bottom: 20px;
+}
+
+label {
+    font-family: 'Cinzel', serif;
+    color: #ffcc33;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+    letter-spacing: 0.5px;
+}
+
+input[type="text"], input[type="tel"] {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1.5px solid #ffcc33;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 1rem;
+    box-sizing: border-box; /* Assicura che padding non modifichi la larghezza */
+    transition: box-shadow 0.2s;
+}
+input[type="text"]::placeholder, input[type="tel"]::placeholder {
+    color: #aaa;
+}
+input[type="text"]:focus, input[type="tel"]:focus {
+    outline: none;
+    box-shadow: 0 0 10px #ffcc33;
+}
+
+.row-group {
+    display: flex;
+    gap: 15px;
+}
+.row-group .form-group, .row-group .icon-group-container {
+    flex: 1;
+}
+.icon-group {
+    position: relative;
+}
+
+/* Stile bottone "Vegas" */
+button[type="submit"] {
+    width: 100%;
+    background: linear-gradient(90deg, #ffb347 0%, #ffcc33 100%);
+    color: #000;
+    border: none;
+    border-radius: 25px;
+    padding: 12px 32px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 18px;
+    box-shadow: 0 2px 8px #ffcc3355;
+    transition: all 0.2s;
+    text-shadow: 0 1px 1px rgba(255, 255, 255, 0.3);
+    font-family: 'Lato', sans-serif; 
+}
+button[type="submit"]:hover:not(:disabled) {
+    transform: scale(1.03);
+    box-shadow:
+        0 0 10px #ffcc33,
+        0 0 20px #ffcc33,
+        0 0 30px #ffcc33;
+}
+button[type="submit"]:disabled {
+    background: #555;
+    color: #999;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.verify-info {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.back-link { 
+    display: block; 
+    text-align: center;
+    margin-top: 15px; 
+    color: #888; 
+    text-decoration: none; 
+}
+
+.back-link:hover { 
+    color: #fff; 
+}

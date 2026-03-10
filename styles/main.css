@@ -1,0 +1,278 @@
+/* ================================================
+   FILE main.css - THEME: "BLACK & RED VIP LOUNGE"
+   ================================================
+*/
+
+/* 1. FONTS DI LUSSO */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@400;700&display=swap');
+
+:root {
+    /* PALETTE COLORI */
+    --gold-gradient: linear-gradient(180deg, #FFF7CC 0%, #FFD700 20%, #D4AF37 50%, #FFD700 80%, #FFF7CC 100%);
+    --gold-text: #FFD700;
+    --deep-black: #050505;
+    --velvet-red: #660000; /* Rosso scuro per i tavoli */
+    --leather-black: #1a1a1a; /* Nero per i bordi */
+}
+
+body {
+    font-family: 'Lato', sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    color: #e0e0e0; /* Testo argento chiaro */
+    
+    /* SFONDO PAGINA: NERO PROFONDO CON SFUMATURE ROSSE */
+    background-color: var(--deep-black);
+    /* Texture pelle scura + Luce rossa soffusa dal basso */
+}
+
+/* HEADER */
+header {
+    text-align: center;
+    padding: 60px 0 30px;
+    /* Gradiente nero verso trasparente */
+    background: linear-gradient(to bottom, #000000, transparent);
+}
+
+header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 4.5rem;
+    text-transform: uppercase;
+    margin: 0;
+    letter-spacing: 6px;
+    
+    /* SCRITTA ORO METALLICO */
+    background: var(--gold-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    
+    /* Ombra nera forte per staccare dallo sfondo */
+    filter: drop-shadow(0 4px 0 #3d2e00) drop-shadow(0 0 20px rgba(255, 0, 0, 0.3));
+}
+
+/* NAVIGAZIONE */
+nav {
+    background: #000; /* Nero assoluto */
+    border-top: 2px solid #D4AF37; /* Linee Oro */
+    border-bottom: 2px solid #D4AF37;
+    margin-top: 20px;
+    padding: 15px 0;
+    text-align: center;
+    box-shadow: 0 0 30px rgba(150, 0, 0, 0.3); /* Alone rosso */
+}
+
+nav ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+nav ul li {
+    display: inline-block;
+    margin: 0 25px;
+}
+
+nav ul li a {
+    font-family: 'Cinzel', serif;
+    color: #888;
+    text-decoration: none;
+    font-size: 1.1rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: all 0.3s;
+}
+
+nav ul li a:hover {
+    color: #FFD700;
+    text-shadow: 0 0 15px #FFD700, 0 0 30px #ff0000;
+}
+
+main {
+    padding: 50px 10vw;
+}
+
+/* SEZIONI: IL TAVOLO DA GIOCO ROSSO */
+section {
+    /* Il "Panno" del tavolo: Rosso Velluto */
+    background-color: var(--velvet-red);
+    background-image: url("https://www.transparenttextures.com/patterns/felt.png"); /* Texture tessuto */
+    
+    margin: 60px 0;
+    padding: 50px;
+    border-radius: 30px; /* Angoli molto curvi */
+    position: relative;
+    
+    /* IL BORDO DEL TAVOLO: PELLE NERA E ORO */
+    border: 15px solid var(--leather-black);
+    box-shadow: 
+        inset 0 0 60px #000, /* Ombra interna sul rosso */
+        0 0 0 2px #FFD700 inset, /* Filo d'oro tra rosso e nero */
+        0 20px 50px #000; /* Ombra esterna del tavolo */
+}
+
+/* Titoli Sezioni */
+section h2 {
+    font-family: 'Cinzel', serif;
+    color: #FFD700;
+    font-size: 2.5rem;
+    text-align: center;
+    margin-top: -20px;
+    margin-bottom: 30px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+    padding-bottom: 15px;
+}
+
+section p {
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: #f5f5f5; /* Bianco ghiaccio per contrastare il rosso */
+    text-align: center;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+}
+
+/* BOTTONI: LINGOTTI D'ORO */
+button, .btn {
+    background: var(--gold-gradient);
+    color: #2a0000; /* Testo rosso scuro */
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    text-transform: uppercase;
+    border: 1px solid #fff;
+    padding: 16px 45px;
+    border-radius: 4px; /* Squadrati come lingotti */
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    transition: all 0.3s;
+    letter-spacing: 1px;
+}
+
+button:hover, .btn:hover {
+    background: #fff;
+    color: #000;
+    box-shadow: 0 0 25px #FFD700;
+    transform: scale(1.05);
+}
+
+.btn a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* CARTE GIOCHI: STILE ELEGANTE */
+.card-game {
+    /* Sfondo Nero Lucido per le carte */
+    background: linear-gradient(145deg, #1a1a1a, #000);
+    border: 1px solid #FFD700; /* Bordo Oro */
+    border-radius: 12px;
+    padding: 25px;
+    margin: 20px;
+    display: inline-block;
+    width: 230px;
+    vertical-align: top;
+    text-align: center;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-game:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.4), 0 0 10px #FFD700; /* Glow rosso e oro */
+    background: #000;
+}
+
+.card-game img {
+    width: 85px;
+    margin-bottom: 15px;
+    /* Rende le icone dorate se sono PNG trasparenti */
+    filter: drop-shadow(0 0 5px #FFD700); 
+}
+
+.card-game h3 {
+    font-family: 'Playfair Display', serif;
+    color: #FFD700;
+    font-size: 1.6rem;
+    margin: 10px 0;
+}
+
+.card-game p {
+    color: #bbb;
+    font-size: 1rem;
+    text-shadow: none;
+}
+
+.card-game button {
+    /* Bottone piccolo nella carta */
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    background: transparent;
+    color: #FFD700;
+    border: 1px solid #FFD700;
+    box-shadow: none;
+    margin-top: 15px;
+}
+.card-game button:hover {
+    background: #FFD700;
+    color: #000;
+}
+
+/* FOOTER */
+footer {
+    background: #000;
+    border-top: 4px solid #800000; /* Linea rossa separatrice */
+    padding: 40px 0;
+    text-align: center;
+    color: #666;
+    font-family: 'Cinzel', serif;
+}
+
+/* STILI DI UTILITÀ (User Bar, Modali) */
+.user-bar {
+    background: #000;
+    border-bottom: 1px solid #333;
+    padding: 10px 20px;
+    text-align: right;
+    color: #FFD700;
+}
+
+.login-modal, .register-modal, .user-modal {
+    background: rgba(0,0,0,0.9);
+    backdrop-filter: blur(5px);
+}
+
+.modal-content {
+    background: #000;
+    border: 2px solid #FFD700;
+    color: #fff;
+    box-shadow: 0 0 50px rgba(255, 0, 0, 0.3); /* Glow rosso */
+}
+
+.modal-content label {
+    color: #FFD700;
+    font-family: 'Cinzel', serif;
+}
+
+.modal-content input {
+    background: #111;
+    border: 1px solid #444;
+    color: #fff;
+}
+.modal-content input:focus {
+    border-color: #FFD700;
+    outline: none;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    header h1 { font-size: 3rem; }
+    section { 
+        padding: 30px 20px; 
+        border-width: 8px; /* Bordo più sottile su mobile */
+        margin: 30px 0;
+    }
+    nav ul li { display: block; margin: 15px 0; border-bottom: 1px solid #333; padding-bottom: 10px;}
+    .card-game { width: 100%; margin: 15px 0; }
+}

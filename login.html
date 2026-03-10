@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accedi | Casino Online</title>
+    <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+    <header>
+        <h1>CASINO ONLINE</h1>
+        <nav>
+            <ul>
+                <li><a href="/index.html">Home</a></li>
+                <li><a href="/registrati.html">Registrati</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section style="max-width:400px;margin:40px auto;background:#23272f;padding:32px 28px;border-radius:12px;box-shadow:0 4px 24px #0006;">
+            <h2 style="color:#ffb400;">Accedi per giocare</h2>
+            <form onsubmit="login(event)">
+                <label for="user" style="color:#ffb400;font-weight:bold;">Nome utente</label>
+                <input type="text" id="user" required placeholder="Inserisci il tuo nome" style="width:100%;padding:8px;margin-bottom:10px;">
+                
+                <label for="pass" style="color:#ffb400;font-weight:bold;">Password</label>
+                <input type="password" id="pass" required placeholder="Password" style="width:100%;padding:8px;margin-bottom:20px;">
+                
+                <button class="btn" type="submit" style="width:100%;">Accedi</button>
+            </form>
+            <p style="margin-top:18px;text-align:center;color:#ccc">Non hai un account? <a href="/registrati.html" style="color:#ffb400;">Registrati</a></p>
+        </section>
+    </main>
+    <script type="module" src="/scripts/supabase-client.js"></script>
+    <script src="/scripts/auth.js"></script>
+</body>
+</html>

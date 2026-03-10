@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack VIP</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/blackjack.css">
+    <link rel="stylesheet" href="../styles/roulette.css"> 
+</head>
+<body>
+
+    <div class="user-bar" id="userBar"></div>
+
+    <header>
+        <h1>BLACKJACK VIP</h1>
+        <nav>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../giochi.html">Giochi</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="game-container">
+            <div class="table-felt">
+                
+                <div class="dealer-area">
+                    <img src="../images/blackjacktipo.png" alt="Dealer" class="dealer-avatar">
+                    <div class="cards-area">
+                        <h2>Banco <span id="dealer-sum-el" class="score-badge">--</span></h2>
+                        <div id="dealer-cards-el" class="cards-display"></div>
+                    </div>
+                </div>
+
+                <div id="message-el" class="game-message">Fai la tua puntata per iniziare</div>
+
+                <div class="player-area">
+                    <div class="cards-area">
+                        <h2>La Tua Mano</h2>
+                        <div id="player-hands-el" class="hands-container"></div>
+                    </div>
+                </div>
+
+                <div class="dashboard">
+                    <div class="dash-item">
+                        <span>SALDO</span>
+                        <span id="player-balance-el">---</span>
+                    </div>
+                    <div class="dash-item">
+                        <span>PUNTATA</span>
+                        <span id="current-bet-el">0</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="controls-panel">
+                
+                <div id="betting-area" class="buttons-area">
+                    <div class="chips-panel">
+                        <div class="chip" data-value="5">5</div>
+                        <div class="chip" data-value="25">25</div>
+                        <div class="chip" data-value="50">50</div>
+                        <div class="chip" data-value="100">100</div>
+                        <div class="chip all-in" data-value="all-in">ALL</div>
+                    </div>
+                    <div class="main-actions">
+                         <button id="clear-btn" class="ctrl-btn red-btn">PULISCI</button>
+                         <button id="confirm-bet-btn" class="spin-btn">PUNTA</button>
+                    </div>
+                </div>
+
+                <div id="actions-area" class="buttons-area hidden">
+                    <button id="hit-btn" class="ctrl-btn">CARTA</button>
+                    <button id="stand-btn" class="ctrl-btn">STAI</button>
+                    <button id="double-btn" class="ctrl-btn">RADDOPPIA</button>
+                    <button id="split-btn" class="ctrl-btn">DIVIDI</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 777casino.it | Tutti i diritti riservati</p>
+    </footer>
+
+    <script src="../scripts/auth.js"></script>
+    <script src="blackjack.js"></script>
+</body>
+</html>

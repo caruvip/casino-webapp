@@ -1,0 +1,357 @@
+/* --- LAYOUT GENERALE E FIX --- */
+body {
+    display: flex;
+    flex-direction: column !important;
+    min-height: 100vh;
+    background: radial-gradient(circle at center, #1a252f 0%, #000000 100%);
+    overflow-x: auto;
+    margin: 0;
+    width: 100%;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 0;
+}
+
+.poker-room {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+/* --- TAVOLO DA GIOCO --- */
+#game-table {
+    position: relative;
+    width: 900px;
+    min-width: 900px; /* IMPORTANTE: impedisce al tavolo di schiacciarsi */
+    height: 500px;
+    min-height: 500px;
+    flex-shrink: 0;
+    background-color: #0e3b1c;
+    background-image: url("https://www.transparenttextures.com/patterns/felt.png");
+    border: 15px solid #3d2b1f;
+    border-radius: 250px;
+    box-shadow: 
+        inset 0 0 100px #000, 
+        0 30px 60px rgba(0,0,0,0.8),
+        0 0 0 2px #c0a062;
+    margin: 40px auto 90px auto; /* Spazio extra sotto per il giocatore umano */
+}
+
+/* --- SCHERMATA DI AVVIO --- */
+.start-screen {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 100;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 250px; /* Segue i bordi del tavolo */
+}
+
+.start-content {
+    text-align: center;
+    color: #fff;
+    font-family: 'Cinzel', serif;
+}
+
+.start-content h2 {
+    font-size: 3rem;
+    color: #FFD700;
+    margin-bottom: 10px;
+    text-shadow: 0 0 10px #FFD700;
+}
+
+.btn-play {
+    background: linear-gradient(180deg, #FFD700 0%, #B8860B 100%);
+    border: 2px solid #fff;
+    padding: 15px 40px;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #000;
+    cursor: pointer;
+    border-radius: 50px;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+    transition: transform 0.2s;
+}
+
+.btn-play:hover {
+    transform: scale(1.1);
+    background: #fff;
+}
+
+/* --- ELEMENTI CENTRALI (LOGO, PIATTO, CARTE COMUNI) --- */
+.table-logo {
+    position: absolute;
+    top: 25%;
+    width: 100%;
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    color: rgba(255, 215, 0, 0.1);
+    font-size: 3rem;
+    pointer-events: none;
+    line-height: 1.1;
+}
+.table-logo span { font-size: 1.5rem; letter-spacing: 5px; }
+
+#center-area {
+    position: absolute;
+    top: 52%; 
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 10;
+    width: 100%;
+}
+
+#pot-container {
+    background: rgba(0,0,0,0.6);
+    padding: 5px 15px;
+    border-radius: 20px;
+    border: 1px solid #FFD700;
+    display: inline-block;
+    margin-bottom: 15px;
+}
+.gold-text { color: #FFD700; font-weight: bold; font-size: 1.3rem; }
+.label { color: #ccc; font-size: 0.8rem; display: block; letter-spacing: 1px;}
+
+#community-cards {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+/* Carte Grandi */
+.card {
+    width: 70px; height: 105px;
+    background-size: cover; background-position: center;
+    border-radius: 6px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.6);
+    background-color: #fff;
+}
+.card.placeholder {
+    background: rgba(255,255,255,0.08);
+    border: 2px dashed rgba(255,255,255,0.3);
+    box-shadow: none;
+}
+
+/* --- PANNELLI GIOCATORI --- */
+.player-panel {
+    position: absolute;
+    width: 140px;
+    background: linear-gradient(180deg, #2c2c2c, #111);
+    border: 2px solid #555;
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.7);
+    transition: all 0.3s;
+    z-index: 20;
+}
+
+.player-panel.active {
+    border-color: #FFD700;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+    transform: scale(1.05);
+}
+.player-panel.folded-panel { opacity: 0.4; filter: grayscale(1); }
+
+.player-info { color: #fff; font-size: 0.9rem; font-weight: bold; margin-bottom: 5px; overflow: hidden; text-overflow: ellipsis;}
+.player-chips { color: #FFD700; font-size: 0.9rem; margin-bottom: 8px; }
+
+/* Carte dei Bot */
+.player-cards { display: flex; justify-content: center; gap: 5px; height: 65px; }
+.player-cards .card { width: 45px; height: 65px; }
+
+/* Posizioni (5 Player Max) */
+#player-0 { top: -30px; left: 160px; } /* Bot 1 */
+#player-1 { top: -30px; right: 160px; } /* Bot 2 */
+#player-2 { top: 50%; right: -80px; transform: translateY(-50%); } /* Bot 3 */
+#player-4 { top: 50%; left: -80px; transform: translateY(-50%); } /* Bot 4 */
+
+/* --- GIOCATORE UMANO (Player 3) --- */
+#player-3 {
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 280px;
+    height: auto;
+    border: 3px solid #FFD700;
+    background: linear-gradient(180deg, #222, #000);
+    z-index: 30;
+    padding-bottom: 15px;
+}
+
+/* Carte Umano Grandi */
+#player-3 .player-cards { height: 90px; margin-bottom: 10px; gap: 8px; }
+#player-3 .player-cards .card { width: 60px; height: 90px; }
+
+/* Scritta Punteggio (es. "Coppia") */
+.hand-strength-label {
+    color: #fff; font-size: 0.85rem; font-weight: bold;
+    margin-bottom: 10px; letter-spacing: 1px;
+    text-transform: uppercase; color: #FFD700;
+    min-height: 1.2em;
+}
+
+/* --- PULSANTI AZIONE (Stile Uiverse Gold 3D) --- */
+#human-actions {
+    display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 5px;
+}
+
+#human-actions button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+    font-weight: 800;
+    color: #3d2b1f;
+    background: linear-gradient(to bottom, #ffd700 0%, #e6ac00 100%);
+    border: 1px solid #b8860b;
+    border-radius: 6px;
+    box-shadow: 
+        inset 0 1px 0 rgba(255,255,255,0.5), 
+        0 4px 0 #b8860b, 
+        0 5px 10px rgba(0,0,0,0.4);
+    cursor: pointer;
+    transition: all 0.1s ease-in-out;
+    text-transform: uppercase;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+}
+
+#human-actions button:hover:not(:disabled) {
+    background: linear-gradient(to bottom, #ffe033 0%, #ffb700 100%);
+    transform: translateY(-2px);
+    box-shadow: 
+        inset 0 1px 0 rgba(255,255,255,0.5), 
+        0 6px 0 #b8860b, 
+        0 7px 15px rgba(0,0,0,0.5);
+}
+
+#human-actions button:active:not(:disabled) {
+    transform: translateY(3px);
+    box-shadow: 
+        inset 0 2px 5px rgba(0,0,0,0.3), 
+        0 1px 0 #b8860b;
+}
+
+#human-actions button:disabled {
+    background: #555;
+    color: #888;
+    border: 1px solid #333;
+    box-shadow: none;
+    cursor: default;
+    text-shadow: none;
+    transform: none;
+}
+
+/* --- MARKERS E LOG --- */
+.marker {
+    position: absolute; width: 22px; height: 22px;
+    border-radius: 50%; font-size: 0.8rem; font-weight: bold;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 4px #000; z-index: 25;
+}
+.dealer-marker { background: #fff; color: #000; top: -10px; right: -10px; border: 2px solid #ccc; }
+
+.action-bubble {
+    position: absolute; top: -25px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.9); color: #fff; padding: 4px 12px;
+    border-radius: 6px; font-size: 0.8rem; white-space: nowrap;
+    opacity: 0; transition: all 0.3s; pointer-events: none; border: 1px solid #555;
+}
+.action-bubble.show { opacity: 1; top: -35px; }
+.act-win { background: #FFD700; color: #000; font-size: 1.1rem; padding: 6px 15px; z-index: 50; border: 2px solid #fff; box-shadow: 0 0 15px #FFD700; }
+
+.game-log {
+    margin-top: 120px;
+    color: #aaa;
+    font-size: 1rem;
+    font-style: italic;
+    text-align: center;
+    text-shadow: 1px 1px 2px #000;
+}
+
+/* --- NUOVO: MENU RILANCIO (SLIDER & INPUT) --- */
+.raise-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    background: rgba(0,0,0,0.5);
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #FFD700;
+}
+
+.raise-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+
+.raise-input {
+    background: #000;
+    border: 1px solid #FFD700;
+    color: #FFD700;
+    padding: 5px;
+    border-radius: 5px;
+    font-weight: bold;
+    width: 80px;
+    text-align: center;
+}
+
+.raise-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: 5px;
+    background: #444;
+    outline: none;
+    opacity: 0.9;
+    transition: opacity .2s;
+}
+
+.raise-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #FFD700;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.8);
+}
+
+.raise-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #FFD700;
+    cursor: pointer;
+}
+
+/* Pulsanti Piccoli per conferma Raise */
+.btn-small {
+    padding: 5px 15px !important;
+    font-size: 0.8rem !important;
+    min-width: auto !important;
+}
+
+.btn-cancel {
+    background: linear-gradient(to bottom, #cc0000 0%, #990000 100%) !important;
+    border-color: #ff3333 !important;
+    color: #fff !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), 0 3px 0 #660000 !important;
+}
+.btn-cancel:active {
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.3), 0 1px 0 #660000 !important;
+}

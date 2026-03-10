@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Ricarica Conto</title>
+    <link rel="stylesheet" href="styles/ricarica.css">
+    <style>
+        /* Aggiunta per il pulsante indietro */
+        
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="card__header">
+            <h1>Deposito Sicuro</h1>
+            <p style="text-align:center; color:#888;">Transazione crittografata a 256-bit</p>
+        </div>
+        <form action="user.html"> <div class="form-group">
+                <label>Intestatario Carta</label>
+                <input type="text" placeholder="Mario Rossi" required>
+            </div>
+            <div class="form-group">
+                <label>Numero Carta</label>
+                <input type="text" id="card-number" placeholder="0000 0000 0000 0000" required>
+            </div>
+            <div class="row-group">
+                <div class="form-group">
+                    <label>Scadenza</label>
+                    <input type="tel" placeholder="MM/YY" required>
+                </div>
+                <div class="form-group">
+                    <label>CVV</label>
+                    <input type="tel" placeholder="123" maxlength="3" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Importo (€)</label>
+                <input type="number" placeholder="Es: 100" required style="width:100%; padding:12px; border-radius:8px; border:1.5px solid #ffcc33; background:rgba(255,255,255,0.1); color:#fff;">
+            </div>
+            
+            <button type="submit">CONFERMA PAGAMENTO</button>
+        </form>
+        <a href="user.html" class="back-link">Annulla e torna al profilo</a>
+    </div>
+    <script type="module" src="/scripts/supabase-client.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/cleave.js@1.6.0/dist/cleave.min.js"></script>
+    <script>
+        new Cleave('#card-number', { creditCard: true });
+    </script>
+</body>
+</html>

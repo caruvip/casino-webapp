@@ -1,0 +1,291 @@
+/* ================================================
+   FILE slot.css - THEME: "TEMPLE CABINET"
+   FIXED LAYOUT & WIN MESSAGE BAR
+   ================================================
+*/
+
+/* FIX LAYOUT PAGINA */
+body {
+    display: flex;
+    flex-direction: column !important;
+    min-height: 100vh;
+    background-color: #1a0505;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
+}
+
+.slot-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* CABINATO ESTERNO */
+.slot-cabinet {
+    width: 900px;
+    max-width: 95%;
+    background: #000;
+    border-radius: 20px;
+    box-shadow: 0 0 50px rgba(255, 215, 0, 0.2), inset 0 0 100px #000;
+    border: 4px solid #333;
+    padding: 20px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Spazio tra gli elementi interni */
+}
+
+/* CORNICE DORATA */
+.cabinet-frame {
+    border: 8px solid #FFD700;
+    border-radius: 10px;
+    padding: 5px;
+    background: linear-gradient(45deg, #b8860b, #FFD700, #b8860b);
+    box-shadow: inset 0 0 20px #000;
+}
+
+/* SCHERMO DI GIOCO */
+#slot-machine-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9; 
+    background-color: #000;
+    border-radius: 5px;
+    overflow: hidden;
+    background-image: url("../images/TempleofGod.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* GRIGLIA SIMBOLI */
+#slot-grid {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 65%;  
+    height: 60%; 
+    z-index: 2;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); 
+    grid-template-rows: repeat(3, 1fr);
+    gap: 5px;
+    padding: 5px;
+    background: rgba(0, 0, 0, 0.4); 
+    border-radius: 5px;
+}
+
+.slot-cell {
+    background: rgba(0,0,0,0.3);
+    border-radius: 5px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.slot-cell img {
+    width: 90%; height: 90%; object-fit: contain;
+    filter: drop-shadow(0 0 5px rgba(255,215,0,0.5));
+}
+
+/* ANIMAZIONE SPIN */
+@keyframes spinBlur {
+    0% { filter: blur(0); transform: translateY(0); }
+    25% { filter: blur(2px); transform: translateY(-10px); }
+    50% { filter: blur(4px); transform: translateY(10px); }
+    100% { filter: blur(0); transform: translateY(0); }
+}
+
+.spinning img {
+    animation: spinBlur 0.2s infinite linear;
+    opacity: 0.7;
+}
+
+/* PLANCIA COMANDI */
+#controls {
+    background: linear-gradient(to bottom, #222, #111);
+    padding: 15px;
+    border-radius: 15px;
+    border-top: 4px solid #FFD700;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* LCD DISPLAY */
+.lcd-display {
+    background: #000;
+    border: 2px solid #555;
+    border-radius: 8px;
+    padding: 5px 15px;
+    min-width: 120px;
+    text-align: center;
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.1);
+}
+.lcd-display.small { min-width: 80px; }
+.lcd-display .label { display: block; font-size: 0.7rem; color: #888; letter-spacing: 1px; }
+.lcd-display .value {
+    display: block; font-size: 1.4rem; color: #FFD700;
+    font-family: 'Cinzel', serif; font-weight: bold; text-shadow: 0 0 5px #FFD700;
+}
+
+/* PULSANTI STILE GOLD 3D */
+.gold-btn {
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    color: #3d2b1f; 
+    background: linear-gradient(to bottom, #ffd700 0%, #e6ac00 100%);
+    border: 1px solid #b8860b;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 4px 0 #b8860b, 0 5px 10px rgba(0,0,0,0.4);
+    cursor: pointer; transition: all 0.1s ease-in-out;
+    text-transform: uppercase; text-shadow: 0 1px 0 rgba(255,255,255,0.3);
+    border-radius: 50px; display: flex; align-items: center; justify-content: center;
+}
+.gold-btn:hover:not(:disabled) {
+    background: linear-gradient(to bottom, #ffe033 0%, #ffb700 100%);
+    transform: translateY(-2px);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 6px 0 #b8860b, 0 7px 15px rgba(0,0,0,0.5);
+}
+.gold-btn:active:not(:disabled) {
+    transform: translateY(3px); box-shadow: inset 0 2px 5px rgba(0,0,0,0.3), 0 1px 0 #b8860b;
+}
+.gold-btn:disabled {
+    background: #555; color: #888; border: 1px solid #333; box-shadow: none; cursor: not-allowed; transform: translateY(3px);
+}
+
+.spin-btn { padding: 15px 40px; font-size: 1.5rem; letter-spacing: 2px; }
+.small-btn { width: 40px; height: 40px; font-size: 1.5rem; border-radius: 50%; padding: 0; }
+
+/* TASTO TURBO */
+.turbo-btn {
+    background: #333; color: #777; border: 2px solid #555; border-radius: 8px;
+    padding: 10px 15px; font-weight: bold; cursor: pointer; transition: all 0.3s;
+    font-size: 0.9rem; display: flex; align-items: center; gap: 5px; box-shadow: inset 0 0 5px #000;
+}
+.turbo-btn:hover { color: #fff; border-color: #888; }
+.turbo-btn.active {
+    background: #001a33; color: #00ffff; border-color: #00ffff;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4), inset 0 0 10px rgba(0, 255, 255, 0.1);
+    text-shadow: 0 0 5px #00ffff;
+}
+
+/* --- NUOVA BARRA MESSAGGI --- */
+.message-bar {
+    width: 100%;
+    background: #000;
+    border: 2px solid #FFD700;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    font-family: 'Cinzel', serif;
+    font-size: 1.2rem;
+    color: #888; /* Colore default */
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    min-height: 50px; /* Altezza fissa per evitare salti */
+    display: flex; justify-content: center; align-items: center;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+}
+
+/* Quando si vince */
+.message-bar.win-active {
+    color: #FFD700;
+    text-shadow: 0 0 10px #FF4500, 0 0 20px #FFD700;
+    border-color: #fff;
+    animation: winPulse 0.8s infinite alternate;
+}
+
+@keyframes winPulse {
+    0% { transform: scale(1); box-shadow: inset 0 0 15px rgba(255,215,0,0.2); }
+    100% { transform: scale(1.02); box-shadow: inset 0 0 25px rgba(255,215,0,0.6); }
+}
+
+@media (max-width: 768px) {
+    #controls { flex-direction: column; }
+    .control-group { width: 100%; justify-content: center; }
+    .spin-btn { width: 100%; }
+}
+/* --- AGGIUNTE PER ANIMAZIONI E BONUS --- */
+
+/* Casella vincente che lampeggia */
+.slot-cell.win-glow {
+    border: 2px solid #fff;
+    box-shadow: 0 0 15px #FFD700, inset 0 0 10px #FFD700;
+    animation: winPulseCell 0.8s infinite alternate;
+    z-index: 10;
+}
+
+@keyframes winPulseCell {
+    from { transform: scale(1); filter: brightness(1.2); }
+    to { transform: scale(1.05); filter: brightness(1.5); }
+}
+
+/* Modalità Bonus Free Spins (Cambia colore cabinato) */
+.slot-cabinet.bonus-mode {
+    border-color: #ff00de; /* Neon fucsia */
+    box-shadow: 0 0 50px rgba(255, 0, 222, 0.4), inset 0 0 100px #220022;
+}
+
+.slot-cabinet.bonus-mode .cabinet-frame {
+    border-color: #ff00de;
+    background: linear-gradient(45deg, #880088, #ff00de, #880088);
+}
+
+.spin-btn.free-mode {
+    background: linear-gradient(180deg, #ff00de, #990099);
+    border-color: #fff;
+    color: #fff;
+    animation: pulseBtn 1s infinite;
+}
+
+@keyframes pulseBtn {
+    0% { box-shadow: 0 0 10px #ff00de; }
+    50% { box-shadow: 0 0 25px #ff00de; }
+    100% { box-shadow: 0 0 10px #ff00de; }
+}
+
+/* Badge Moltiplicatore */
+.multiplier-badge {
+    background: #333;
+    color: #888;
+    border: 2px solid #555;
+    border-radius: 50%;
+    width: 60px; height: 60px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    font-family: 'Cinzel', serif;
+    font-weight: bold;
+    box-shadow: inset 0 0 10px #000;
+    transition: all 0.3s;
+}
+
+.multiplier-badge.active {
+    background: #ff0000;
+    color: #fff;
+    border-color: #fff;
+    box-shadow: 0 0 20px #ff0000;
+    transform: scale(1.2) rotate(10deg);
+}
+
+/* Fix per allineare il badge nel pannello */
+#controls {
+    justify-content: space-around; /* Distribuisce meglio */
+}

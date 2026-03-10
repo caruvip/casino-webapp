@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrati | Casino Online</title>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+    <header>
+        <h1>CASINO ONLINE</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="login.html">Accedi</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section style="max-width:400px;margin:40px auto;background:#23272f;padding:32px 28px;border-radius:12px;box-shadow:0 4px 24px #0006;">
+            <h2 style="color:#ffb400;">Registrati</h2>
+            <form onsubmit="register(event)">
+                <label for="reguser" style="color:#ffb400;font-weight:bold;">Nome utente</label>
+                <input type="text" id="reguser" required placeholder="Scegli un nome" style="width:100%;padding:8px;margin-bottom:10px;">
+                
+                <label for="regpass" style="color:#ffb400;font-weight:bold;">Password</label>
+                <input type="password" id="regpass" required placeholder="Scegli una password" style="width:100%;padding:8px;margin-bottom:10px;">
+                
+                <label for="regbirth" style="color:#ffb400;font-weight:bold;">Data di Nascita (+18)</label>
+                <input type="date" id="regbirth" required style="width:100%;padding:8px;margin-bottom:20px;">
+
+                <button class="btn" type="submit" style="width:100%;">Registrati</button>
+            </form>
+            <p style="margin-top:18px;text-align:center;color:#ccc">Hai già un account? <a href="login.html" style="color:#ffb400;">Accedi</a></p>
+        </section>
+    </main>
+    <script type="module" src="/scripts/supabase-client.js"></script>
+    <script src="scripts/auth.js"></script>
+</body>
+</html>

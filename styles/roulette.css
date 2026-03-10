@@ -1,0 +1,877 @@
+/* Il Tavolo */
+
+.game-table-wrapper {
+
+    max-width: 1100px;
+
+    margin: 20px auto;
+
+    background-color: #0b3a18; /* Verde scuro */
+
+    background-image: url("https://www.transparenttextures.com/patterns/felt.png");
+
+    border: 15px solid #2a1a0a; /* Legno */
+
+    border-radius: 40px;
+
+    box-shadow:
+
+        inset 0 0 80px #000,
+
+        0 20px 50px rgba(0,0,0,0.8);
+
+    padding: 30px;
+
+    position: relative;
+
+    overflow: hidden;
+
+}
+
+
+
+/* SEZIONE SUPERIORE */
+
+.top-section {
+
+    display: flex;
+
+    justify-content: space-around;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    margin-bottom: 30px;
+
+    border-bottom: 2px solid rgba(212, 175, 55, 0.3); /* Linea Oro */
+
+    padding-bottom: 20px;
+
+}
+
+
+
+/* RUOTA */
+
+.wheel-container {
+
+    position: relative;
+
+    width: 320px;
+
+    height: 320px;
+
+    background: #111;
+
+    border-radius: 50%;
+
+    box-shadow: 0 0 30px #000;
+
+    border: 8px solid #d4af37; /* Oro */
+
+}
+
+
+
+/* Immagine */
+
+.wheel {
+
+    width: 100%;
+
+    height: 100%;
+
+    border-radius: 50%;
+
+    transition: transform 4s cubic-bezier(0.1, 0, 0.2, 1);
+
+    transform: rotate(0deg);
+
+}
+
+.wheel img {
+
+    width: 100%;
+
+    height: 100%;
+
+    /* Ruotiamo l'immagine per allineare lo 0 */
+
+}
+
+
+
+/* FRECCIA */
+
+.pointer {
+
+    position: absolute;
+
+    top: -15px;
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    color: #fff;
+
+    font-size: 2rem;
+
+    z-index: 10;
+
+    text-shadow: 0 2px 2px #000;
+
+    filter: drop-shadow(0 2px 0 #000);
+
+}
+
+
+
+/* PALLINA */
+
+.ball-container {
+
+    position: absolute;
+
+    top: 0; left: 0;
+
+    width: 100%; height: 100%;
+
+    border-radius: 50%;
+
+    pointer-events: none;
+
+    animation: none; 
+
+}
+
+
+
+.ball {
+
+    position: absolute;
+
+    top: 13%; /* Posiziona la pallin */
+
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 12px;
+
+    height: 12px;
+
+    background: #fff;
+
+    border-radius: 50%;
+
+    box-shadow: 0 0 8px #fff;
+
+}
+
+
+
+/* ANIMAZIONI */
+
+@keyframes spin-ball {
+
+    0% { transform: rotate(0deg); }
+
+    100% { transform: rotate(-3600deg); } 
+
+}
+
+
+
+
+
+.info-panel {
+
+    background: rgba(0,0,0,0.4);
+
+    border: 1px solid #d4af37;
+
+    border-radius: 15px;
+
+    padding: 20px;
+
+    min-width: 250px;
+
+    text-align: center;
+
+    backdrop-filter: blur(5px);
+
+}
+
+
+
+.display-box .label, .history-box .label {
+
+    font-size: 0.8rem;
+
+    color: #aaa;
+
+    letter-spacing: 1px;
+
+    display: block;
+
+    margin-bottom: 5px;
+
+}
+
+
+
+.win-display {
+
+    font-family: 'Cinzel', serif;
+
+    font-size: 3rem;
+
+    font-weight: bold;
+
+    color: #fff;
+
+    text-shadow: 0 0 10px #d4af37;
+
+    margin-bottom: 15px;
+
+    min-height: 60px;
+
+}
+
+
+
+.gold { color: #d4af37; font-weight: bold; font-size: 1.2rem; }
+
+
+
+.history-row {
+
+    display: flex;
+
+    justify-content: center;
+
+    gap: 5px;
+
+    margin-top: 5px;
+
+}
+
+.hist-num {
+
+    width: 30px; height: 30px;
+
+    border-radius: 50%;
+
+    display: flex; align-items: center; justify-content: center;
+
+    font-size: 0.8rem; font-weight: bold; color: #fff;
+
+    border: 1px solid #fff;
+
+}
+
+.hist-red { background: #b00; }
+
+.hist-black { background: #000; }
+
+.hist-green { background: #060; }
+
+
+
+
+
+/* SEZIONE MESSAGGI */
+
+.message-area {
+
+    text-align: center;
+
+    color: #fff;
+
+    font-size: 1.2rem;
+
+    font-family: 'Cinzel', serif;
+
+    margin-bottom: 10px;
+
+    min-height: 30px;
+
+    text-shadow: 0 2px 4px #000;
+
+}
+
+
+
+/* SEZIONE INFERIORE */
+
+.bottom-section {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    gap: 20px;
+
+}
+
+
+
+/* CHIPS */
+
+.chips-panel {
+
+    display: flex;
+
+    gap: 15px;
+
+    background: rgba(0,0,0,0.3);
+
+    padding: 10px 30px;
+
+    border-radius: 50px;
+
+    border: 1px solid #555;
+
+}
+
+
+
+.chip {
+
+    width: 55px; height: 55px;
+
+    border-radius: 50%;
+
+    display: flex; align-items: center; justify-content: center;
+
+    font-weight: bold; cursor: pointer;
+
+    border: 2px dashed #fff;
+
+    box-shadow: 0 5px 10px rgba(0,0,0,0.5);
+
+    transition: transform 0.2s;
+
+}
+
+.chip:hover { transform: translateY(-5px); }
+
+.chip.selected { box-shadow: 0 0 15px #fff; transform: scale(1.1); border-style: solid; }
+
+
+
+.chip[data-value="5"] { background: #b00; color: #fff; }
+
+.chip[data-value="25"] { background: #090; color: #fff; }
+
+.chip[data-value="50"] { background: #009; color: #fff; }
+
+.chip[data-value="100"] { background: #111; color: #d4af37; border-color: #d4af37; }
+
+.chip.all-in { background: #d4af37; color: #000; font-size: 0.8rem; }
+
+
+
+
+
+/* GRIGLIA PUNTATE */
+
+.betting-table-container {
+
+    overflow-x: auto;
+
+    padding: 10px;
+
+    border: 10px solid #d4af37;
+
+    border-radius: 8px;
+
+    background: #063312; /* Verde  diverso */
+
+    box-shadow: inset 0 0 20px #000;
+
+}
+
+
+
+.betting-board {
+
+    display: grid;
+
+    /* Layout standard: 0 a sinistra, 3 righe di numeri */
+
+    grid-template-columns: 50px repeat(12, 55px);
+
+    grid-template-rows: repeat(3, 55px);
+
+    gap: 2px;
+
+}
+
+
+
+.bet-spot {
+
+    display: flex; align-items: center; justify-content: center;
+
+    border: 1px solid #fff;
+
+    color: #fff;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    position: relative;
+
+    transition: background 0.2s;
+
+}
+
+.bet-spot:hover { filter: brightness(1.2); }
+
+
+
+.bet-spot.red { background-color: #d40000; }
+
+.bet-spot.black { background-color: #111; }
+
+.bet-spot.green { background-color: #006600; }
+
+
+
+.number-0 {
+
+    grid-row: 1 / 4; 
+
+    grid-column: 1 / 2;
+
+    border-radius: 5px 0 0 5px;
+
+    font-size: 1.5rem;
+
+}
+
+
+
+/* FICHES SUL TAVOLO */
+
+.bet-overlay {
+
+    position: absolute;
+
+    width: 35px; height: 35px;
+
+    background: url('../images/fiches.png') no-repeat center center;
+
+    background-size: cover;
+
+    display: none; 
+
+    justify-content: center; align-items: center;
+
+    color: #000;
+
+    font-size: 0.7rem; font-weight: bold;
+
+    text-shadow: 0 0 2px #fff;
+
+    z-index: 5;
+
+}
+
+.bet-overlay.active { display: flex; }
+
+
+
+/* CONTROLLI */
+
+.controls-panel {
+
+    display: flex; gap: 15px;
+
+}
+
+.ctrl-btn {
+
+    background: #333; color: #fff; border: 1px solid #777;
+
+    padding: 10px 20px; cursor: pointer; border-radius: 5px;
+
+}
+
+.spin-btn {
+
+    background: linear-gradient(180deg, #d4af37, #b8860b);
+
+    color: #000; padding: 15px 50px;
+
+    font-family: 'Cinzel', serif; font-weight: 900; font-size: 1.2rem;
+
+    border: none; border-radius: 50px;
+
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+
+    cursor: pointer;
+
+}
+
+.spin-btn:disabled { filter: grayscale(1); cursor: not-allowed; }
+
+/* GRIGLIA TAVOLO */
+
+.betting-board {
+
+    display: grid;
+
+    
+
+    grid-template-columns: 50px repeat(12, 55px) 50px;
+
+   
+
+    grid-template-rows: repeat(3, 55px) 45px 45px;
+
+    gap: 2px;
+
+}
+
+
+
+.bet-spot {
+
+    display: flex; align-items: center; justify-content: center;
+
+    border: 1px solid rgba(255,255,255,0.3);
+
+    color: #fff; font-weight: bold; cursor: pointer;
+
+    position: relative;
+
+    transition: background 0.2s;
+
+    font-size: 0.9rem;
+
+}
+
+.bet-spot:hover { background: rgba(255, 255, 255, 0.2); }
+
+
+
+/* Colori celle */
+
+.red { background-color: #d40000; }
+
+.black { background-color: #111; }
+
+.green { background-color: #006600; }
+
+
+
+/* Celle speciali */
+
+.number-0 { grid-row: 1 / 4; grid-column: 1 / 2; border-radius: 5px 0 0 5px; font-size: 1.5rem; }
+
+.col-bet { font-size: 0.8rem; writing-mode: vertical-rl; text-orientation: mixed; } /* Scritta verticale */
+
+.doz-bet, .simple-bet { font-size: 0.8rem; letter-spacing: 1px; }
+
+
+
+/* FIX FICHES */
+
+.bet-overlay {
+
+    position: absolute;
+
+    
+
+    top: 50%; left: 50%;
+
+    transform: translate(-50%, -50%);
+
+   
+
+    width: 32px; height: 32px; 
+
+    background: url('../images/fiches.png') no-repeat center center;
+
+    background-size: contain; 
+
+   
+
+    display: none; 
+
+    justify-content: center; align-items: center;
+
+   
+
+    color: #000; font-size: 0.7rem; font-weight: bold;
+
+    text-shadow: 0 0 2px #fff;
+
+    z-index: 10;
+
+    pointer-events: none; 
+
+   
+
+ 
+
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.8));
+
+}
+
+.bet-overlay.active { display: flex; }
+
+
+
+/* BOTTONI CONTROLLO */
+
+.controls-panel { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; }
+
+.ctrl-btn {
+
+    background: #333; color: #fff; border: 1px solid #777;
+
+    padding: 12px 20px; cursor: pointer; border-radius: 5px; font-weight: bold;
+
+    min-width: 100px;
+
+}
+
+.ctrl-btn:hover:not(:disabled) { background: #555; }
+
+.ctrl-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.red-btn { background: #500; border-color: #a00; }
+
+.red-btn:hover:not(:disabled) { background: #800; }
+
+
+
+.betting-table-container {
+
+    overflow-x: auto;
+
+    padding: 15px;
+
+    border: 12px solid #5a3a22; /* Bordo legno */
+
+    border-radius: 8px;
+
+    background: #063312;
+
+    box-shadow: inset 0 0 20px #000;
+
+    margin-top: 20px;
+
+    display: inline-block; 
+
+}
+
+
+
+.betting-board {
+
+    display: grid;
+
+    grid-template-columns: 50px repeat(12, 55px) 50px;
+
+    grid-template-rows: repeat(3, 55px) 45px 45px;
+
+    gap: 3px; 
+
+}
+
+
+
+.bet-spot {
+
+    display: flex; align-items: center; justify-content: center;
+
+    border: 1px solid rgba(255,255,255,0.2);
+
+    color: #fff;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    position: relative; 
+
+    transition: background 0.2s;
+
+    font-size: 0.9rem;
+
+    user-select: none;
+
+}
+
+.bet-spot:hover { background: rgba(255, 255, 255, 0.15); border-color: #fff; }
+
+
+
+.red { background-color: #d40000; }
+
+.black { background-color: #111; }
+
+.green { background-color: #006600; }
+
+
+
+/* Celle speciali */
+
+.number-0 { grid-row: 1 / 4; grid-column: 1 / 2; border-radius: 4px 0 0 4px; font-size: 1.5rem; }
+
+.col-bet { font-size: 0.75rem; writing-mode: vertical-rl; text-orientation: mixed; line-height: 1; }
+
+.doz-bet, .simple-bet { font-size: 0.8rem; letter-spacing: 1px; text-transform: uppercase; }
+
+
+
+/* FICHES SUL TAVOLO */
+
+.bet-overlay {
+
+    position: absolute;
+
+    top: 50%; left: 50%;
+
+    transform: translate(-50%, -50%); 
+
+   
+
+    width: 38px;  
+
+    height: 38px; 
+
+   
+
+    background-image: url('../images/fiches.png');
+
+    background-size: contain; 
+
+    background-repeat: no-repeat;
+
+    background-position: center;
+
+   
+
+    display: none; 
+
+    justify-content: center;
+
+    align-items: center;
+
+   
+
+    color: #000;
+
+    font-size: 0.75rem;
+
+    font-weight: 900;
+
+    text-shadow: 0 0 2px #fff;
+
+    z-index: 20;
+
+    pointer-events: none; 
+
+   
+
+    filter: drop-shadow(0 4px 3px rgba(0,0,0,0.6)); 
+
+}
+
+
+
+.bet-overlay.active { display: flex; }
+
+
+
+/* Stili Bottoni */
+
+.controls-panel { display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap; justify-content: center; width: 100%; }
+
+.ctrl-btn {
+
+    background: linear-gradient(to bottom, #444, #222);
+
+    color: #fff;
+
+    border: 1px solid #777;
+
+    padding: 12px 20px;
+
+    cursor: pointer;
+
+    border-radius: 6px;
+
+    font-weight: bold;
+
+    min-width: 110px;
+
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+
+}
+
+.ctrl-btn:hover:not(:disabled) { background: linear-gradient(to bottom, #555, #333); border-color: #fff; }
+
+.ctrl-btn:disabled { opacity: 0.4; cursor: not-allowed; box-shadow: none; }
+
+
+
+.red-btn { background: linear-gradient(to bottom, #800, #400); border-color: #a00; }
+
+.red-btn:hover:not(:disabled) { background: linear-gradient(to bottom, #a00, #600); }
+
+
+
+/* Ripristino stili base */
+
+.game-table-wrapper {
+
+    max-width: 1100px; margin: 20px auto; background: #0b3a18; border: 15px solid #2a1a0a; border-radius: 40px; padding: 30px;
+
+}
+
+.top-section { display: flex; justify-content: space-around; align-items: center; margin-bottom: 30px; }
+
+.wheel-container { position: relative; width: 300px; height: 300px; background: #000; border-radius: 50%; border: 8px solid #d4af37; }
+
+.wheel { width: 100%; height: 100%; border-radius: 50%; transition: transform 4s cubic-bezier(0.1, 0, 0.2, 1); }
+
+.wheel img { width: 100%; height: 100%; }
+
+.pointer { position: absolute; top: -15px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 2rem; z-index: 10; text-shadow: 0 2px 2px #000; }
+
+.ball-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; pointer-events: none; }
+
+.ball { position: absolute; top: 13%; left: 50%; transform: translateX(-50%); width: 12px; height: 12px; background: #fff; border-radius: 50%; box-shadow: 0 0 8px #fff; }
+
+.info-panel { background: rgba(0,0,0,0.5); border: 1px solid #d4af37; border-radius: 15px; padding: 20px; text-align: center; color: #fff; }
+
+.win-display { font-family: serif; font-size: 3rem; font-weight: bold; color: #d4af37; margin-bottom: 10px; }
+
+.chips-panel { display: flex; gap: 10px; background: rgba(0,0,0,0.4); padding: 10px 20px; border-radius: 50px; margin-bottom: 20px; }
+
+.chip { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; cursor: pointer; border: 2px dashed #fff; color: #fff; }
+
+.chip.selected { border-style: solid; box-shadow: 0 0 10px #fff; transform: scale(1.1); }
+
+.chip[data-value="5"] { background: #b00; }
+
+.chip[data-value="25"] { background: #090; }
+
+.chip[data-value="50"] { background: #009; }
+
+.chip[data-value="100"] { background: #111; border-color: gold; color: gold; }
+
+.chip.all-in { background: gold; color: #000; }
+
+.spin-btn { background: linear-gradient(180deg, #d4af37, #b8860b); color: #000; padding: 15px 40px; font-weight: 900; border: none; border-radius: 50px; cursor: pointer; font-size: 1.1rem; }

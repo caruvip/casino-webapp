@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Promozioni | Casino Online</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/promozioni.css">
+</head>
+<body>
+    <div class="user-bar" id="userBar"></div>
+    <header>
+        <h1>CASINO ONLINE</h1>
+        <nav>
+            <ul>
+                <li><a href="/giochi.html">Giochi</a></li>
+                <li><a href="/promozioni.html">Promozioni</a></li>
+                <li><a href="/chi-siamo.html">Chi Siamo</a></li>
+                <li><a href="/contatti.html">Contatti</a></li>
+            </ul>
+        </nav>    
+    </header>
+    <main>
+        <section>
+            <h2>Promozioni Attive</h2>
+            <div class="promo-grid">
+                <div class="promo-card">
+                    <div class="promo-tag">NUOVO</div>
+                    <h3>Bonus Benvenuto</h3>
+                    <p>Sul tuo primo deposito fino a</p>
+                    <span class="promo-value">€500</span>
+                    <button class="btn" onclick="window.location.href='ricarica.html'">Richiedi Ora</button>
+                </div>
+                <div class="promo-card">
+                    <h3>Giri Gratis</h3>
+                    <p>Ogni venerdì sulle slot</p>
+                    <span class="promo-value">50 SPINS</span>
+                    <button class="btn" onclick="window.location.href='giochi.html'">Gioca Ora</button>
+                </div>
+                <div class="promo-card">
+                    <h3>Cashback VIP</h3>
+                    <p>Ritorno sulle perdite settimanali</p>
+                    <span class="promo-value">10%</span>
+                    <button class="btn" onclick="window.location.href='user.html'">Vedi Livello</button>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer><p>&copy; 2025 777casino.it</p></footer>
+    <script type="module" src="/scripts/supabase-client.js"></script>
+    <script src="scripts/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="it">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Temple of God | Slot Machine</title>
+
+    <link rel="stylesheet" href="../styles/main.css" />
+    <link rel="stylesheet" href="../styles/slot.css" />
+  </head>
+  <body>
+    <div class="user-bar" id="userBar"></div>
+
+    <header>
+      <h1>SLOT MACHINE</h1>
+      <nav>
+          <ul>
+              <li><a href="../index.html">Home</a></li>
+              <li><a href="../giochi.html">Giochi</a></li>
+          </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="slot-section">
+        <h2 style="color: #ffd700; text-shadow: 0 0 10px #000; margin-bottom: 20px;">
+          La scommessa degli Dei
+        </h2>
+
+        <div class="slot-cabinet">
+          <div class="cabinet-frame">
+            <div id="slot-machine-container">
+              <div id="slot-grid"></div>
+            </div>
+          </div>
+
+          <div id="controls">
+            
+            <div class="control-group left">
+                <div class="lcd-display">
+                  <span class="label">SALDO</span>
+                  <span id="balance-display" class="value">---</span>
+                </div>
+            </div>
+
+            <div class="control-group center bet-area">
+              <button id="bet-minus-button" class="gold-btn small-btn">-</button>
+              <div class="lcd-display small">
+                <span class="label">PUNTATA</span>
+                <span id="bet-display" class="value">0</span>
+              </div>
+              <button id="bet-plus-button" class="gold-btn small-btn">+</button>
+            </div>
+
+            <div class="control-group right actions">
+                <button id="turbo-button" class="turbo-btn">⚡ TURBO</button>
+                <button id="spin-button" class="gold-btn spin-btn">GIRA</button>
+            </div>
+
+          </div>
+
+          <div id="message-bar" class="message-bar">
+             Buona Fortuna!
+          </div>
+
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2025 777casino.it | Tutti i diritti riservati</p>
+    </footer>
+
+    <script src="../scripts/auth.js"></script>
+    <script src="../giochi+script/slot.js"></script>
+  </body>
+</html>

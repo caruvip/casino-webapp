@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Texas Hold'em VIP | Casino Online</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/poker.css">
+</head>
+<body>
+
+    <div class="user-bar" id="userBar"></div>
+
+    <header>
+        <h1>TEXAS HOLD'EM</h1>
+        <nav>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../giochi.html">Giochi</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div class="poker-room">
+            
+            <div id="start-screen" class="start-screen">
+                <div class="start-content">
+                    <h2>TAVOLO VIP</h2>
+                    <p>Sfida 4 Bot intelligenti.</p>
+                    <button class="btn-play" onclick="startGameManual()">SIEDITI E GIOCA</button>
+                </div>
+            </div>
+
+            <div id="game-table">
+                
+                <div class="table-logo">TEXAS HOLD'EM<br><span>VIP CLUB</span></div>
+
+                <div id="center-area">
+                    <div id="pot-container">
+                        <span class="label">PIATTO</span>
+                        <span id="pot-amount" class="gold-text">0</span>
+                    </div>
+                    <div id="community-cards">
+                        <div class="card placeholder" id="comm-card-0"></div>
+                        <div class="card placeholder" id="comm-card-1"></div>
+                        <div class="card placeholder" id="comm-card-2"></div>
+                        <div class="card placeholder" id="comm-card-3"></div>
+                        <div class="card placeholder" id="comm-card-4"></div>
+                    </div>
+                </div>
+
+                <div id="player-0" class="player-panel">
+                    <div class="player-info">Bot 1</div>
+                    <div class="player-chips">€ 0</div>
+                    <div class="player-cards"></div>
+                </div>
+
+                <div id="player-1" class="player-panel">
+                    <div class="player-info">Bot 2</div>
+                    <div class="player-chips">€ 0</div>
+                    <div class="player-cards"></div>
+                </div>
+
+                <div id="player-2" class="player-panel">
+                    <div class="player-info">Bot 3</div>
+                    <div class="player-chips">€ 0</div>
+                    <div class="player-cards"></div>
+                </div>
+
+                <div id="player-4" class="player-panel">
+                    <div class="player-info">Bot 4</div>
+                    <div class="player-chips">€ 0</div>
+                    <div class="player-cards"></div>
+                </div>
+
+                <div id="player-3" class="player-panel active">
+                    <div class="player-info" id="my-player-name">Tu</div>
+                    <div class="player-chips" id="player-balance-el">€ 0</div>
+                    <div class="player-cards"></div>
+                    
+                    <div id="my-hand-strength" class="hand-strength-label"></div>
+                    
+                    <div id="human-actions"></div>
+                </div>
+
+            </div>
+            
+            <div id="game-log" class="game-log">
+                <p>Premi su "GIOCA" per iniziare la partita.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 777casino.it | Tutti i diritti riservati</p>
+    </footer>
+
+    <script src="../scripts/auth.js"></script>
+    <script src="poker.js"></script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roulette Royale | Casino Online</title>
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/roulette.css">
+</head>
+<body>
+    <div class="user-bar" id="userBar"></div>
+    <header>
+        <h1>ROULETTE PRO</h1>
+        <nav>
+            <ul>
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="../giochi.html">Giochi</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <div class="game-table-wrapper">
+            <div class="top-section">
+                <div class="wheel-container">
+                    <div class="pointer">▼</div>
+                    <div id="wheel" class="wheel">
+                        <img src="../images/roulette.png" alt="Roulette Wheel">
+                    </div>
+                    <div id="ball-container" class="ball-container">
+                        <div id="ball" class="ball"></div>
+                    </div>
+                </div>
+                <div class="info-panel">
+                    <div class="display-box">
+                        <div id="winning-number-display" class="win-display">--</div>
+                    </div>
+                    <div class="stats-box">
+                        <p>SALDO: <span id="bank-value" class="gold">---</span></p>
+                        <p>PUNTATA: <span id="current-bet" class="gold">0</span></p>
+                    </div>
+                    <div id="message-area" class="message-area">Piazza le tue puntate</div>
+                </div>
+            </div>
+            <div class="bottom-section">
+                <div class="chips-panel">
+                    <div class="chip" data-value="5" onclick="selectChip(5)">5</div>
+                    <div class="chip" data-value="25" onclick="selectChip(25)">25</div>
+                    <div class="chip" data-value="50" onclick="selectChip(50)">50</div>
+                    <div class="chip" data-value="100" onclick="selectChip(100)">100</div>
+                    <div class="chip all-in" onclick="selectChip('all-in')">ALL</div>
+                </div>
+                <div class="betting-table-container">
+                    <div id="betting-board" class="betting-board">
+                        <div class="bet-spot number-0 green" data-id="0" onclick="placeBet('0', 35)">0<div class="bet-overlay"></div></div>
+                        <div class="bet-spot col-bet" data-id="col3" style="grid-row: 1; grid-column: 14;" onclick="placeBet('col3', 2)">2:1<div class="bet-overlay"></div></div>
+                        <div class="bet-spot col-bet" data-id="col2" style="grid-row: 2; grid-column: 14;" onclick="placeBet('col2', 2)">2:1<div class="bet-overlay"></div></div>
+                        <div class="bet-spot col-bet" data-id="col1" style="grid-row: 3; grid-column: 14;" onclick="placeBet('col1', 2)">2:1<div class="bet-overlay"></div></div>
+                        <div class="bet-spot doz-bet" data-id="1st12" style="grid-row: 4; grid-column: 2 / 6;" onclick="placeBet('1st12', 2)">1st 12<div class="bet-overlay"></div></div>
+                        <div class="bet-spot doz-bet" data-id="2nd12" style="grid-row: 4; grid-column: 6 / 10;" onclick="placeBet('2nd12', 2)">2nd 12<div class="bet-overlay"></div></div>
+                        <div class="bet-spot doz-bet" data-id="3rd12" style="grid-row: 4; grid-column: 10 / 14;" onclick="placeBet('3rd12', 2)">3rd 12<div class="bet-overlay"></div></div>
+                        <div class="bet-spot simple-bet" data-id="1-18" style="grid-row: 5; grid-column: 2 / 4;" onclick="placeBet('1-18', 1)">1-18<div class="bet-overlay"></div></div>
+                        <div class="bet-spot simple-bet" data-id="even" style="grid-row: 5; grid-column: 4 / 6;" onclick="placeBet('even', 1)">PARI<div class="bet-overlay"></div></div>
+                        <div class="bet-spot simple-bet red" data-id="red" style="grid-row: 5; grid-column: 6 / 8;" onclick="placeBet('red', 1)">ROSSO<div class="bet-overlay"></div></div>
+                        <div class="bet-spot simple-bet black" data-id="black" style="grid-row: 5; grid-column: 8 / 10;" onclick="placeBet('black', 1)">NERO<div class="bet-overlay"></div></div>
+                        <div class="bet-spot simple-bet" data-id="odd" style="grid-row: 5; grid-column: 10 / 12;" onclick="placeBet('odd', 1)">DISPARI<div class="bet-overlay"></div></div>
+                        <div class="bet-spot simple-bet" data-id="19-36" style="grid-row: 5; grid-column: 12 / 14;" onclick="placeBet('19-36', 1)">19-36<div class="bet-overlay"></div></div>
+                    </div>
+                </div>
+                <div class="controls-panel">
+                    <button id="undo-btn" class="ctrl-btn" onclick="undoLastBet()" disabled>↩ UNDO</button>
+                    <button id="rebet-btn" class="ctrl-btn" onclick="rebet()" disabled>↺ RIPUNTA</button>
+                    <button id="double-btn" class="ctrl-btn" onclick="doubleBets()" disabled>x2 RADDOPPIA</button>
+                    <button id="spin-btn" class="spin-btn" onclick="spinWheel()">GIRA LA RUOTA</button>
+                    <button id="clear-btn" class="ctrl-btn red-btn" onclick="clearBets()" disabled>✖ PULISCI</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer><p>&copy; 2025 777casino.it</p></footer>
+    <script src="../scripts/auth.js"></script>
+    <script src="roulette.js"></script>
+</body>
+</html>

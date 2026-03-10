@@ -1,0 +1,628 @@
+/* --- holdem_mechanics.js --- */
+
+// Costanti di gioco
+const PLAYER_COUNT = 6;
+const STARTING_CHIPS = 1000;
+const HUMAN_PLAYER_INDEX = 3; 
+const SMALL_BLIND = 10;
+const BIG_BLIND = 20;
+const CARD_IMAGE_URL = 'https://deckofcardsapi.com/static/img/'; 
+const CARD_BACK_IMAGE = 'https://www.printableplayingcards.net/wp-content/uploads/2013/05/playing-card-back-1.png';
+
+// Enum e Strutture
+const Round = { PRE_FLOP: 0, FLOP: 1, TURN: 2, RIVER: 3, SHOWDOWN: 4 };
+const Action = { FOLD: 'FOLD', CALL: 'CALL', RAISE: 'RAISE', CHECK: 'CHECK', BET: 'BET' };
+const Suit = { C: 'C', D: 'D', H: 'H', S: 'S' }; // Fiori, Quadri, Cuori, Picche
+const Rank = {
+    _2: { val: "2", num: 2 }, _3: { val: "3", num: 3 }, _4: { val: "4", num: 4 }, 
+    _5: { val: "5", num: 5 }, _6: { val: "6", num: 6 }, _7: { val: "7", num: 7 }, 
+    _8: { val: "8", num: 8 }, _9: { val: "9", num: 9 }, T: { val: "10", num: 10 },
+    J: { val: "J", num: 11 }, Q: { val: "Q", num: 12 }, K: { val: "K", num: 13 }, 
+    A: { val: "A", num: 14 }
+};
+
+class Card {
+    constructor(suit, rank) {
+        this.suit = suit;
+        this.rank = rank;
+    }
+    getImageName() {
+        return (this.rank.val === "10" ? '0' : this.rank.val) + this.suit;
+    }
+}
+
+class Deck {
+    constructor() {
+        this.reset();
+    }
+    reset() {
+        this.cards = [];
+        for (const s of Object.values(Suit)) {
+            for (const r of Object.values(Rank)) {
+                this.cards.push(new Card(s, r));
+            }
+        }
+        this.shuffle();
+    }
+    shuffle() {
+        for (let i = this.cards.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [this.cards[i], this.cards[j]] = [this.cards[j], this.cards[i]];
+        }
+    }
+    draw() {
+        return this.cards.pop();
+    }
+}
+
+class Player {
+    constructor(name, chips, isHuman = false) {
+        this.name = name;
+        this.chips = chips;
+        this.isHuman = isHuman;
+        this.resetForHand();
+    }
+    resetForHand() {
+        this.holeCards = [];
+        this.folded = false;
+        this.actedThisRound = false;
+        this.currentBet = 0;
+    }
+    bet(amount) {
+        const actual = Math.min(amount, this.chips);
+        this.chips -= actual;
+        this.currentBet += actual;
+        return actual;
+    }
+    isAllIn() {
+        return this.chips === 0;
+    }
+}
+
+class TexasHoldemGame {
+    constructor() {
+        this.tableElement = document.getElementById('game-table');
+        this.potLabel = document.getElementById('pot-amount');
+        this.logElement = document.getElementById('game-log');
+        this.initGameLogic();
+        this.createPlayerPanels();
+        this.startHand();
+    }
+
+    log(message) {
+        if(this.logElement) {
+            this.logElement.innerText = message;
+        }
+        console.log(message);
+    }
+
+    initGameLogic() {
+        this.deck = new Deck();
+        this.players = [];
+        for (let i = 0; i < PLAYER_COUNT; i++) {
+            const isHuman = (i === HUMAN_PLAYER_INDEX);
+            const name = isHuman ? "TU" : `BOT ${i}`;
+            this.players.push(new Player(name, STARTING_CHIPS, isHuman));
+        }
+        this.communityCards = [];
+        this.dealerIndex = Math.floor(Math.random() * PLAYER_COUNT);
+        this.pot = 0;
+    }
+    
+    createPlayerPanels() {
+        this.playerPanels = [];
+        for (let i = 0; i < this.players.length; i++) {
+            const player = this.players[i];
+            const panel = document.createElement('div');
+            panel.className = 'player-panel';
+            panel.id = `player-${i}`;
+            
+            let actionsHtml = '';
+            if (player.isHuman) {
+                actionsHtml = `
+                    <div id="human-actions">
+                        <button data-action="fold">Fold</button>
+                        <button data-action="call">Call</button>
+                        <button data-action="check">Check</button>
+                        <button data-action="raise">Raise</button>
+                    </div>
+                `;
+            }
+
+            panel.innerHTML = `
+                <div class="action-bubble"></div>
+                <div class="player-info">
+                    ${player.name}
+                    <span class="marker dealer-marker" style="display:none;">D</span>
+                    <span class="marker blind-marker" style="display:none;"></span>
+                </div>
+                <div class="player-chips">Chips: <span class="val">${player.chips}</span></div>
+                <div class="player-cards">
+                    <div class="card card-hole-1"></div>
+                    <div class="card card-hole-2"></div>
+                </div>
+                ${actionsHtml}
+            `;
+            this.tableElement.appendChild(panel);
+            this.playerPanels.push(panel);
+
+            if (player.isHuman) {
+                panel.querySelector('#human-actions').addEventListener('click', (e) => this.handleHumanAction(e));
+            }
+        }
+    }
+
+    startHand() {
+        this.deck.reset();
+        this.communityCards = [];
+        this.pot = 0;
+        this.currentRound = Round.PRE_FLOP;
+        this.currentMaxBet = 0;
+        
+        this.players.forEach(p => p.resetForHand());
+        
+        this.dealerIndex = (this.dealerIndex + 1) % PLAYER_COUNT;
+        while(this.players[this.dealerIndex].chips <= 0) {
+            this.dealerIndex = (this.dealerIndex + 1) % PLAYER_COUNT;
+        }
+        
+        const { sbIndex, bbIndex } = this.postBlinds();
+        this.dealHoleCards();
+        
+        this.currentPlayerIndex = (bbIndex + 1) % PLAYER_COUNT;
+        
+        this.updateGUI();
+        this.nextTurn();
+    }
+
+    postBlinds() {
+        const getNextActivePlayer = (startIndex) => {
+            let index = startIndex;
+            do {
+                index = (index + 1) % PLAYER_COUNT;
+            } while (this.players[index].chips === 0);
+            return index;
+        };
+
+        const sbIndex = getNextActivePlayer(this.dealerIndex);
+        const bbIndex = getNextActivePlayer(sbIndex);
+
+        this.players[sbIndex].bet(SMALL_BLIND);
+        this.players[bbIndex].bet(BIG_BLIND);
+        this.pot = SMALL_BLIND + BIG_BLIND;
+
+        this.currentMaxBet = BIG_BLIND;
+        return { sbIndex, bbIndex };
+    }
+
+    dealHoleCards() {
+        for (let i = 0; i < 2; i++) {
+            for (let j = 0; j < PLAYER_COUNT; j++) {
+                const playerIndex = (this.dealerIndex + 1 + j) % PLAYER_COUNT;
+                if (this.players[playerIndex].chips > 0) {
+                    this.players[playerIndex].holeCards.push(this.deck.draw());
+                }
+            }
+        }
+    }
+    
+    nextTurn() {
+        const activePlayers = this.players.filter(p => !p.folded);
+        if (activePlayers.length <= 1) {
+            this.endRound();
+            return;
+        }
+
+        const bettingPlayers = this.players.filter(p => !p.folded && !p.isAllIn());
+        const allActed = bettingPlayers.every(p => p.actedThisRound);
+        const allBetsMatched = activePlayers.every(p => p.currentBet === this.currentMaxBet || p.isAllIn());
+
+        if (allActed && allBetsMatched) {
+            this.endRound();
+            return;
+        }
+        
+        let nextPlayer = this.players[this.currentPlayerIndex];
+        while(nextPlayer.folded || nextPlayer.isAllIn()) {
+            this.currentPlayerIndex = (this.currentPlayerIndex + 1) % PLAYER_COUNT;
+            nextPlayer = this.players[this.currentPlayerIndex];
+        }
+
+        this.updateGUI();
+        this.handlePlayerAction();
+    }
+
+    handlePlayerAction() {
+        const player = this.players[this.currentPlayerIndex];
+        if (player.isHuman) {
+            this.log("Tocca a te!");
+            this.setHumanActionsEnabled(true);
+        } else {
+            this.log(`Tocca a ${player.name}...`);
+            this.setHumanActionsEnabled(false);
+            this.handleBotTurn(player);
+        }
+    }
+    
+    handleBotTurn(bot) {
+        setTimeout(() => {
+            const toCall = this.currentMaxBet - bot.currentBet;
+            const canCheck = toCall <= 0;
+            const r = Math.random();
+            let action = Action.FOLD;
+            let amount = 0;
+
+            if (canCheck) {
+                // I bot fanno check più spesso se non hanno nulla
+                action = (r < 0.8) ? Action.CHECK : Action.BET;
+                if (action === Action.BET) amount = BIG_BLIND;
+            } else {
+                if (r < 0.6) action = Action.CALL;
+                else if (r < 0.85) action = Action.RAISE;
+                else action = Action.FOLD;
+                if (action === Action.RAISE) amount = BIG_BLIND;
+            }
+
+            if (action === Action.RAISE && bot.chips <= toCall + amount) action = Action.CALL;
+            if (action === Action.CALL && bot.chips < toCall) action = Action.FOLD;
+            if (action === Action.BET && bot.chips < amount) action = Action.CALL;
+            
+            this.processAction(this.currentPlayerIndex, action, amount);
+
+        }, 800 + Math.random() * 700);
+    }
+
+    handleHumanAction(event) {
+        const button = event.target.closest('button');
+        if (!button || button.disabled) return;
+
+        const action = button.dataset.action.toUpperCase();
+        let amount = 0;
+
+        if (action === Action.RAISE || action === Action.BET) {
+            const player = this.players[HUMAN_PLAYER_INDEX];
+            const toCall = this.currentMaxBet - player.currentBet;
+            const minRaise = BIG_BLIND;
+            const promptMsg = `Rilanciare (minimo ${minRaise}). Chips disponibili: ${player.chips - toCall}`;
+            const val = prompt(promptMsg, minRaise);
+            if (val === null) return; 
+            amount = parseInt(val, 10);
+            if (isNaN(amount) || amount < minRaise) {
+                alert(`Importo non valido.`);
+                return;
+            }
+             if (amount > (player.chips - toCall)) amount = player.chips - toCall;
+        }
+        
+        this.setHumanActionsEnabled(false);
+        this.processAction(HUMAN_PLAYER_INDEX, action, amount);
+    }
+
+    processAction(playerIndex, action, amount) {
+        const player = this.players[playerIndex];
+        player.actedThisRound = true;
+        let bubbleText = action;
+        let bubbleType = 'act-check';
+
+        switch (action) {
+            case Action.FOLD:
+                player.folded = true;
+                bubbleType = 'act-fold';
+                break;
+            case Action.CHECK:
+                bubbleType = 'act-check';
+                break;
+            case Action.CALL:
+                const amountToCall = this.currentMaxBet - player.currentBet;
+                const calledAmount = player.bet(amountToCall);
+                this.pot += calledAmount;
+                bubbleText = `CALL ${calledAmount}`;
+                bubbleType = 'act-call';
+                break;
+            case Action.BET: 
+            case Action.RAISE:
+                const toCall = this.currentMaxBet - player.currentBet;
+                const totalBet = toCall + amount;
+                const betAmount = player.bet(totalBet);
+                this.pot += betAmount;
+                this.currentMaxBet = player.currentBet;
+                this.players.forEach((p, i) => { if (i !== playerIndex && !p.folded) p.actedThisRound = false; });
+                
+                if(action === Action.BET) {
+                    bubbleText = `BET ${amount}`;
+                    bubbleType = 'act-bet';
+                } else {
+                    bubbleText = `RAISE ${amount}`;
+                    bubbleType = 'act-raise';
+                }
+                break;
+        }
+
+        this.triggerActionBubble(playerIndex, bubbleText, bubbleType);
+        this.currentPlayerIndex = (this.currentPlayerIndex + 1) % PLAYER_COUNT;
+        this.nextTurn();
+    }
+
+    triggerActionBubble(playerIndex, text, typeClass) {
+        const panel = this.playerPanels[playerIndex];
+        const bubble = panel.querySelector('.action-bubble');
+        
+        bubble.className = 'action-bubble';
+        bubble.textContent = text;
+        bubble.classList.add(typeClass);
+        void bubble.offsetWidth; 
+        bubble.classList.add('show');
+        
+        setTimeout(() => {
+            bubble.classList.remove('show');
+        }, 1500);
+    }
+
+    endRound() {
+        this.players.forEach(p => {
+            p.currentBet = 0;
+            p.actedThisRound = false;
+        });
+        this.currentMaxBet = 0;
+
+        const activePlayers = this.players.filter(p => !p.folded);
+        if (activePlayers.length <= 1) {
+            this.doShowdown();
+            return;
+        }
+
+        this.currentRound++;
+        
+        if (this.currentRound === Round.FLOP) {
+            this.deck.draw();
+            this.communityCards.push(this.deck.draw(), this.deck.draw(), this.deck.draw());
+        } else if (this.currentRound === Round.TURN || this.currentRound === Round.RIVER) {
+            this.deck.draw();
+            this.communityCards.push(this.deck.draw());
+        }
+        
+        if (this.currentRound === Round.SHOWDOWN) {
+            this.doShowdown();
+            return;
+        }
+        
+        this.currentPlayerIndex = (this.dealerIndex + 1) % PLAYER_COUNT;
+        this.nextTurn();
+    }
+    
+    doShowdown() {
+        this.updateGUI(true);
+        const contenders = this.players.filter(p => !p.folded);
+        let winner = contenders[0];
+
+        if (contenders.length > 1) {
+            let bestHand = { player: null, score: -1, tieBreaker: -1, description: '' };
+            
+            for (const player of contenders) {
+                const allCards = [...this.communityCards, ...player.holeCards];
+                const res = this.evaluateHand(allCards);
+                
+                // Logica di confronto completa con Tie-Breaker
+                if (res.score > bestHand.score || (res.score === bestHand.score && res.tieBreaker > bestHand.tieBreaker)) {
+                    bestHand = { player, score: res.score, tieBreaker: res.tieBreaker, description: res.description };
+                }
+            }
+            winner = bestHand.player;
+            const winIdx = this.players.indexOf(winner);
+            this.triggerActionBubble(winIdx, "WINNER!", "act-win");
+            alert(`${winner.name} vince ${this.pot} con ${bestHand.description}`);
+        } else {
+             const winIdx = this.players.indexOf(winner);
+             this.triggerActionBubble(winIdx, "WINNER!", "act-win");
+             alert(`${winner.name} vince ${this.pot} (avversari fold).`);
+        }
+        
+        winner.chips += this.pot;
+        this.updateGUI(true);
+        setTimeout(() => { this.startHand(); }, 4000); // 4 secondi per vedere le carte
+    }
+
+    // --- NUOVA LOGICA DI VALUTAZIONE MANO COMPLETA ---
+    evaluateHand(sevenCards) {
+        // Ordina le carte per valore decrescente (A=14 ... 2=2)
+        const sortedCards = sevenCards.sort((a, b) => b.rank.num - a.rank.num);
+
+        // Funzioni Helper
+        const getFlush = (cards) => {
+            const suits = {};
+            cards.forEach(c => suits[c.suit] = (suits[c.suit] || 0) + 1);
+            const flushSuit = Object.keys(suits).find(s => suits[s] >= 5);
+            if (flushSuit) {
+                return cards.filter(c => c.suit === flushSuit).slice(0, 5);
+            }
+            return null;
+        };
+
+        const getStraight = (cards) => {
+            const uniqueRanks = [...new Set(cards.map(c => c.rank.num))];
+            // Controllo scala normale
+            for (let i = 0; i <= uniqueRanks.length - 5; i++) {
+                if (uniqueRanks[i] - uniqueRanks[i+4] === 4) {
+                    return uniqueRanks[i]; // Restituisce il valore più alto della scala
+                }
+            }
+            // Controllo scala A-5 (Ace low: 14, 5, 4, 3, 2)
+            if (uniqueRanks.includes(14) && uniqueRanks.includes(2) && uniqueRanks.includes(3) && uniqueRanks.includes(4) && uniqueRanks.includes(5)) {
+                return 5; // La carta più alta della scala A-5 è il 5
+            }
+            return null;
+        };
+
+        const getGroups = (cards) => {
+            const counts = {};
+            cards.forEach(c => counts[c.rank.num] = (counts[c.rank.num] || 0) + 1);
+            // Crea array di gruppi [ [rank, count], [rank, count] ] ordinati per count DESC, poi rank DESC
+            const groups = Object.entries(counts).map(([r, c]) => [parseInt(r), c]);
+            groups.sort((a, b) => {
+                if (b[1] !== a[1]) return b[1] - a[1]; // Prima per numero di carte (4, 3, 2)
+                return b[0] - a[0]; // Poi per valore della carta
+            });
+            return groups;
+        };
+
+        // 1. Controllo Scala Reale o Scala Colore (Opzionale avanzato, qui lo semplifichiamo controllando Colore + Scala separati per ora, o se vuoi essere preciso)
+        const flushCards = getFlush(sortedCards);
+        const straightHigh = getStraight(sortedCards);
+        
+        // Se c'è colore, controlliamo se è una scala colore
+        if (flushCards) {
+            const straightFlushHigh = getStraight(flushCards);
+            if (straightFlushHigh) {
+                return { score: 9, tieBreaker: straightFlushHigh, description: "Scala Colore" };
+            }
+        }
+
+        const groups = getGroups(sortedCards);
+        // groups[0] è il gruppo più numeroso (es: Poker o Tris)
+        
+        // 2. Poker (4 uguali)
+        if (groups[0][1] === 4) {
+            return { score: 8, tieBreaker: groups[0][0], description: `Poker di ${this.getRankName(groups[0][0])}` };
+        }
+
+        // 3. Full (3 uguali + 2 uguali)
+        if (groups[0][1] === 3 && groups.length > 1 && groups[1][1] >= 2) {
+            return { score: 7, tieBreaker: groups[0][0], description: `Full di ${this.getRankName(groups[0][0])} e ${this.getRankName(groups[1][0])}` };
+        }
+
+        // 4. Colore
+        if (flushCards) {
+            // Tie breaker è la somma o la carta alta del colore
+            return { score: 6, tieBreaker: flushCards[0].rank.num, description: `Colore al ${this.getRankName(flushCards[0].rank.num)}` };
+        }
+
+        // 5. Scala
+        if (straightHigh) {
+            return { score: 5, tieBreaker: straightHigh, description: `Scala al ${this.getRankName(straightHigh)}` };
+        }
+
+        // 6. Tris
+        if (groups[0][1] === 3) {
+            return { score: 4, tieBreaker: groups[0][0], description: `Tris di ${this.getRankName(groups[0][0])}` };
+        }
+
+        // 7. Doppia Coppia
+        if (groups[0][1] === 2 && groups.length > 1 && groups[1][1] === 2) {
+            return { score: 3, tieBreaker: groups[0][0], description: `Doppia Coppia ${this.getRankName(groups[0][0])} e ${this.getRankName(groups[1][0])}` };
+        }
+
+        // 8. Coppia
+        if (groups[0][1] === 2) {
+            return { score: 2, tieBreaker: groups[0][0], description: `Coppia di ${this.getRankName(groups[0][0])}` };
+        }
+
+        // 9. Carta Alta
+        return { score: 1, tieBreaker: sortedCards[0].rank.num, description: `Carta Alta ${this.getRankName(sortedCards[0].rank.num)}` };
+    }
+
+    getRankName(num) {
+        const r = Object.values(Rank).find(r => r.num === num);
+        return r ? r.val : '';
+    }
+            
+    updateGUI(showdown = false) {
+        this.potLabel.textContent = this.pot;
+        
+        for (let i = 0; i < 5; i++) {
+            const cardElem = document.getElementById(`comm-card-${i}`);
+            if (this.communityCards[i]) {
+                cardElem.style.backgroundImage = `url(${CARD_IMAGE_URL}${this.communityCards[i].getImageName()}.png)`;
+                cardElem.classList.remove('placeholder');
+            } else {
+                cardElem.style.backgroundImage = 'none';
+                cardElem.classList.add('placeholder');
+            }
+        }
+
+        const { sbIndex, bbIndex } = this.getBlindIndexes();
+        
+        this.players.forEach((player, i) => {
+            const panel = this.playerPanels[i];
+            panel.querySelector('.val').textContent = player.chips;
+            
+            const showHole = player.isHuman || (showdown && !player.folded);
+            const card1Elem = panel.querySelector('.card-hole-1');
+            const card2Elem = panel.querySelector('.card-hole-2');
+            
+            if (player.holeCards.length > 0) {
+                if (showHole) {
+                    card1Elem.style.backgroundImage = `url(${CARD_IMAGE_URL}${player.holeCards[0].getImageName()}.png)`;
+                    card2Elem.style.backgroundImage = `url(${CARD_IMAGE_URL}${player.holeCards[1].getImageName()}.png)`;
+                } else {
+                    card1Elem.style.backgroundImage = `url(${CARD_BACK_IMAGE})`;
+                    card2Elem.style.backgroundImage = `url(${CARD_BACK_IMAGE})`;
+                }
+            } else {
+                card1Elem.style.backgroundImage = 'none';
+                card2Elem.style.backgroundImage = 'none';
+            }
+
+            if (player.folded) {
+                panel.classList.add('folded-panel');
+                panel.classList.remove('active');
+            } else {
+                panel.classList.remove('folded-panel');
+                if (i === this.currentPlayerIndex && !showdown) {
+                    panel.classList.add('active');
+                } else {
+                    panel.classList.remove('active');
+                }
+            }
+
+            panel.querySelector('.dealer-marker').style.display = (i === this.dealerIndex) ? 'flex' : 'none';
+            const blindMarker = panel.querySelector('.blind-marker');
+            if (i === sbIndex) { blindMarker.textContent = 'SB'; blindMarker.style.display = 'flex'; }
+            else if (i === bbIndex) { blindMarker.textContent = 'BB'; blindMarker.style.display = 'flex'; }
+            else { blindMarker.style.display = 'none'; }
+        });
+    }
+
+    setHumanActionsEnabled(enabled) {
+        const player = this.players[HUMAN_PLAYER_INDEX];
+        const actionsDiv = this.playerPanels[HUMAN_PLAYER_INDEX].querySelector('#human-actions');
+        
+        if (player.folded || player.isAllIn() || player.chips === 0) {
+            enabled = false;
+        }
+
+        const buttons = actionsDiv.querySelectorAll('button');
+        buttons.forEach(b => b.disabled = !enabled);
+
+        if (!enabled) return;
+
+        const toCall = this.currentMaxBet - player.currentBet;
+        
+        actionsDiv.querySelector('[data-action="fold"]').disabled = false;
+        actionsDiv.querySelector('[data-action="check"]').disabled = toCall > 0;
+        
+        const callBtn = actionsDiv.querySelector('[data-action="call"]');
+        callBtn.disabled = toCall <= 0;
+        callBtn.textContent = toCall > 0 ? `Call ${Math.min(toCall, player.chips)}` : 'Call';
+        
+        const raiseBtn = actionsDiv.querySelector('[data-action="raise"]');
+        raiseBtn.disabled = player.chips <= toCall;
+        raiseBtn.textContent = this.currentMaxBet > 0 ? 'Raise' : 'Bet';
+    }
+
+    getBlindIndexes() {
+        const getNextActivePlayer = (startIndex) => {
+            let index = startIndex;
+            do {
+                index = (index + 1) % PLAYER_COUNT;
+            } while (this.players[index].chips === 0);
+            return index;
+        };
+        const sbIndex = getNextActivePlayer(this.dealerIndex);
+        const bbIndex = getNextActivePlayer(sbIndex);
+        return { sbIndex, bbIndex };
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    window.texasHoldemGame = new TexasHoldemGame();
+});

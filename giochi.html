@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Giochi | Casino Online</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/giochi.css">
+    <style>
+        /* Fix Footer specifico */
+        body { display: flex; flex-direction: column; min-height: 100vh; }
+        main { flex: 1; }
+        .play-btn { display: inline-block; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="user-bar" id="userBar">
+        <!-- User status will be injected here by auth.js -->
+    </div>
+
+    <header>
+        <h1>CASINO ONLINE</h1>
+        <nav>
+            <ul>
+                <li><a href="/index.html">Home</a></li>
+                
+                <li><a href="/promozioni.html">Promozioni</a></li>
+                <li><a href="/chi-siamo.html">Chi Siamo</a></li>
+                <li><a href="/contatti.html">Contatti</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>I Nostri Giochi</h2>
+            <div class="game-container">
+                <div class="card-game">
+                    <img src="/images/roulette.png" alt="Roulette">
+                    <h3>Roulette</h3>
+                    <p>Punta sul tuo numero fortunato.</p>
+                    <a href="/giochi+script/roulette.html" class="btn play-btn">Gioca Ora</a>
+                </div>
+                <div class="card-game">
+                    <img src="/images/slot.png" alt="Slot">
+                    <h3>Slot Machine</h3>
+                    <p>Gira i rulli e cerca il Jackpot.</p>
+                    <a href="/giochi+script/slot.html" class="btn play-btn">Gioca Ora</a>
+                </div>
+                <div class="card-game">
+                    <img src="/images/blackjacktipo.png" alt="Blackjack">
+                    <h3>Blackjack</h3>
+                    <p>Sfida il banco a fare 21.</p>
+                    <a href="/giochi+script/blackjack.html" class="btn play-btn">Gioca Ora</a>
+                </div>
+                <div class="card-game">
+                    <img src="/images/blackjacktipo.png" alt="Poker">
+                    <h3>Poker</h3>
+                    <p>Gioca con le tue carte e vinci.</p>
+                    <a href="/giochi+script/poker.html" class="btn play-btn">Gioca Ora</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 777casino.it | Tutti i diritti riservati</p>
+    </footer>
+
+    <script type="module" src="/scripts/supabase-client.js"></script>
+    <script src="/scripts/auth.js"></script>
+</body>
+</html>
