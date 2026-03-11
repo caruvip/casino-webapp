@@ -12,7 +12,7 @@ This repository contains the source code for an online casino website, "777casin
 - User Profile: A personal dashboard (user.html) where players can view their game statistics, which are also visualized through charts (using Chart.js).
 - Credit Management: A section for reloading the user's game account.
 - Static Pages: Includes informational sections like "About Us" and "Contact."
-- Frontend: HTML5, CSS3, JavaScript
+- Frontend: HTML, CSS, JavaScript
 - Backend & Database: Supabase - used for authentication, the PostgreSQL database, and real-time APIs.
 - JavaScript Libraries: Chart.js - for displaying charts in the user statistics section.
 - Based on the aggiornamenti.txt file, here is a roadmap of planned features for the future:
@@ -25,6 +25,6 @@ This repository contains the source code for an online casino website, "777casin
   - Track total playtime per user and per game.
   - Analyze the average user session duration on the site.
   - Collect data on the average number of active players by time slot.
--Gamification and Rewards:
+- Gamification and Rewards:
   - Introduce a reward system based on login frequency.
-  - Create an achievement system: upon reaching certain winnings or milestones, the user unlocks "badges" to display on their profile.
+  - Create an achievement system; upon reaching certain winnings or milestones, the user unlocks "badges" to display on their profile.
