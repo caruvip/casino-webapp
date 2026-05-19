@@ -1,0 +1,87 @@
+/* ── Reset completo regole generiche da main.css ─────────── */
+/* Queste righe neutralizzano le regole del vecchio main.css  */
+/* che applicavano il panno rosso feltro a section e main     */
+
+/* Override del main element (grid area main nella shell) */
+.shell .main {
+    padding: 20px;
+}
+
+/* Reset sezioni feltro */
+section {
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+}
+section h2 {
+    text-align: left;
+    margin-top: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+    text-shadow: none;
+    color: inherit;
+    font-size: inherit;
+}
+section p {
+    text-align: left;
+    text-shadow: none;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+}
+
+.page-hero {
+    min-height: 280px;
+    display: flex;
+    align-items: center;
+    padding: 50px 40px;
+    background: linear-gradient(135deg, rgba(128,0,0,0.85) 0%, rgba(5,5,5,0.9) 60%);
+    border-bottom: 2px solid var(--border-gold);
+}
+.page-hero-content { max-width: 600px; }
+.page-hero-title {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    line-height: 1.1;
+    margin: 0 0 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(180deg, #FFF7CC 0%, #FFD700 35%, #D4AF37 70%, #FFD700 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.page-hero-sub { font-size: 16px; color: #c0b8a0; line-height: 1.7; max-width: 480px; }
+.content-section { padding: 40px 40px; }
+.content-title {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--gold);
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+}
+.content-text { font-size: 15px; line-height: 1.8; color: var(--text-secondary); margin-bottom: 20px; }
+.content-text strong { color: var(--gold-dim); }
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 20px;
+    margin: 40px 0;
+}
+.stat-card {
+    background: linear-gradient(135deg, #1a0000, #0d0000);
+    border: 1px solid var(--border-gold);
+    border-radius: 12px;
+    padding: 24px;
+    text-align: center;
+}
+.stat-value { font-family: 'Cinzel', serif; font-size: 32px; font-weight: 900; color: var(--gold); margin-bottom: 8px; }
+.stat-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); }

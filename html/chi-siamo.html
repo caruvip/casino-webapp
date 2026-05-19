@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chi Siamo | 777Casino</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/layout.css">
+    <link rel="stylesheet" href="../styles/chi-siamo.css">
+    
+</head>
+<body>
+
+<div class="shell">
+    <nav class="topnav">
+        <a class="nav-logo" href="index.html">
+            <div class="nav-logo-icon">7</div>
+            <span class="nav-logo-name">777CASINO</span>
+        </a>
+        <div class="nav-links">
+            <a class="nav-link" href="index.html">Home</a>
+            <a class="nav-link" href="giochi.html">Giochi</a>
+            <a class="nav-link" href="promozioni.html">Promozioni</a>
+            <a class="nav-link active" href="chi-siamo.html">Chi Siamo</a>
+            <a class="nav-link" href="contatti.html">Contatti</a>
+        </div>
+        <div class="nav-actions" id="userBar"></div>
+    </nav>
+
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Sezioni</div>
+            <ul>
+                <li><div class="sidebar-item active"><span class="sidebar-icon">ℹ️</span>La Nostra Storia</div></li>
+                <li><div class="sidebar-item" onclick="window.location.href='#'"><span class="sidebar-icon">🎯</span>La Nostra Missione</div></li>
+                <li><div class="sidebar-item" onclick="window.location.href='#'"><span class="sidebar-icon">🏆</span>I Nostri Successi</div></li>
+            </ul>
+        </div>
+        <div class="sidebar-section" style="border-top: 1px solid var(--border);">
+            <div class="sidebar-section-label">Status VIP</div>
+        </div>
+        <div class="vip-card">
+            <div class="vip-header">
+                <span class="vip-title" id="vipLevelName">Standard</span>
+                <span class="vip-pct" id="vipPct">0%</span>
+            </div>
+            <div class="vip-track">
+                <div class="vip-fill" id="vipFill"></div>
+            </div>
+            <div class="vip-info" id="vipInfo">Gioca per guadagnare <strong>punti VIP</strong></div>
+        </div>
+        <div class="spacer"></div>
+        <div class="support-box">
+            <div class="support-label">Supporto</div>
+            <div class="support-text">24/7 online</div>
+            <button class="support-btn" onclick="window.location.href='contatti.html'">Chat Live</button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <section class="page-hero">
+            <div class="page-hero-content">
+                <h1 class="page-hero-title">Chi Siamo</h1>
+                <p class="page-hero-sub">Scopri la storia dietro il casino online più esclusivo d'Italia</p>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <h2 class="content-title">La Nostra Storia</h2>
+            <p class="content-text">
+                Dal <strong>2018</strong>, 777Casino ridefinisce l'intrattenimento online nel cuore dell'Italia. 
+                Nati dalla passione per il classico stile di Las Vegas e la moderna tecnologia blockchain, 
+                offriamo un ambiente <strong>sicuro, trasparente e interamente certificato</strong>.
+            </p>
+            <p class="content-text">
+                Ogni transazione, ogni giro, ogni mano è protetta da algoritmi RNG certificati 
+                e da protocolli di sicurezza di livello bancario. Crediamo che il gioco sia un diritto, 
+                ma soprattutto una responsabilità.
+            </p>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-value">150K+</div>
+                    <div class="stat-label">Giocatori Attivi</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">85+</div>
+                    <div class="stat-label">Giochi Disponibili</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">€25M+</div>
+                    <div class="stat-label">Vinti dai Nostri Giocatori</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">24/7</div>
+                    <div class="stat-label">Supporto VIP</div>
+                </div>
+            </div>
+
+            <h2 class="content-title">Perché Scegliere 777Casino?</h2>
+            <p class="content-text">
+                ✓ <strong>Sicurezza certificata</strong> — Licenza internazionale e crittografia SSL<br>
+                ✓ <strong>Bonus esclusivi</strong> — Fino a €1.000 sul primo deposito<br>
+                ✓ <strong>RTP competitivo</strong> — Fino al 99.5% su giochi selezionati<br>
+                ✓ <strong>Gioco responsabile</strong> — Strumenti di controllo e limiti di spesa<br>
+                ✓ <strong>VIP Club</strong> — Cashback, giri gratis e premi esclusivi
+            </p>
+        </section>
+
+        <footer style="padding: 24px 40px; border-top: 1px solid var(--border); text-align:center;">
+            <p style="font-family:'Cinzel',serif; font-size:11px; color:var(--text-muted); letter-spacing:1px;">
+                Â© 2025 777Casino.it | Tutti i diritti riservati | Gioco Responsabile
+            </p>
+        </footer>
+    </main>
+
+    <footer class="ticker">
+        <div class="ticker-label"><div class="ticker-dot"></div> Live Jackpot</div>
+        <div class="ticker-amount" id="jackpotAmt">€4.290.123,82</div>
+        <div class="ticker-scroll">
+            <div class="ticker-track">
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+            </div>
+        </div>
+                <div class="ticker-item">🏆 <span class="winner">Giulia</span> ha vinto <strong>€5.320</strong> a Slot</div>
+            </div>
+        </div>
+        <div class="ticker-18">Responsabile 18+</div>
+    </footer>
+</div>
+
+<script src="../scripts/auth.js"></script>
+<script src="../scripts/main.js"></script>
+<script>
+let jackpot = 4290123.82;
+const jackpotEl = document.getElementById('jackpotAmt');
+setInterval(() => {
+    jackpot += Math.random() * 9.5 + 0.5;
+    jackpotEl.textContent = '€' + jackpot.toLocaleString('it-IT', {
+        minimumFractionDigits: 2, maximumFractionDigits: 2
+    });
+}, 2200);
+
+(function initVip() {
+    try {
+        const user = JSON.parse(localStorage.getItem('casino_current_user'));
+        if (!user) return;
+        const levels = { standard: { name: 'Standard', pct: 15, next: 'Silver' },
+                         silver:   { name: '🥈 Silver',  pct: 45, next: 'Gold' },
+                         gold:     { name: '💎 Gold',    pct: 75, next: 'Platinum' },
+                         platinum: { name: '💎 Platinum',pct: 95, next: 'Diamond' } };
+        const l = levels[user.vipLevel] || levels.standard;
+        document.getElementById('vipLevelName').textContent = l.name;
+        document.getElementById('vipPct').textContent = l.pct + '%';
+        setTimeout(() => {
+            document.getElementById('vipFill').style.width = l.pct + '%';
+        }, 400);
+    } catch(e) {}
+})();
+
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        const user = JSON.parse(localStorage.getItem('casino_current_user'));
+        const bar = document.getElementById('userBar');
+        if (!bar) return;
+        if (user) {
+            bar.innerHTML = `
+                <div class="nav-balance">
+                    <span class="nav-balance-label">Saldo</span>
+                    <span class="nav-balance-amount" id="userBalanceNav">€0</span>
+                </div>
+                <a href="ricarica.html" class="nav-btn nav-btn-outline">Ricarica</a>
+                <a href="user.html" class="nav-btn nav-btn-outline">Profilo</a>
+                <button class="nav-btn nav-btn-outline" onclick="localStorage.removeItem('casino_current_user');location.reload()">Esci</button>
+            `;
+        } else {
+            bar.innerHTML = `
+                <a href="login.html" class="nav-btn nav-btn-outline">Accedi</a>
+                <a href="registrati.html" class="nav-btn nav-btn-solid">Registrati</a>
+            `;
+        }
+    } catch(e) {}
+});
+</script>
+</body>
+</html>

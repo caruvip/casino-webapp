@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profilo Utente | 777Casino</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/layout.css">
+    <link rel="stylesheet" href="../styles/user.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+</head>
+<body>
+
+<div class="shell">
+    <nav class="topnav">
+        <a class="nav-logo" href="index.html">
+            <div class="nav-logo-icon">7</div>
+            <span class="nav-logo-name">777CASINO</span>
+        </a>
+        <div class="nav-links">
+            <a class="nav-link" href="index.html">Home</a>
+            <a class="nav-link" href="giochi.html">Giochi</a>
+            <a class="nav-link" href="promozioni.html">Promozioni</a>
+            <a class="nav-link" href="chi-siamo.html">Chi Siamo</a>
+            <a class="nav-link" href="contatti.html">Contatti</a>
+        </div>
+        <div class="nav-actions" id="userBar"></div>
+    </nav>
+
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Menu Profilo</div>
+            <ul>
+                <li><div class="sidebar-item active" onclick="window.location.href='user.html'">
+                    <span class="sidebar-icon">👤</span> Dashboard
+                </div></li>
+                <li><div class="sidebar-item" onclick="window.location.href='ricarica.html'">
+                    <span class="sidebar-icon">💳</span> Ricarica
+                </div></li>
+                <li><div class="sidebar-item" onclick="window.location.href='giochi.html'">
+                    <span class="sidebar-icon">🎲</span> I miei giochi
+                </div></li>
+                <li><div class="sidebar-item" id="logoutBtn">
+                    <span class="sidebar-icon">🚪</span> Disconnetti
+                </div></li>
+            </ul>
+        </div>
+        <div class="sidebar-section" style="border-top: 1px solid var(--border);">
+            <div class="sidebar-section-label" style="padding-top:0">Status VIP</div>
+        </div>
+        <div class="vip-card">
+            <div class="vip-header">
+                <span class="vip-title" id="vipLevelName">Standard</span>
+                <span class="vip-pct" id="vipPct">0%</span>
+            </div>
+            <div class="vip-track">
+                <div class="vip-fill" id="vipFill"></div>
+            </div>
+            <div class="vip-info" id="vipInfo">
+                Gioca per guadagnare <strong>punti VIP</strong> e sblocca premi.
+            </div>
+        </div>
+        <div class="spacer"></div>
+        <div class="support-box">
+            <div class="support-label">Supporto Elite</div>
+            <div class="support-text">Siamo qui 24/7</div>
+            <button class="support-btn" onclick="window.location.href='contatti.html'">Chat Live</button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="dashboard">
+            <!-- ── Profilo Hero ─────────────────────────────────────────────────── -->
+            <section class="profile-hero" style="display: flex; justify-content: space-between; align-items: center; gap: 2rem; background: var(--bg-elevated); padding: 2rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid var(--border-gold); box-shadow: inset 0 0 20px rgba(0,0,0,0.5);">
+                <div style="display: flex; align-items: center;">
+                    <div style="width: 80px; height: 80px; border-radius: 50%; border: 2px solid var(--gold); margin-right: 1.5rem; background: linear-gradient(135deg, #800000, #cc0000); display: flex; align-items: center; justify-content: center; font-size: 36px;">👤</div>
+                    <div class="profile-hero-text">
+                        <h2 style="font-family: 'Cinzel', serif; font-size: 24px; margin: 0; color: var(--gold); text-transform: uppercase;">Bentornato, <span id="userName">—</span></h2>
+                        <div class="vip-badge" id="userVip" style="color: var(--text-muted); font-weight: 700; font-size: 12px; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px;">🥉 Standard</div>
+                        <p style="margin-top:8px; color: var(--text-secondary); font-size: 12px;">
+                            Ultimo accesso: <span id="lastLogin">—</span>
+                        </p>
+                    </div>
+                </div>
+                <div class="balance-card" style="text-align: right; background: rgba(0,0,0,0.3); padding: 15px 25px; border-radius: 8px; border: 1px solid var(--border);">
+                    <span class="label" style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Saldo Reale Disponibile</span>
+                    <span class="amount" id="userBalance" style="display: block; font-family: 'Cinzel', serif; font-size: 32px; font-weight: 900; color: var(--gold); margin: 0.5rem 0; filter: drop-shadow(0 0 8px rgba(212,175,55,0.3));">€ —</span>
+                    <a href="ricarica.html" class="nav-btn nav-btn-solid" style="display:inline-block;margin-top:4px; text-decoration: none;">
+                        + Ricarica Conto
+                    </a>
+                </div>
+            </section>
+
+            <!-- ── Statistiche aggregate ────────────────────────────────────────── -->
+            <section class="chart-box" style="background-color: var(--bg-surface); margin: 20px 0; padding: 25px; border-radius: 12px; border: 1px solid var(--border);">
+                <h3 class="section-title" style="font-family: 'Cinzel', serif; font-size: 16px; font-weight: 900; color: var(--gold-dim); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px;">
+                    <span style="color: var(--accent-light);">📊</span> Le Tue Statistiche
+                </h3>
+                <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 1rem;">
+                    <div class="stat-card" style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem 1rem; text-align: center;">
+                        <h4 style="font-family: 'Cinzel', serif; font-size: 10px; color: var(--text-muted); margin-top: 0; text-transform: uppercase; letter-spacing: 1px;">Giocate</h4>
+                        <p id="gamesPlayed" style="font-size: 24px; font-weight: 700; color: var(--text-primary); margin: 0.5rem 0 0;">0</p>
+                    </div>
+                    <div class="stat-card" style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem 1rem; text-align: center;">
+                        <h4 style="font-family: 'Cinzel', serif; font-size: 10px; color: var(--text-muted); margin-top: 0; text-transform: uppercase; letter-spacing: 1px;">Vinte</h4>
+                        <p id="gamesWon" style="font-size: 24px; font-weight: 700; color: var(--text-primary); margin: 0.5rem 0 0;">0</p>
+                    </div>
+                    <div class="stat-card" style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem 1rem; text-align: center;">
+                        <h4 style="font-family: 'Cinzel', serif; font-size: 10px; color: var(--text-muted); margin-top: 0; text-transform: uppercase; letter-spacing: 1px;">Win Rate</h4>
+                        <p id="winRate" style="font-size: 24px; font-weight: 700; color: var(--text-primary); margin: 0.5rem 0 0;">0%</p>
+                    </div>
+                    <div class="stat-card" style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem 1rem; text-align: center;">
+                        <h4 style="font-family: 'Cinzel', serif; font-size: 10px; color: var(--text-muted); margin-top: 0; text-transform: uppercase; letter-spacing: 1px;">Totale Vinto</h4>
+                        <p id="totalWon" style="font-size: 18px; font-weight: 700; color: #22c55e; margin: 0.5rem 0 0;">€ 0</p>
+                    </div>
+                    <div class="stat-card" style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem 1rem; text-align: center;">
+                        <h4 style="font-family: 'Cinzel', serif; font-size: 10px; color: var(--text-muted); margin-top: 0; text-transform: uppercase; letter-spacing: 1px;">Totale Perso</h4>
+                        <p id="totalLost" style="font-size: 18px; font-weight: 700; color: #ef4444; margin: 0.5rem 0 0;">€ 0</p>
+                    </div>
+                    <div class="stat-card" style="background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 8px; padding: 1.5rem 1rem; text-align: center;">
+                        <h4 style="font-family: 'Cinzel', serif; font-size: 10px; color: var(--text-muted); margin-top: 0; text-transform: uppercase; letter-spacing: 1px;">Profitto Netto</h4>
+                        <p id="netProfit" style="font-size: 18px; font-weight: 700; color: var(--text-primary); margin: 0.5rem 0 0;">€ 0</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── Grafici ───────────────────────────────────────────────────────── -->
+            <div class="charts-row">
+                <div class="chart-box" style="background-color: var(--bg-surface); padding: 25px; border-radius: 12px; border: 1px solid var(--border);">
+                    <h3 style="font-family: 'Cinzel', serif; font-size: 14px; font-weight: 900; color: var(--gold-dim); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">🥧 Vittorie / Sconfitte</h3>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="winLossChart"></canvas>
+                    </div>
+                </div>
+                <div class="chart-box" style="background-color: var(--bg-surface); padding: 25px; border-radius: 12px; border: 1px solid var(--border);">
+                    <h3 style="font-family: 'Cinzel', serif; font-size: 14px; font-weight: 900; color: var(--gold-dim); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">📈 Andamento Saldo</h3>
+                    <div class="chart-canvas-wrap">
+                        <canvas id="balanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chart-box" style="background-color: var(--bg-surface); margin: 20px 0; padding: 25px; border-radius: 12px; border: 1px solid var(--border);">
+                <h3 style="font-family: 'Cinzel', serif; font-size: 14px; font-weight: 900; color: var(--gold-dim); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">🎮 Risultati per Gioco</h3>
+                <div class="chart-canvas-wrap" style="height: 250px;">
+                    <canvas id="gameBreakdownChart"></canvas>
+                </div>
+            </div>
+
+            <!-- ── Cronologia partite ────────────────────────────────────────────── -->
+            <div class="transaction-history" style="background-color: var(--bg-surface); margin: 20px 0; padding: 25px; border-radius: 12px; border: 1px solid var(--border);">
+                <h3 class="section-title" style="font-family: 'Cinzel', serif; font-size: 14px; font-weight: 900; color: var(--gold-dim); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">🎲 Ultime Partite</h3>
+                <div style="overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-elevated);">
+                    <table id="historyTable" style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: rgba(0,0,0,0.5);">
+                                <th>Data</th>
+                                <th>Gioco</th>
+                                <th>Puntata</th>
+                                <th>Vincita</th>
+                                <th>Risultato</th>
+                                <th>Saldo dopo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td colspan="6" style="text-align:center;color:#888;padding:30px;">
+                                Caricamento...
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ── Info account ─────────────────────────────────────────────────── -->
+            <div class="chart-box" style="background-color: var(--bg-surface); margin: 20px 0; padding: 25px; border-radius: 12px; border: 1px solid var(--border);">
+                <h3 class="section-title" style="font-family: 'Cinzel', serif; font-size: 14px; font-weight: 900; color: var(--gold-dim); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 1px;">👤 Informazioni Account</h3>
+                <div class="info-grid" style="display: flex; gap: 2rem; justify-content: space-around; flex-wrap: wrap; background: var(--bg-elevated); padding: 20px; border-radius: 8px; border: 1px solid var(--border);">
+                    <div class="info-item" style="text-align: center;">
+                        <div class="info-label" style="color: var(--text-muted); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Email</div>
+                        <div class="info-value" id="userEmail" style="color: var(--text-primary); font-size: 14px; font-weight: 700;">—</div>
+                    </div>
+                    <div class="info-item" style="text-align: center;">
+                        <div class="info-label" style="color: var(--text-muted); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Membro dal</div>
+                        <div class="info-value" id="joinDate" style="color: var(--text-primary); font-size: 14px; font-weight: 700;">—</div>
+                    </div>
+                    <div class="info-item" style="text-align: center;">
+                        <div class="info-label" style="color: var(--text-muted); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Livello VIP</div>
+                        <div class="info-value" id="userVip2" style="color: var(--gold); font-size: 14px; font-weight: 700; font-family: 'Cinzel', serif;">Standard</div>
+                    </div>
+                </div>
+            </div>
+            
+            <footer style="text-align: center; padding: 20px 0; color: var(--text-muted); font-size: 11px;">
+                <p>&copy; 2025 777casino.it — Gioca responsabilmente. Vietato ai minori di 18 anni.</p>
+                <p style="margin-top: 5px;">
+                    <a href="termini.html" style="color: var(--text-muted); text-decoration: none;">Termini e Condizioni</a> ·
+                    <a href="gioco_responsabile.html" style="color: var(--text-muted); text-decoration: none;">Gioco Responsabile</a> ·
+                    <a href="contatti.html" style="color: var(--text-muted); text-decoration: none;">Contatti</a>
+                </p>
+            </footer>
+        </div>
+    </main>
+
+    <footer class="ticker">
+        <div class="ticker-label">
+            <div class="ticker-dot"></div>
+            Live Jackpot
+        </div>
+        <div class="ticker-amount" id="jackpotAmt">€4.290.123,82</div>
+        <div class="ticker-scroll">
+            <div class="ticker-track">
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+            </div>
+        </div>
+        <div class="ticker-18">Responsabile 18+</div>
+    </footer>
+</div>
+
+<script src="../scripts/auth.js"></script>
+<script src="../scripts/balance.js"></script>
+<script src="../scripts/main.js"></script>
+<script src="../scripts/statistiche.js"></script>
+<script>
+let jackpot = 4290123.82;
+const jackpotEl = document.getElementById('jackpotAmt');
+setInterval(() => {
+    jackpot += Math.random() * 9.5 + 0.5;
+    jackpotEl.textContent = '€' + jackpot.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+}, 2200);
+
+(function initVip() {
+    try {
+        const user = JSON.parse(localStorage.getItem('casino_current_user'));
+        if (!user) return;
+        const levels = { standard: { name: 'Standard', pct: 15, next: 'Silver' }, silver: { name: '🥈 Silver', pct: 45, next: 'Gold' }, gold: { name: '💎 Gold', pct: 75, next: 'Platinum' }, platinum: { name: '💎 Platinum', pct: 95, next: 'Diamond' } };
+        const l = levels[user.vipLevel] || levels.standard;
+        const vipNameEl = document.getElementById('vipLevelName');
+        const vipPctEl = document.getElementById('vipPct');
+        const vipInfoEl = document.getElementById('vipInfo');
+        const vipFillEl = document.getElementById('vipFill');
+        if (vipNameEl) vipNameEl.textContent = l.name;
+        if (vipPctEl) vipPctEl.textContent = l.pct + '%';
+        if (vipInfoEl) vipInfoEl.innerHTML = `Mancano punti per il livello <strong>${l.next}</strong>`;
+        if (vipFillEl) setTimeout(() => { vipFillEl.style.width = l.pct + '%'; }, 400);
+        
+        const userVip2 = document.getElementById('userVip2');
+        if (userVip2) userVip2.textContent = l.name;
+    } catch(e) {}
+})();
+
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        const user = JSON.parse(localStorage.getItem('casino_current_user'));
+        const bar = document.getElementById('userBar');
+        if (!bar) return;
+        if (user) {
+            bar.innerHTML = `<div style="display:flex;flex-direction:column;align-items:flex-end;line-height:1.2;"><span style="font-family:'Cinzel',serif;font-size:15px;font-weight:900;color:var(--gold);">€${(user.balance || 0).toLocaleString('it-IT',{minimumFractionDigits:2})}</span><span style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Saldo Reale</span></div><a href="ricarica.html" class="nav-btn nav-btn-outline">+ Deposita</a><div style="display:flex;align-items:center;gap:7px;padding:5px 12px 5px 5px;border-radius:50px;background:var(--bg-elevated);border:1px solid var(--border-gold);cursor:pointer;" onclick="window.location.href='user.html'"><div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#800000,#cc0000);border:1px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;font-size:13px;">👤</div><span style="font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--gold-dim);">${user.username}</span><span style="font-size:10px;color:var(--text-muted);">▾</span></div>`;
+        } else {
+            bar.innerHTML = `<a href="login.html" class="nav-btn nav-btn-outline">Accedi</a><a href="registrati.html" class="nav-btn nav-btn-solid">Registrati</a>`;
+        }
+    } catch(e) {}
+});
+</script>
+</body>
+</html>

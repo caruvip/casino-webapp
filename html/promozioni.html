@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Promozioni | 777Casino</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/layout.css">
+    <link rel="stylesheet" href="../styles/promozioni.css">
+    
+</head>
+<body>
+
+<div class="shell">
+    <nav class="topnav">
+        <a class="nav-logo" href="index.html">
+            <div class="nav-logo-icon">7</div>
+            <span class="nav-logo-name">777CASINO</span>
+        </a>
+        <div class="nav-links">
+            <a class="nav-link" href="index.html">Home</a>
+            <a class="nav-link" href="giochi.html">Giochi</a>
+            <a class="nav-link active" href="promozioni.html">Promozioni</a>
+            <a class="nav-link" href="chi-siamo.html">Chi Siamo</a>
+            <a class="nav-link" href="contatti.html">Contatti</a>
+        </div>
+        <div class="nav-actions" id="userBar"></div>
+    </nav>
+
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Promozioni</div>
+            <ul>
+                <li><div class="sidebar-item active"><span class="sidebar-icon">🎯</span>Benvenuto</div></li>
+                <li><div class="sidebar-item"><span class="sidebar-icon">🎁</span>Settimanali</div></li>
+                <li><div class="sidebar-item"><span class="sidebar-icon">🏆</span>VIP Club</div></li>
+            </ul>
+        </div>
+        <div class="sidebar-section" style="border-top: 1px solid var(--border);">
+            <div class="sidebar-section-label">Status VIP</div>
+        </div>
+        <div class="vip-card">
+            <div class="vip-header">
+                <span class="vip-title" id="vipLevelName">Standard</span>
+                <span class="vip-pct" id="vipPct">0%</span>
+            </div>
+            <div class="vip-track">
+                <div class="vip-fill" id="vipFill"></div>
+            </div>
+            <div class="vip-info" id="vipInfo">Gioca per guadagnare <strong>punti VIP</strong></div>
+        </div>
+        <div class="spacer"></div>
+        <div class="support-box">
+            <div class="support-label">Supporto</div>
+            <div class="support-text">24/7 online</div>
+            <button class="support-btn" onclick="window.location.href='contatti.html'">Chat Live</button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <section class="page-hero">
+            <div class="page-hero-content">
+                <h1 class="page-hero-title">🎁 Promozioni Attive</h1>
+                <p class="page-hero-sub">Vinci di più con i nostri bonus esclusivi</p>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="promo-grid">
+                <div class="promo-card">
+                    <div class="promo-tag">NUOVO</div>
+                    <h3>Bonus Benvenuto</h3>
+                    <p>Ricevi il tuo bonus di benvenuto sul primo deposito</p>
+                    <span class="promo-value">€1.000</span>
+                    <p style="font-size:12px; color:var(--text-muted);">Deposita e ricevi fino a €1.000 in bonus</p>
+                    <button class="promo-btn" onclick="window.location.href='ricarica.html'">Richiedi Ora</button>
+                </div>
+
+                <div class="promo-card">
+                    <div class="promo-tag">SETTIMANALE</div>
+                    <h3>Giri Gratis</h3>
+                    <p>Ogni venerdì sui giochi selezionati</p>
+                    <span class="promo-value">50 SPINS</span>
+                    <p style="font-size:12px; color:var(--text-muted);">Spin gratis sulle migliori slot machine</p>
+                    <button class="promo-btn" onclick="window.location.href='giochi.html'">Gioca Ora</button>
+                </div>
+
+                <div class="promo-card">
+                    <div class="promo-tag">VIP</div>
+                    <h3>Cashback VIP</h3>
+                    <p>Ritorno sulle perdite settimanali</p>
+                    <span class="promo-value">10%</span>
+                    <p style="font-size:12px; color:var(--text-muted);">Fino al 10% di cashback per i nostri VIP</p>
+                    <button class="promo-btn" onclick="window.location.href='user.html'">Vedi Livello</button>
+                </div>
+
+                <div class="promo-card">
+                    <div class="promo-tag">ESCLUSIVA</div>
+                    <h3>Bonus di Ricarica</h3>
+                    <p>Bonus su ogni ricarica successiva</p>
+                    <span class="promo-value">25%</span>
+                    <p style="font-size:12px; color:var(--text-muted);">25% di bonus su ricariche da €50+</p>
+                    <button class="promo-btn" onclick="window.location.href='ricarica.html'">Ricarica</button>
+                </div>
+
+                <div class="promo-card">
+                    <div class="promo-tag">TORNEI</div>
+                    <h3>Tornei Mensili</h3>
+                    <p>Competi con altri giocatori</p>
+                    <span class="promo-value">€10K</span>
+                    <p style="font-size:12px; color:var(--text-muted);">Premi totali di €10.000 in palio</p>
+                    <button class="promo-btn" onclick="window.location.href='giochi.html'">Partecipa</button>
+                </div>
+
+                <div class="promo-card">
+                    <div class="promo-tag">REFERRAL</div>
+                    <h3>Invita Amici</h3>
+                    <p>Guadagna bonus per ogni amico invitato</p>
+                    <span class="promo-value">€50</span>
+                    <p style="font-size:12px; color:var(--text-muted);">€50 per ogni amico che si registra</p>
+                    <button class="promo-btn" onclick="alert('Programma referral in arrivo!')">Scopri di Più</button>
+                </div>
+            </div>
+        </section>
+
+        <footer style="padding: 24px 40px; border-top: 1px solid var(--border); text-align:center; margin-top:40px;">
+            <p style="font-family:'Cinzel',serif; font-size:11px; color:var(--text-muted); letter-spacing:1px;">
+                Â© 2025 777Casino.it | Termini e Condizioni | Gioco Responsabile
+            </p>
+        </footer>
+    </main>
+
+    <footer class="ticker">
+        <div class="ticker-label"><div class="ticker-dot"></div> Live Jackpot</div>
+        <div class="ticker-amount" id="jackpotAmt">€4.290.123,82</div>
+        <div class="ticker-scroll">
+            <div class="ticker-track">
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+            </div>
+        </div>
+                <div class="ticker-item">🏆 <span class="winner">Giulia</span> ha vinto <strong>€5.320</strong> a Slot</div>
+                <div class="ticker-item">🏆 <span class="winner">Antonio</span> ha vinto <strong>€3.890</strong> a Blackjack</div>
+            </div>
+        </div>
+        <div class="ticker-18">Responsabile 18+</div>
+    </footer>
+</div>
+
+<script src="../scripts/auth.js"></script>
+<script src="../scripts/main.js"></script>
+<script>
+let jackpot = 4290123.82;
+const jackpotEl = document.getElementById('jackpotAmt');
+setInterval(() => {
+    jackpot += Math.random() * 9.5 + 0.5;
+    jackpotEl.textContent = '€' + jackpot.toLocaleString('it-IT', {
+        minimumFractionDigits: 2, maximumFractionDigits: 2
+    });
+}, 2200);
+
+(function initVip() {
+    try {
+        const user = JSON.parse(localStorage.getItem('casino_current_user'));
+        if (!user) return;
+        const levels = { standard: { name: 'Standard', pct: 15, next: 'Silver' },
+                         silver:   { name: '🥈 Silver',  pct: 45, next: 'Gold' },
+                         gold:     { name: '💎 Gold',    pct: 75, next: 'Platinum' },
+                         platinum: { name: '💎 Platinum',pct: 95, next: 'Diamond' } };
+        const l = levels[user.vipLevel] || levels.standard;
+        document.getElementById('vipLevelName').textContent = l.name;
+        document.getElementById('vipPct').textContent = l.pct + '%';
+        setTimeout(() => {
+            document.getElementById('vipFill').style.width = l.pct + '%';
+        }, 400);
+    } catch(e) {}
+})();
+
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        const user = JSON.parse(localStorage.getItem('casino_current_user'));
+        const bar = document.getElementById('userBar');
+        if (!bar) return;
+        if (user) {
+            bar.innerHTML = `
+                <div class="nav-balance">
+                    <span class="nav-balance-label">Saldo</span>
+                    <span class="nav-balance-amount" id="userBalanceNav">€0</span>
+                </div>
+                <a href="ricarica.html" class="nav-btn nav-btn-outline">Ricarica</a>
+                <a href="user.html" class="nav-btn nav-btn-outline">Profilo</a>
+                <button class="nav-btn nav-btn-outline" onclick="localStorage.removeItem('casino_current_user');location.reload()">Esci</button>
+            `;
+        } else {
+            bar.innerHTML = `
+                <a href="login.html" class="nav-btn nav-btn-outline">Accedi</a>
+                <a href="registrati.html" class="nav-btn nav-btn-solid">Registrati</a>
+            `;
+        }
+    } catch(e) {}
+});
+</script>
+</body>
+</html>

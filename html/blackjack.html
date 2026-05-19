@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack VIP | 777Casino</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/layout.css">
+    <link rel="stylesheet" href="../styles/blackjack.css">
+    <link rel="stylesheet" href="../styles/games.css">
+</head>
+<body>
+
+<div class="shell">
+    <nav class="topnav">
+        <a class="nav-logo" href="index.html">
+            <div class="nav-logo-icon">7</div>
+            <span class="nav-logo-name">777CASINO</span>
+        </a>
+        <div class="nav-links">
+            <a class="nav-link" href="index.html">Home</a>
+            <a class="nav-link active" href="giochi.html">Giochi</a>
+            <a class="nav-link" href="promozioni.html">Promozioni</a>
+            <a class="nav-link" href="chi-siamo.html">Chi Siamo</a>
+            <a class="nav-link" href="contatti.html">Contatti</a>
+        </div>
+        <div class="nav-actions" id="userBar"></div>
+    </nav>
+
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Categorie</div>
+            <ul>
+                <li><div class="sidebar-item" onclick="window.location.href='giochi.html'">
+                    <span class="sidebar-icon">⭐</span> Popolari
+                </div></li>
+                <li><div class="sidebar-item" onclick="window.location.href='giochi.html'">
+                    <span class="sidebar-icon">🎰</span> Slot Machine
+                </div></li>
+                <li><div class="sidebar-item active" onclick="window.location.href='giochi.html'">
+                    <span class="sidebar-icon">♠️</span> Giochi da Tavolo
+                </div></li>
+                <li><div class="sidebar-item" onclick="window.location.href='giochi.html'">
+                    <span class="sidebar-icon">🎁</span> Jackpots
+                    <span class="sidebar-badge">HOT</span>
+                </div></li>
+            </ul>
+        </div>
+        <div class="sidebar-section" style="border-top: 1px solid var(--border);">
+            <div class="sidebar-section-label" style="padding-top:0">Status VIP</div>
+        </div>
+        <div class="vip-card">
+            <div class="vip-header">
+                <span class="vip-title" id="vipLevelName">Standard</span>
+                <span class="vip-pct" id="vipPct">0%</span>
+            </div>
+            <div class="vip-track">
+                <div class="vip-fill" id="vipFill"></div>
+            </div>
+            <div class="vip-info" id="vipInfo">
+                Gioca per guadagnare <strong>punti VIP</strong> e sblocca premi.
+            </div>
+        </div>
+        <div class="spacer"></div>
+        <div class="support-box">
+            <div class="support-label">Supporto Elite</div>
+            <div class="support-text">Siamo qui 24/7</div>
+            <button class="support-btn" onclick="window.location.href='contatti.html'">Chat Live</button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="game-container">
+            <div class="table-felt">
+                
+                <div class="dealer-area">
+                    <img src="../images/blackjacktipo.png" alt="Dealer" class="dealer-avatar">
+                    <div class="cards-area">
+                        <h2>Banco <span id="dealer-sum-el" class="score-badge">--</span></h2>
+                        <div id="dealer-cards-el" class="cards-display"></div>
+                    </div>
+                </div>
+
+                <div id="message-el" class="game-message">Fai la tua puntata per iniziare</div>
+
+                <div class="player-area">
+                    <div class="cards-area">
+                        <h2>La Tua Mano</h2>
+                        <div id="player-hands-el" class="hands-container"></div>
+                    </div>
+                </div>
+
+                <div class="dashboard">
+                    <div class="dash-item">
+                        <span>SALDO</span>
+                        <span id="player-balance-el">---</span>
+                    </div>
+                    <div class="dash-item">
+                        <span>PUNTATA</span>
+                        <span id="current-bet-el">0</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="controls-panel">
+                
+                <div id="betting-area" class="buttons-area">
+                    <div class="chips-panel">
+                        <div class="chip" data-value="5">5</div>
+                        <div class="chip" data-value="25">25</div>
+                        <div class="chip" data-value="50">50</div>
+                        <div class="chip" data-value="100">100</div>
+                        <div class="chip all-in" data-value="all-in">ALL</div>
+                    </div>
+                    <div class="main-actions">
+                         <button id="clear-btn" class="ctrl-btn red-btn">PULISCI</button>
+                         <button id="confirm-bet-btn" class="spin-btn">PUNTA</button>
+                    </div>
+                </div>
+
+                <div id="actions-area" class="buttons-area hidden">
+                    <button id="hit-btn" class="ctrl-btn">CARTA</button>
+                    <button id="stand-btn" class="ctrl-btn">STAI</button>
+                    <button id="double-btn" class="ctrl-btn">RADDOPPIA</button>
+                    <button id="split-btn" class="ctrl-btn">DIVIDI</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="ticker">
+        <div class="ticker-label">
+            <div class="ticker-dot"></div>
+            Live Jackpot
+        </div>
+        <div class="ticker-amount" id="jackpotAmt">€4.290.123,82</div>
+        <div class="ticker-scroll">
+            <div class="ticker-track">
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+            </div>
+        </div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+            </div>
+        </div>
+        <div class="ticker-18">Responsabile 18+</div>
+    </footer>
+</div>
+
+<script src="../scripts/auth.js"></script>
+<script src="../scripts/main.js"></script>
+<script src="../scripts/blackjack.js"></script>
+<script src="../scripts/init.js"></script>
+</body>
+</html>

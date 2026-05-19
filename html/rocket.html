@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rocket Cash 🚀 | 777Casino</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Orbitron:wght@400;700;900&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/layout.css">
+    <link rel="stylesheet" href="../styles/rocket.css">
+</head>
+<body>
+
+<div class="shell">
+
+    <!-- ══════════ TOPNAV ══════════ -->
+    <nav class="topnav">
+        <a class="nav-logo" href="index.html">
+            <div class="nav-logo-icon">7</div>
+            <span class="nav-logo-name">777CASINO</span>
+        </a>
+        <div class="nav-links">
+            <a class="nav-link" href="index.html">Home</a>
+            <a class="nav-link active" href="giochi.html">Giochi</a>
+            <a class="nav-link" href="promozioni.html">Promozioni</a>
+            <a class="nav-link" href="chi-siamo.html">Chi Siamo</a>
+            <a class="nav-link" href="contatti.html">Contatti</a>
+        </div>
+        <div class="nav-actions" id="userBar"></div>
+    </nav>
+
+    <!-- ══════════ SIDEBAR ══════════ -->
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Categorie</div>
+            <ul>
+                <li><div class="sidebar-item" onclick="window.location.href='giochi.html'">
+                    <span class="sidebar-icon">⭐</span> Popolari
+                </div></li>
+                <li><div class="sidebar-item" onclick="window.location.href='giochi.html'">
+                    <span class="sidebar-icon">🎰</span> Slot Machine
+                </div></li>
+                <li><div class="sidebar-item" onclick="window.location.href='giochi.html'">
+                    <span class="sidebar-icon">♠️</span> Giochi da Tavolo
+                </div></li>
+                <li><div class="sidebar-item active" onclick="window.location.href='rocket.html'">
+                    <span class="sidebar-icon">🚀</span> Crash Games
+                </div></li>
+            </ul>
+        </div>
+        <div class="sidebar-section" style="border-top: 1px solid var(--border);">
+            <div class="sidebar-section-label" style="padding-top:0">Status VIP</div>
+        </div>
+        <div class="vip-card">
+            <div class="vip-header">
+                <span class="vip-title" id="vipLevelName">Standard</span>
+                <span class="vip-pct" id="vipPct">0%</span>
+            </div>
+            <div class="vip-track">
+                <div class="vip-fill" id="vipFill"></div>
+            </div>
+            <div class="vip-info" id="vipInfo">
+                Gioca per guadagnare <strong>punti VIP</strong> e sblocca premi.
+            </div>
+        </div>
+        <div class="spacer"></div>
+        <div class="support-box">
+            <div class="support-label">Supporto Elite</div>
+            <div class="support-text">Siamo qui 24/7</div>
+            <button class="support-btn" onclick="window.location.href='contatti.html'">Chat Live</button>
+        </div>
+    </aside>
+
+    <!-- ══════════ MAIN ══════════ -->
+    <main class="main">
+        <div class="rocket-wrapper">
+
+            <!-- Titolo gioco -->
+            <div class="rocket-header">
+                <div>
+                    <h1 class="rocket-title">🚀 Rocket Cash</h1>
+                    <p class="rocket-subtitle">Punta prima del lancio. Ritira prima dello schianto!</p>
+                </div>
+                <div class="rocket-rtp-badge">RTP 97%</div>
+            </div>
+
+            <!-- Storia round precedenti -->
+            <div class="rocket-history-bar" id="historyBar">
+                <!-- Popolato da JS -->
+            </div>
+
+            <!-- Layout principale: canvas + pannello -->
+            <div class="rocket-game-area">
+
+                <!-- ── CANVAS ── -->
+                <div class="rocket-canvas-wrap">
+                    <canvas id="gameCanvas"></canvas>
+
+                    <!-- Moltiplicatore sovrapposto -->
+                    <div class="rocket-mult-overlay" id="multOverlay">
+                        <div class="rocket-mult-value" id="multDisplay">1.00x</div>
+                        <div class="rocket-mult-status" id="multStatus">In attesa...</div>
+                    </div>
+                </div>
+
+                <!-- ── PANNELLO PUNTATA ── -->
+                <div class="rocket-panel">
+
+                    <!-- Tabs -->
+                    <div class="rocket-tabs">
+                        <button class="rocket-tab active" id="tab-bet-btn" onclick="switchTab('bet', this)">Puntata</button>
+                        <button class="rocket-tab" id="tab-live-btn" onclick="switchTab('live', this)">Live 🔴</button>
+                        <button class="rocket-tab" id="tab-stats-btn" onclick="switchTab('stats', this)">Stats</button>
+                    </div>
+
+                    <!-- TAB: Puntata -->
+                    <div class="rocket-tab-panel active" id="tab-bet">
+
+                        <div class="rp-section">
+                            <span class="rp-label">Importo Puntata</span>
+                            <div class="rp-input-row">
+                                <span class="rp-currency">€</span>
+                                <input type="number" class="rp-input" id="betInput" value="10" min="1" max="5000" step="1">
+                            </div>
+                            <div class="rp-chips">
+                                <button class="rp-chip" onclick="addBet(1)">+1</button>
+                                <button class="rp-chip" onclick="addBet(5)">+5</button>
+                                <button class="rp-chip" onclick="addBet(10)">+10</button>
+                                <button class="rp-chip" onclick="addBet(50)">+50</button>
+                                <button class="rp-chip" onclick="setBet(1)">MIN</button>
+                                <button class="rp-chip" onclick="halveBet()">½</button>
+                                <button class="rp-chip" onclick="doubleBet()">×2</button>
+                                <button class="rp-chip" onclick="allIn()">MAX</button>
+                            </div>
+                        </div>
+
+                        <div class="rp-autocashout-row">
+                            <input type="checkbox" id="autoCashoutCheck">
+                            <span class="rp-autocashout-label">Auto Cashout a</span>
+                            <input type="number" class="rp-autocashout-val" id="autoCashoutVal" value="2.00" min="1.01" max="1000" step="0.01">
+                            <span class="rp-autocashout-x">x</span>
+                        </div>
+
+                        <button class="rp-main-btn rp-btn-bet" id="mainBtn" onclick="handleMainButton()">
+                            🚀 &nbsp; PUNTA
+                        </button>
+
+                        <div class="rp-result rp-result-neutral" id="betResult">&nbsp;</div>
+
+                        <div class="rp-info-box">
+                            <div class="rp-info-row"><span>RTP</span><span>97.00%</span></div>
+                            <div class="rp-info-row"><span>Min / Max</span><span>€1 / €5.000</span></div>
+                            <div class="rp-info-row"><span>Crash probability</span><span>~3% / giro</span></div>
+                        </div>
+
+                    </div>
+
+                    <!-- TAB: Live -->
+                    <div class="rocket-tab-panel" id="tab-live">
+                        <div class="rp-live-header">
+                            <span>Giocatore</span>
+                            <span>Puntata</span>
+                            <span>Uscito a</span>
+                        </div>
+                        <div id="liveList" class="rp-live-list"></div>
+                    </div>
+
+                    <!-- TAB: Stats -->
+                    <div class="rocket-tab-panel" id="tab-stats">
+                        <div class="rp-stats-grid">
+                            <div class="rp-stat-card">
+                                <div class="rp-stat-label">Round Giocati</div>
+                                <div class="rp-stat-value" id="statRounds" style="color:var(--gold)">0</div>
+                            </div>
+                            <div class="rp-stat-card">
+                                <div class="rp-stat-label">Win Rate</div>
+                                <div class="rp-stat-value" id="statWinRate" style="color:#22c55e">0%</div>
+                            </div>
+                            <div class="rp-stat-card">
+                                <div class="rp-stat-label">Miglior Mult.</div>
+                                <div class="rp-stat-value" id="statBestMult" style="color:#22c55e">—</div>
+                            </div>
+                            <div class="rp-stat-card">
+                                <div class="rp-stat-label">Profitto Netto</div>
+                                <div class="rp-stat-value" id="statProfit">€ 0</div>
+                            </div>
+                        </div>
+                        <div class="rp-stat-history-label">Ultimi Risultati</div>
+                        <div id="statsHistory" class="rp-stat-history"></div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- ══════════ TICKER ══════════ -->
+    <footer class="ticker">
+        <div class="ticker-label"><div class="ticker-dot"></div> Live Jackpot</div>
+        <div class="ticker-amount" id="jackpotAmt">€4.290.123,82</div>
+        <div class="ticker-scroll">
+            <div class="ticker-track">
+                <div class="ticker-item">🚀 <span class="winner">@SpeedKing</span> ha fatto cashout a <strong>8.24x</strong> su Rocket Cash</div>
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha fatto cashout a <strong>3.50x</strong> su Rocket Cash</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha fatto cashout a <strong>12.0x</strong> su Rocket Cash</div>
+                <div class="ticker-item">🚀 <span class="winner">@SpeedKing</span> ha fatto cashout a <strong>8.24x</strong> su Rocket Cash</div>
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha fatto cashout a <strong>3.50x</strong> su Rocket Cash</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha fatto cashout a <strong>12.0x</strong> su Rocket Cash</div>
+            </div>
+        </div>
+        <div class="ticker-18">Responsabile 18+</div>
+    </footer>
+
+</div>
+
+<script src="../scripts/auth.js"></script>
+<script src="../scripts/main.js"></script>
+<script src="../scripts/balance.js"></script>
+<script src="../scripts/rocket.js"></script>
+</body>
+</html>

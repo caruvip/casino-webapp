@@ -1,0 +1,138 @@
+/* ── Reset completo regole generiche da main.css ─────────── */
+/* Queste righe neutralizzano le regole del vecchio main.css  */
+/* che applicavano il panno rosso feltro a section e main     */
+
+/* Override del main element (grid area main nella shell) */
+.shell .main {
+    padding: 20px;
+}
+
+/* Reset sezioni feltro */
+section {
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+}
+section h2 {
+    text-align: left;
+    margin-top: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+    text-shadow: none;
+    color: inherit;
+    font-size: inherit;
+}
+section p {
+    text-align: left;
+    text-shadow: none;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+}
+
+.page-hero {
+    min-height: 240px;
+    display: flex;
+    align-items: center;
+    padding: 50px 40px;
+    background: linear-gradient(135deg, rgba(128,0,0,0.85) 0%, rgba(5,5,5,0.9) 60%);
+    border-bottom: 2px solid var(--border-gold);
+}
+.page-hero-content { max-width: 600px; }
+.page-hero-title {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    line-height: 1.1;
+    margin: 0 0 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(180deg, #FFF7CC 0%, #FFD700 35%, #D4AF37 70%, #FFD700 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.page-hero-sub { font-size: 16px; color: #c0b8a0; line-height: 1.7; }
+.content-section { padding: 40px 40px; }
+.promo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+}
+.promo-card {
+    background: linear-gradient(135deg, #1a0000, #0d0000);
+    border: 1px solid var(--border-gold);
+    border-radius: 12px;
+    padding: 28px;
+    position: relative;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+.promo-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(128,0,0,0.3);
+}
+.promo-tag {
+    position: absolute;
+    top: -12px;
+    left: 20px;
+    background: linear-gradient(135deg, #FFD700, #D4AF37);
+    color: #2a0000;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+.promo-card h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--gold);
+    margin: 16px 0 12px;
+}
+.promo-card p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 12px 0;
+    line-height: 1.6;
+}
+.promo-value {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 32px;
+    font-weight: 900;
+    color: var(--gold);
+    margin: 20px 0;
+    text-shadow: 0 0 16px rgba(255,215,0,0.3);
+}
+.promo-btn {
+    display: inline-block;
+    padding: 12px 32px;
+    margin-top: 20px;
+    background: linear-gradient(180deg, #FFF7CC 0%, #FFD700 30%, #D4AF37 70%, #FFD700 100%);
+    color: #2a0000;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(255,215,0,0.3);
+    transition: all 0.25s;
+    width: 100%;
+    text-align: center;
+}
+.promo-btn:hover {
+    box-shadow: 0 0 24px var(--gold);
+    transform: translateY(-2px);
+}

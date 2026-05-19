@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>777Casino — Il Tuo Casino Online</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/layout.css">
+    <link rel="stylesheet" href="../styles/index.css">
+</head>
+<body>
+
+<div class="shell">
+
+    <!-- ══════════ TOPNAV ══════════ -->
+    <nav class="topnav">
+
+        <a class="nav-logo" href="index.html">
+            <div class="nav-logo-icon">7</div>
+            <span class="nav-logo-name">777CASINO</span>
+        </a>
+
+        <div class="nav-links">
+            <a class="nav-link active" href="index.html">Home</a>
+            <a class="nav-link" href="giochi.html">Giochi</a>
+            <a class="nav-link" href="promozioni.html">Promozioni</a>
+            <a class="nav-link" href="chi-siamo.html">Chi Siamo</a>
+            <a class="nav-link" href="contatti.html">Contatti</a>
+        </div>
+
+        <div class="nav-actions" id="userBar">
+            <!-- Popolato da auth.js -->
+        </div>
+
+    </nav>
+
+    <!-- ══════════ SIDEBAR ══════════ -->
+    <aside class="sidebar">
+
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Categorie</div>
+            <ul>
+                <li><div class="sidebar-item active" onclick="filterGames(event, 'all')">
+                    <span class="sidebar-icon">⭐</span> Popolari
+                </div></li>
+                <li><div class="sidebar-item" onclick="filterGames(event, 'slot')">
+                    <span class="sidebar-icon">🎰</span> Slot Machine
+                </div></li>
+                <li><div class="sidebar-item" onclick="filterGames(event, 'tavolo')">
+                    <span class="sidebar-icon">♠️</span> Giochi da Tavolo
+                </div></li>
+                <li><div class="sidebar-item" onclick="window.location.href='giochi.html'">
+                    <span class="sidebar-icon">🎁</span> Jackpots
+                    <span class="sidebar-badge">HOT</span>
+                </div></li>
+                <li><div class="sidebar-item" onclick="filterGames(event, 'crash')">
+                    <span class="sidebar-icon">🚀</span> Crash Games
+                </div></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section" style="border-top: 1px solid var(--border);">
+            <div class="sidebar-section-label" style="padding-top:0">Status VIP</div>
+        </div>
+        <div class="vip-card">
+            <div class="vip-header">
+                <span class="vip-title" id="vipLevelName">Standard</span>
+                <span class="vip-pct" id="vipPct">0%</span>
+            </div>
+            <div class="vip-track">
+                <div class="vip-fill" id="vipFill"></div>
+            </div>
+            <div class="vip-info" id="vipInfo">
+                Gioca per guadagnare <strong>punti VIP</strong> e sbloccare premi esclusivi.
+            </div>
+            <div class="vip-cta" onclick="window.location.href='promozioni.html'">
+                <span>Dettagli Premi</span>
+                <span class="vip-arrow">›</span>
+            </div>
+        </div>
+
+        <div class="spacer"></div>
+
+        <div class="support-box">
+            <div class="support-label">Supporto Elite</div>
+            <div class="support-text">Siamo qui per aiutarti 24/7</div>
+            <button class="support-btn" onclick="window.location.href='contatti.html'">Chat Live</button>
+        </div>
+
+    </aside>
+
+    <!-- ══════════ MAIN ══════════ -->
+    <main class="main">
+
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-eyebrow">Il Casino Online Italiano</div>
+                <h1 class="hero-title">Gioca &amp; Vinci<br>Al Massimo</h1>
+                <p class="hero-sub">
+                    La piattaforma premium con i migliori giochi di casino,
+                    jackpot da milioni e bonus esclusivi per ogni giocatore.
+                </p>
+                <div class="hero-actions">
+                    <button class="hero-btn-primary" onclick="window.location.href='giochi.html'">
+                        🎲 Gioca Ora
+                    </button>
+                    <button class="hero-btn-secondary" onclick="window.location.href='registrati.html'">
+                        Registrati Gratis
+                    </button>
+                </div>
+            </div>
+
+            <div class="hero-promo">
+                <div class="hero-promo-label">Bonus Benvenuto</div>
+                <div class="hero-promo-value">€1.000</div>
+                <div class="hero-promo-sub">Sul Primo Deposito</div>
+            </div>
+
+            <img src="../images/casinotipa.png" alt="" class="hero-img">
+        </section>
+
+        <!-- Giochi Popolari -->
+        <div class="section-wrap">
+            <div class="section-header">
+                <span class="section-title">🔥 Giochi Popolari</span>
+                <a class="section-link" href="giochi.html">Vedi tutti →</a>
+            </div>
+        </div>
+
+        <div class="games-grid" id="gamesGrid">
+
+            <div class="game-card" data-cat="tavolo" onclick="window.location.href='blackjack.html'">
+                <div class="game-thumb t-blackjack">🃏</div>
+                <div class="game-rtp">RTP 99.5%</div>
+                <div class="game-overlay"><button class="game-play">Gioca</button></div>
+                <div class="game-info">
+                    <div class="game-name">Blackjack</div>
+                    <div class="game-provider">Classico</div>
+                </div>
+            </div>
+
+            <div class="game-card" data-cat="tavolo" onclick="window.location.href='roulette.html'">
+                <div class="game-thumb t-roulette">🎡</div>
+                <div class="game-rtp">RTP 97.3%</div>
+                <div class="game-overlay"><button class="game-play">Gioca</button></div>
+                <div class="game-info">
+                    <div class="game-name">Roulette</div>
+                    <div class="game-provider">Europea</div>
+                </div>
+            </div>
+
+            <div class="game-card" data-cat="slot" onclick="window.location.href='slot.html'">
+                <div class="game-thumb t-slot">🎰</div>
+                <div class="game-rtp">RTP 96%</div>
+                <div class="game-overlay"><button class="game-play">Gioca</button></div>
+                <div class="game-info">
+                    <div class="game-name">Fortune 777</div>
+                    <div class="game-provider">Slot Machine</div>
+                </div>
+            </div>
+
+            <div class="game-card" data-cat="tavolo" onclick="window.location.href='poker.html'">
+                <div class="game-thumb t-poker">🤠</div>
+                <div class="game-rtp">RTP 98.5%</div>
+                <div class="game-overlay"><button class="game-play">Gioca</button></div>
+                <div class="game-info">
+                    <div class="game-name">Texas Hold'em</div>
+                    <div class="game-provider">Poker</div>
+                </div>
+            </div>
+
+            <div class="game-card" data-cat="crash" onclick="window.location.href='giochi.html'">
+                <div class="game-thumb t-crash">🚀</div>
+                <div class="game-rtp">RTP 97%</div>
+                <div class="game-overlay"><button class="game-play">Gioca</button></div>
+                <div class="game-info">
+                    <div class="game-name">Rocket Crash</div>
+                    <div class="game-provider">Crash Game</div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- Features -->
+        <div class="section-wrap">
+            <div class="section-header" style="margin-bottom:14px;">
+                <span class="section-title">🏆 Perché 777Casino</span>
+            </div>
+        </div>
+        <div class="features-strip">
+            <div class="feature-item">
+                <div class="feature-icon">🔒</div>
+                <div class="feature-title">Giochi Sicuri</div>
+                <div class="feature-desc">Certificati e controllati. La tua sicurezza prima di tutto.</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">Prelievi Veloci</div>
+                <div class="feature-desc">Ricevi le tue vincite in meno di 24 ore.</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🎁</div>
+                <div class="feature-title">Bonus Esclusivi</div>
+                <div class="feature-desc">Promozioni ogni giorno per tutti i livelli VIP.</div>
+            </div>
+            <div class="feature-item">
+                <div class="feature-icon">🎧</div>
+                <div class="feature-title">Supporto 24/7</div>
+                <div class="feature-desc">Il nostro team è sempre disponibile per aiutarti.</div>
+            </div>
+        </div>
+
+        <footer style="padding: 24px 32px; border-top: 1px solid var(--border); text-align:center;">
+            <p style="font-family:'Cinzel',serif; font-size:11px; color:var(--text-muted); letter-spacing:1px;">
+                &copy; 2025 777casino.it — Tutti i diritti riservati &nbsp;·&nbsp;
+                <a href="#" style="color:var(--text-muted);">Termini</a> &nbsp;·&nbsp;
+                <a href="#" style="color:var(--text-muted);">Privacy</a> &nbsp;·&nbsp;
+                <a href="contatti.html" style="color:var(--text-muted);">Contatti</a>
+            </p>
+            <p style="font-size:11px; color:var(--text-muted); margin-top:6px;">
+                🔞 Vietato ai minori di 18 anni. Gioca responsabilmente.
+            </p>
+        </footer>
+
+    </main>
+
+    <!-- ══════════ TICKER ══════════ -->
+    <footer class="ticker">
+
+        <div class="ticker-label">
+            <div class="ticker-dot"></div>
+            Live Jackpot
+        </div>
+
+        <div class="ticker-amount" id="jackpotAmt">€4.290.123,82</div>
+
+        <div class="ticker-scroll">
+            <div class="ticker-track">
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+            </div>
+        </div>
+        </div>
+
+        <div class="ticker-18">Responsabile 18+</div>
+
+    </footer>
+
+</div><!-- /shell -->
+
+<script src="../scripts/auth.js"></script>
+<script src="../scripts/main.js"></script>
+<script src="../scripts/index.js"></script>
+<script>
+
+// ── Jackpot animato ───────────────────────────────────────
+let jackpot = 4290123.82;
+const jackpotEl = document.getElementById('jackpotAmt');
+setInterval(() => {
+    jackpot += Math.random() * 9.5 + 0.5;
+    jackpotEl.textContent = '€' + jackpot.toLocaleString('it-IT', {
+        minimumFractionDigits: 2, maximumFractionDigits: 2
+    });
+}, 2200);
+
+// ── VIP progress da localStorage ─────────────────────────
+(function initVip() {
+    try {
+        const user = JSON.parse(localStorage.getItem('casino_current_user'));
+        if (!user) return;
+        const levels = { standard: { name: 'Standard', pct: 15, next: 'Silver' },
+                         silver:   { name: '🥈 Silver',  pct: 45, next: 'Gold' },
+                         gold:     { name: '💎 Gold',    pct: 75, next: 'Platinum' },
+                         platinum: { name: '💎 Platinum',pct: 95, next: 'Diamond' } };
+        const l = levels[user.vipLevel] || levels.standard;
+        document.getElementById('vipLevelName').textContent = l.name;
+        document.getElementById('vipPct').textContent = l.pct + '%';
+        document.getElementById('vipInfo').innerHTML =
+            `Mancano punti per il livello <strong>${l.next}</strong>`;
+        setTimeout(() => {
+            document.getElementById('vipFill').style.width = l.pct + '%';
+        }, 400);
+    } catch(e) {}
+})();
+
+// ── Filtro categorie sidebar ──────────────────────────────
+function filterGames(evt, cat) {
+    const target = evt?.currentTarget || (typeof event !== 'undefined' ? event.currentTarget : null);
+    // Aggiorna item attivo
+    document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+    if (target) target.classList.add('active');
+
+    // Filtra card
+    document.querySelectorAll('.game-card').forEach(card => {
+        const c = card.dataset.cat || 'all';
+        card.style.display = (cat === 'all' || c === cat) ? '' : 'none';
+    });
+}
+
+// ── Aggiorna userBar (auth.js standard) ──────────────────
+// auth.js si occupa di popolare #userBar,
+// ma vogliamo usare i pulsanti nav-btn invece di btn-small.
+// Override del renderer per il nuovo layout:
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        const user = JSON.parse(localStorage.getItem('casino_current_user'));
+        const bar = document.getElementById('userBar');
+        if (!bar) return;
+
+        if (user) {
+            bar.innerHTML = `
+                <div style="display:flex;flex-direction:column;align-items:flex-end;line-height:1.2;">
+                    <span style="font-family:'Cinzel',serif;font-size:15px;font-weight:900;color:var(--gold);">
+                        €${(user.balance || 0).toLocaleString('it-IT',{minimumFractionDigits:2})}
+                    </span>
+                    <span style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Saldo Reale</span>
+                </div>
+                <a href="ricarica.html" class="nav-btn nav-btn-outline">+ Deposita</a>
+                <div style="display:flex;align-items:center;gap:7px;padding:5px 12px 5px 5px;border-radius:50px;background:var(--bg-elevated);border:1px solid var(--border-gold);cursor:pointer;" onclick="window.location.href='user.html'">
+                    <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#800000,#cc0000);border:1px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;font-size:13px;">👤</div>
+                    <span style="font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--gold-dim);">${user.username}</span>
+                    <span style="font-size:10px;color:var(--text-muted);">▾</span>
+                </div>
+                <button class="nav-btn nav-btn-outline" onclick="localStorage.removeItem('casino_current_user');location.reload()">Esci</button>
+            `;
+        } else {
+            bar.innerHTML = `
+                <a href="login.html" class="nav-btn nav-btn-outline">Accedi</a>
+                <a href="registrati.html" class="nav-btn nav-btn-solid">Registrati</a>
+            `;
+        }
+    } catch(e) {}
+});
+
+</script>
+</body>
+</html>

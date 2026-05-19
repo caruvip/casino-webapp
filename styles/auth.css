@@ -1,0 +1,186 @@
+/* ================================================
+   FILE auth.css - AUTHENTICATION PAGES
+   Login & Registrati pages styling
+================================================ */
+
+:root {
+    --bg-base:      #050505;
+    --bg-surface:   #0d0d0d;
+    --bg-elevated:  #1a1a1a;
+    --accent:       #800000;
+    --gold:         #FFD700;
+    --gold-dim:     #D4AF37;
+    --text-primary:   #f0eedc;
+    --text-secondary: #8a8470;
+    --text-muted:     #4a4840;
+    --border:         rgba(212,175,55,0.12);
+    --border-gold:    rgba(212,175,55,0.45);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+    margin: 0;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: 'Lato', sans-serif;
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+}
+
+.auth-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.auth-form {
+    width: 100%;
+    max-width: 420px;
+    background: linear-gradient(135deg, #1a0a0a, #0d0000);
+    border: 1px solid var(--border-gold);
+    border-radius: 16px;
+    padding: 48px 40px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+}
+
+.auth-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 40px;
+}
+
+.auth-logo-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #800000, #cc0000);
+    border: 2px solid var(--gold-dim);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    font-weight: 900;
+    color: var(--gold);
+}
+
+.auth-logo-name {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    background: linear-gradient(180deg, #FFF7CC 0%, #FFD700 40%, #D4AF37 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.auth-title {
+    font-family: 'Cinzel', serif;
+    font-size: 24px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--gold);
+    text-align: center;
+    margin-bottom: 8px;
+    text-shadow: 0 0 16px rgba(255,215,0,0.2);
+}
+
+.auth-subtitle {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-label {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gold-dim);
+    margin-bottom: 8px;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border-gold);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    transition: border 0.2s, background 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    background: rgba(255,255,255,0.06);
+    border-color: var(--gold);
+}
+
+.form-input::placeholder {
+    color: var(--text-muted);
+}
+
+.btn-submit {
+    width: 100%;
+    padding: 14px;
+    margin-top: 32px;
+    background: linear-gradient(180deg, #FFF7CC 0%, #FFD700 30%, #D4AF37 70%, #FFD700 100%);
+    color: #2a0000;
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(255,215,0,0.3);
+    transition: all 0.25s;
+}
+
+.btn-submit:hover {
+    box-shadow: 0 0 30px var(--gold);
+    transform: translateY(-2px);
+}
+
+.form-footer {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.form-footer a {
+    color: var(--gold-dim);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.form-footer a:hover {
+    color: var(--gold);
+}
+
+footer {
+    padding: 20px;
+    text-align: center;
+    border-top: 1px solid var(--border-gold);
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--bg-surface);
+}

@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrati | 777Casino</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/auth.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-form">
+            <div class="auth-header">
+                <div class="auth-logo-icon">7</div>
+                <div class="auth-logo-name">777CASINO</div>
+            </div>
+
+            <h1 class="auth-title">Registrati</h1>
+            <p class="auth-subtitle">Unisciti al casino online più esclusivo</p>
+
+            <form id="regForm">
+                <div id="regError" class="form-error"></div>
+                <div class="form-group">
+                    <label class="form-label" for="reguser">Nome utente</label>
+                    <input type="text" id="reguser" class="form-input" required placeholder="Scegli un nome utente">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="regpass">Password</label>
+                    <input type="password" id="regpass" class="form-input" required placeholder="Scegli una password sicura">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="regemail">Email</label>
+                    <input type="email" id="regemail" class="form-input" required placeholder="Inserisci la tua email">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="regbirth">Data di Nascita (18+)</label>
+                    <input type="date" id="regbirth" class="form-input" required>
+                </div>
+
+                <button type="submit" class="btn-submit">Registrati Gratis</button>
+            </form>
+
+            <div class="form-footer">
+                Hai già un account? <a href="login.html">Accedi qui</a>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Â© 2025 777Casino.it | Tutti i diritti riservati | Solo 18+ | Gioco responsabile
+    </footer>
+
+    <script src="../scripts/auth.js"></script>
+</body>
+</html>

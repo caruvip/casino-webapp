@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ricarica | 777Casino</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/auth.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="deposit-form">
+        <div class="form-header">
+            <h1>Deposito Sicuro</h1>
+            <p>🔒 Transazione crittografata a 256-bit</p>
+        </div>
+
+        <form id="ricaricaForm" action="../php/elabora_ricarica.php" method="POST">
+            <div class="form-group">
+                <label class="form-label" for="holder">Intestatario Carta</label>
+                <input type="text" id="holder" class="form-input" placeholder="Mario Rossi" required>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="card">Numero Carta</label>
+                <input type="text" id="card-number" class="form-input" placeholder="0000 0000 0000 0000" required>
+            </div>
+
+            <div class="row-group">
+                <div class="form-group">
+                    <label class="form-label" for="expiry">Scadenza</label>
+                    <input type="text" id="expiry" class="form-input" placeholder="MM/YY" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="cvv">CVV</label>
+                    <input type="text" id="cvv" class="form-input" placeholder="123" maxlength="3" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="importo">Importo (€)</label>
+                <input type="number" id="importoInput" name="importo" class="form-input" placeholder="Es: 100" required>
+            </div>
+
+            <div id="limitWarning" class="warning-box">
+                <div class="warning-title">⚠️ Importo troppo alto!</div>
+                <div class="warning-text">Il saldo massimo ricaricabile in una singola transazione è di €10.000</div>
+                <button type="button" id="hoCapitoBtn" class="btn-understand">Ho capito</button>
+            </div>
+
+            <button type="submit" class="btn-submit">Conferma Pagamento</button>
+        </form>
+
+        <a href="user.html" class="back-link">← Annulla e torna</a>
+    </div>
+</div>
+
+<footer>
+    Â© 2025 777Casino.it | Depositi Sicuri | Pagamenti Crittografati
+</footer>
+
+<script src="../scripts/verificacarta.js"></script>
+<script>
+document.getElementById('ricaricaForm').addEventListener('submit', function(e) {
+    const importoVal = parseFloat(document.getElementById('importoInput').value);
+    if (importoVal > 10000) {
+        e.preventDefault();
+        document.getElementById('limitWarning').style.display = 'block';
+    }
+});
+
+document.getElementById('hoCapitoBtn').addEventListener('click', function() {
+    document.getElementById('limitWarning').style.display = 'none';
+    document.getElementById('importoInput').value = '';
+});
+</script>
+</body>
+</html>

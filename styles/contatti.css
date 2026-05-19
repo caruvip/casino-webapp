@@ -1,0 +1,149 @@
+/* ── Reset completo regole generiche da main.css ─────────── */
+/* Queste righe neutralizzano le regole del vecchio main.css  */
+/* che applicavano il panno rosso feltro a section e main     */
+
+/* Override del main element (grid area main nella shell) */
+.shell .main {
+    padding: 20px;
+}
+
+/* Reset sezioni feltro */
+section {
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+}
+section h2 {
+    text-align: left;
+    margin-top: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+    text-shadow: none;
+    color: inherit;
+    font-size: inherit;
+}
+section p {
+    text-align: left;
+    text-shadow: none;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+}
+
+.page-hero {
+    min-height: 240px;
+    display: flex;
+    align-items: center;
+    padding: 50px 40px;
+    background: linear-gradient(135deg, rgba(128,0,0,0.85) 0%, rgba(5,5,5,0.9) 60%);
+    border-bottom: 2px solid var(--border-gold);
+}
+.page-hero-content { max-width: 600px; }
+.page-hero-title {
+    font-family: 'Cinzel', serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    line-height: 1.1;
+    margin: 0 0 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(180deg, #FFF7CC 0%, #FFD700 35%, #D4AF37 70%, #FFD700 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.content-section { padding: 40px 40px; }
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: 40px;
+}
+.contact-card {
+    background: linear-gradient(135deg, #1a0000, #0d0000);
+    border: 1px solid var(--border-gold);
+    border-radius: 12px;
+    padding: 28px;
+}
+.contact-card-title {
+    font-family: 'Cinzel', serif;
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--gold);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.contact-card-text {
+    font-size: 14px;
+    color: var(--text-secondary);
+    line-height: 1.8;
+    margin-bottom: 12px;
+}
+.contact-card-text a {
+    color: var(--gold-dim);
+    text-decoration: none;
+    font-weight: 600;
+}
+.contact-card-text a:hover { color: var(--gold); }
+.form-section {
+    background: linear-gradient(135deg, #1a0a0a, #0d0000);
+    border: 1px solid var(--border-gold);
+    border-radius: 12px;
+    padding: 28px;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-label {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--gold-dim);
+    margin-bottom: 8px;
+}
+.form-input, .form-textarea {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border-gold);
+    border-radius: 6px;
+    color: var(--text-primary);
+    font-family: 'Lato', sans-serif;
+    font-size: 14px;
+    transition: border 0.2s, background 0.2s;
+}
+.form-input:focus, .form-textarea:focus {
+    outline: none;
+    background: rgba(255,255,255,0.06);
+    border-color: var(--gold);
+}
+.form-input::placeholder, .form-textarea::placeholder {
+    color: var(--text-muted);
+}
+.btn-submit {
+    padding: 12px 32px;
+    background: linear-gradient(180deg, #FFF7CC 0%, #FFD700 30%, #D4AF37 70%, #FFD700 100%);
+    color: #2a0000;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(255,215,0,0.3);
+    transition: all 0.25s;
+}
+.btn-submit:hover {
+    box-shadow: 0 0 24px var(--gold);
+    transform: translateY(-2px);
+}

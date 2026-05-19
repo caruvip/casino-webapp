@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>777Casino — Admin Panel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../styles/admin.css">
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     LOGIN SCREEN
+══════════════════════════════════════ -->
+<div id="loginScreen" class="login-screen">
+    <div class="login-bg-grid"></div>
+    <div class="login-card">
+        <div class="login-logo">
+            <span class="login-logo-icon">⬡</span>
+            <span class="login-logo-text">ADMIN<span>PANEL</span></span>
+        </div>
+        <p class="login-subtitle">777Casino Control Center</p>
+        <div class="login-fields">
+            <div class="login-field">
+                <label>Username</label>
+                <input type="text" id="adminUser" placeholder="admin" autocomplete="off">
+            </div>
+            <div class="login-field">
+                <label>Password</label>
+                <input type="password" id="adminPass" placeholder="••••••••">
+            </div>
+        </div>
+        <div class="login-error" id="loginError"></div>
+        <button class="login-btn" onclick="adminLogin()">ACCEDI AL PANNELLO</button>
+        <a href="login.html" class="login-back">← Torna al Casino</a>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════
+     ADMIN SHELL
+══════════════════════════════════════ -->
+<div id="adminShell" class="admin-shell hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="adm-sidebar">
+        <div class="adm-brand">
+            <span class="adm-brand-icon">⬡</span>
+            <div>
+                <div class="adm-brand-name">777Casino</div>
+                <div class="adm-brand-role">Admin Panel</div>
+            </div>
+        </div>
+
+        <nav class="adm-nav">
+            <div class="adm-nav-group">
+                <span class="adm-nav-label">Dashboard</span>
+                <a class="adm-nav-item active" onclick="showSection('dashboard')" href="#">
+                    <span class="adm-nav-icon">◈</span> Overview
+                </a>
+            </div>
+            <div class="adm-nav-group">
+                <span class="adm-nav-label">Gestione</span>
+                <a class="adm-nav-item" onclick="showSection('users')" href="#">
+                    <span class="adm-nav-icon">◎</span> Utenti
+                    <span class="adm-nav-badge" id="badgeUsers">0</span>
+                </a>
+                <a class="adm-nav-item" onclick="showSection('transactions')" href="#">
+                    <span class="adm-nav-icon">◇</span> Transazioni
+                </a>
+                <a class="adm-nav-item" onclick="showSection('bonuses')" href="#">
+                    <span class="adm-nav-icon">◈</span> Bonus
+                </a>
+            </div>
+            <div class="adm-nav-group">
+                <span class="adm-nav-label">Analytics</span>
+                <a class="adm-nav-item" onclick="showSection('analytics')" href="#">
+                    <span class="adm-nav-icon">◉</span> Analisi Giochi
+                </a>
+                <a class="adm-nav-item" onclick="showSection('revenue')" href="#">
+                    <span class="adm-nav-icon">◆</span> Revenue
+                </a>
+            </div>
+            <div class="adm-nav-group">
+                <span class="adm-nav-label">Sistema</span>
+                <a class="adm-nav-item" onclick="showSection('maintenance')" href="#">
+                    <span class="adm-nav-icon">⬡</span> Manutenzione
+                </a>
+                <a class="adm-nav-item" onclick="showSection('logs')" href="#">
+                    <span class="adm-nav-icon">◱</span> Activity Log
+                </a>
+                <a class="adm-nav-item" onclick="showSection('settings')" href="#">
+                    <span class="adm-nav-icon">◎</span> Impostazioni
+                </a>
+            </div>
+        </nav>
+
+        <div class="adm-sidebar-footer">
+            <div class="adm-admin-info">
+                <div class="adm-admin-avatar">A</div>
+                <div>
+                    <div class="adm-admin-name" id="sidebarAdminName">Admin</div>
+                    <div class="adm-admin-role">Superadmin</div>
+                </div>
+            </div>
+            <button class="adm-logout-btn" onclick="adminLogout()">Esci</button>
+        </div>
+    </aside>
+
+    <!-- MAIN -->
+    <div class="adm-main">
+
+        <!-- TOP BAR -->
+        <header class="adm-topbar">
+            <div class="adm-topbar-left">
+                <h1 class="adm-page-title" id="pageTitle">Overview</h1>
+                <span class="adm-breadcrumb" id="pageBreadcrumb">Dashboard / Overview</span>
+            </div>
+            <div class="adm-topbar-right">
+                <div class="adm-status-dot" id="statusDot" title="Sistema online"></div>
+                <span class="adm-topbar-time" id="topbarTime"></span>
+                <div class="adm-notif-btn" onclick="toggleNotifs()">
+                    🔔 <span class="adm-notif-count" id="notifCount">3</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Notifiche dropdown -->
+        <div class="adm-notif-panel hidden" id="notifPanel">
+            <div class="notif-header">Notifiche <button onclick="clearNotifs()">Cancella tutto</button></div>
+            <div id="notifList"></div>
+        </div>
+
+        <!-- CONTENT AREA -->
+        <div class="adm-content">
+
+            <!-- ══ DASHBOARD ══ -->
+            <section class="adm-section active" id="sec-dashboard">
+                <div class="kpi-grid">
+                    <div class="kpi-card kpi-users">
+                        <div class="kpi-icon">👥</div>
+                        <div class="kpi-body">
+                            <div class="kpi-value" id="kpiUsers">0</div>
+                            <div class="kpi-label">Utenti Totali</div>
+                            <div class="kpi-delta positive" id="kpiUsersDelta">+0 oggi</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card kpi-revenue">
+                        <div class="kpi-icon">💶</div>
+                        <div class="kpi-body">
+                            <div class="kpi-value" id="kpiRevenue">€ 0</div>
+                            <div class="kpi-label">Revenue (30gg)</div>
+                            <div class="kpi-delta positive" id="kpiRevenueDelta">+0%</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card kpi-bets">
+                        <div class="kpi-icon">🎲</div>
+                        <div class="kpi-body">
+                            <div class="kpi-value" id="kpiBets">0</div>
+                            <div class="kpi-label">Puntate Totali</div>
+                            <div class="kpi-delta" id="kpiBetsDelta">—</div>
+                        </div>
+                    </div>
+                    <div class="kpi-card kpi-online">
+                        <div class="kpi-icon">🟢</div>
+                        <div class="kpi-body">
+                            <div class="kpi-value" id="kpiOnline">0</div>
+                            <div class="kpi-label">Utenti Online</div>
+                            <div class="kpi-delta" id="kpiOnlineDelta">in questo momento</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dash-grid">
+                    <!-- Attività recente -->
+                    <div class="adm-card dash-activity">
+                        <div class="adm-card-header">
+                            <span>Attività Recente</span>
+                            <span class="live-badge">● LIVE</span>
+                        </div>
+                        <div class="activity-list" id="activityList"></div>
+                    </div>
+
+                    <!-- Top giochi -->
+                    <div class="adm-card dash-topgames">
+                        <div class="adm-card-header">Top Giochi (Volume)</div>
+                        <div class="topgames-list" id="topGamesList"></div>
+                    </div>
+
+                    <!-- Distribuzione VIP -->
+                    <div class="adm-card dash-vip">
+                        <div class="adm-card-header">Distribuzione VIP</div>
+                        <div class="vip-bars" id="vipBars"></div>
+                    </div>
+
+                    <!-- Avvisi sistema -->
+                    <div class="adm-card dash-alerts">
+                        <div class="adm-card-header">Avvisi Sistema</div>
+                        <div class="alerts-list" id="alertsList"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══ UTENTI ══ -->
+            <section class="adm-section" id="sec-users">
+                <div class="adm-toolbar">
+                    <input class="adm-search" id="userSearch" type="text" placeholder="🔍  Cerca per username, email…" oninput="filterUsers()">
+                    <select class="adm-select" id="userFilter" onchange="filterUsers()">
+                        <option value="all">Tutti gli utenti</option>
+                        <option value="active">Attivi</option>
+                        <option value="banned">Bannati</option>
+                        <option value="vip">VIP</option>
+                    </select>
+                    <button class="adm-btn adm-btn-primary" onclick="openCreateUser()">+ Nuovo Utente</button>
+                    <button class="adm-btn" onclick="exportUsers()">↓ Esporta CSV</button>
+                </div>
+
+                <div class="adm-card">
+                    <table class="adm-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Utente</th>
+                                <th>Email</th>
+                                <th>Saldo</th>
+                                <th>VIP</th>
+                                <th>Partite</th>
+                                <th>Stato</th>
+                                <th>Registrato</th>
+                                <th>Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ══ TRANSAZIONI ══ -->
+            <section class="adm-section" id="sec-transactions">
+                <div class="adm-toolbar">
+                    <input class="adm-search" type="text" id="txSearch" placeholder="🔍  Cerca utente o importo…" oninput="filterTransactions()">
+                    <select class="adm-select" id="txFilter" onchange="filterTransactions()">
+                        <option value="all">Tutte</option>
+                        <option value="deposit">Depositi</option>
+                        <option value="withdrawal">Prelievi</option>
+                        <option value="bonus">Bonus</option>
+                    </select>
+                    <button class="adm-btn" onclick="exportTransactions()">↓ Esporta CSV</button>
+                </div>
+                <div class="adm-card">
+                    <table class="adm-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Utente</th>
+                                <th>Tipo</th>
+                                <th>Importo</th>
+                                <th>Stato</th>
+                                <th>Data</th>
+                                <th>Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody id="txTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ══ BONUS ══ -->
+            <section class="adm-section" id="sec-bonuses">
+                <div class="adm-toolbar">
+                    <button class="adm-btn adm-btn-primary" onclick="openAddBonus()">+ Crea Bonus</button>
+                    <button class="adm-btn" onclick="sendMassBonus()">📤 Bonus di Massa</button>
+                </div>
+                <div class="bonus-grid" id="bonusGrid"></div>
+
+                <!-- Form crea bonus -->
+                <div class="modal-overlay hidden" id="bonusModal">
+                    <div class="modal-box">
+                        <div class="modal-header">Crea Bonus <button onclick="closeModal('bonusModal')">✕</button></div>
+                        <div class="modal-body">
+                            <div class="form-row">
+                                <label>Nome Bonus</label>
+                                <input type="text" id="bName" placeholder="es. Bonus Benvenuto">
+                            </div>
+                            <div class="form-row">
+                                <label>Importo (€)</label>
+                                <input type="number" id="bAmount" placeholder="100" min="1">
+                            </div>
+                            <div class="form-row">
+                                <label>Tipo</label>
+                                <select id="bType">
+                                    <option>welcome</option>
+                                    <option>deposit</option>
+                                    <option>cashback</option>
+                                    <option>vip</option>
+                                </select>
+                            </div>
+                            <div class="form-row">
+                                <label>Scadenza</label>
+                                <input type="date" id="bExpiry">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="adm-btn" onclick="closeModal('bonusModal')">Annulla</button>
+                            <button class="adm-btn adm-btn-primary" onclick="createBonus()">Crea</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══ ANALYTICS ══ -->
+            <section class="adm-section" id="sec-analytics">
+                <div class="analytics-grid">
+                    <div class="adm-card analytics-big">
+                        <div class="adm-card-header">Performance Giochi</div>
+                        <div class="chart-wrap">
+                            <canvas id="gamesChart" width="600" height="260"></canvas>
+                        </div>
+                    </div>
+                    <div class="adm-card analytics-stats">
+                        <div class="adm-card-header">Statistiche per Gioco</div>
+                        <div id="gameStatsList"></div>
+                    </div>
+                    <div class="adm-card analytics-rtp">
+                        <div class="adm-card-header">RTP Effettivo vs Teorico</div>
+                        <div id="rtpList"></div>
+                    </div>
+                    <div class="adm-card analytics-winloss">
+                        <div class="adm-card-header">Win / Loss Ratio</div>
+                        <div class="donut-wrap">
+                            <canvas id="winLossChart" width="220" height="220"></canvas>
+                        </div>
+                        <div id="winLossLegend" class="donut-legend"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══ REVENUE ══ -->
+            <section class="adm-section" id="sec-revenue">
+                <div class="revenue-kpi-row">
+                    <div class="adm-card rev-kpi">
+                        <div class="rev-kpi-label">GGR Oggi</div>
+                        <div class="rev-kpi-value" id="revToday">€ 0</div>
+                    </div>
+                    <div class="adm-card rev-kpi">
+                        <div class="rev-kpi-label">GGR Settimana</div>
+                        <div class="rev-kpi-value" id="revWeek">€ 0</div>
+                    </div>
+                    <div class="adm-card rev-kpi">
+                        <div class="rev-kpi-label">GGR Mese</div>
+                        <div class="rev-kpi-value" id="revMonth">€ 0</div>
+                    </div>
+                    <div class="adm-card rev-kpi">
+                        <div class="rev-kpi-label">Saldo Medio Utente</div>
+                        <div class="rev-kpi-value" id="revAvgBal">€ 0</div>
+                    </div>
+                </div>
+                <div class="adm-card">
+                    <div class="adm-card-header">Andamento Revenue (ultimi 30 giorni)</div>
+                    <div class="chart-wrap">
+                        <canvas id="revenueChart" width="800" height="280"></canvas>
+                    </div>      
+                </div>
+                <div class="adm-card" style="margin-top:16px;">
+                    <div class="adm-card-header">Top 10 Spenders</div>
+                    <table class="adm-table">
+                        <thead>
+                            <tr><th>Rank</th><th>Utente</th><th>Totale Puntato</th><th>Totale Vinto</th><th>Profitto Casino</th><th>VIP</th></tr>
+                        </thead>
+                        <tbody id="topSpendersBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ══ MANUTENZIONE ══ -->
+            <section class="adm-section" id="sec-maintenance">
+                <div class="maint-grid">
+
+                    <!-- Status servizi -->
+                    <div class="adm-card maint-services">
+                        <div class="adm-card-header">Stato Servizi</div>
+                        <div id="servicesList"></div>
+                    </div>
+
+                    <!-- Modalità manutenzione -->
+                    <div class="adm-card maint-toggle">
+                        <div class="adm-card-header">Modalità Manutenzione</div>
+                        <div class="maint-mode-body">
+                            <div class="toggle-row">
+                                <span>Modalità Manutenzione Sito</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="maintMode" onchange="toggleMaint()">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-row">
+                                <span>Blocca Nuove Registrazioni</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="blockReg">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-row">
+                                <span>Blocca Prelievi</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="blockWithd">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <div class="toggle-row">
+                                <span>Solo Utenti VIP</span>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="vipOnly">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            <textarea class="adm-textarea" id="maintMessage" placeholder="Messaggio di manutenzione visualizzato agli utenti…"></textarea>
+                            <button class="adm-btn adm-btn-primary" onclick="saveMaintSettings()">Salva Impostazioni</button>
+                        </div>
+                    </div>
+
+                    <!-- Azioni rapide -->
+                    <div class="adm-card maint-actions">
+                        <div class="adm-card-header">Azioni Rapide</div>
+                        <div class="maint-action-list">
+                            <button class="maint-action-btn" onclick="clearCache()">
+                                <span class="ma-icon">🗑️</span>
+                                <span class="ma-text">
+                                    <strong>Svuota Cache</strong>
+                                    <small>Pulisce dati temporanei localStorage</small>
+                                </span>
+                            </button>
+                            <button class="maint-action-btn" onclick="resetAllBalances()">
+                                <span class="ma-icon">🔄</span>
+                                <span class="ma-text">
+                                    <strong>Reset Saldi Demo</strong>
+                                    <small>Ripristina saldo di tutti a €1.000</small>
+                                </span>
+                            </button>
+                            <button class="maint-action-btn" onclick="exportFullBackup()">
+                                <span class="ma-icon">💾</span>
+                                <span class="ma-text">
+                                    <strong>Backup Dati</strong>
+                                    <small>Esporta tutto il DB in JSON</small>
+                                </span>
+                            </button>
+                            <button class="maint-action-btn danger" onclick="confirmNukeUsers()">
+                                <span class="ma-icon">⚠️</span>
+                                <span class="ma-text">
+                                    <strong>Elimina Tutti gli Utenti</strong>
+                                    <small>IRREVERSIBILE — solo per ambienti demo</small>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Statistiche sistema -->
+                    <div class="adm-card maint-sysinfo">
+                        <div class="adm-card-header">Info Sistema</div>
+                        <div id="sysInfoList"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══ LOG ══ -->
+            <section class="adm-section" id="sec-logs">
+                <div class="adm-toolbar">
+                    <select class="adm-select" id="logFilter" onchange="filterLogs()">
+                        <option value="all">Tutti i log</option>
+                        <option value="login">Login</option>
+                        <option value="bet">Puntate</option>
+                        <option value="admin">Admin</option>
+                        <option value="error">Errori</option>
+                    </select>
+                    <button class="adm-btn" onclick="clearLogs()">🗑️ Svuota Log</button>
+                    <button class="adm-btn" onclick="exportLogs()">↓ Esporta</button>
+                </div>
+                <div class="adm-card log-terminal" id="logTerminal">
+                    <div id="logLines"></div>
+                    <div class="log-cursor">█</div>
+                </div>
+            </section>
+
+            <!-- ══ IMPOSTAZIONI ══ -->
+            <section class="adm-section" id="sec-settings">
+                <div class="settings-grid">
+                    <div class="adm-card">
+                        <div class="adm-card-header">Impostazioni Casino</div>
+                        <div class="settings-form">
+                            <div class="form-row">
+                                <label>Nome Casino</label>
+                                <input type="text" id="setCasinoName" value="777Casino">
+                            </div>
+                            <div class="form-row">
+                                <label>Bonus Benvenuto (€)</label>
+                                <input type="number" id="setWelcomeBonus" value="1000">
+                            </div>
+                            <div class="form-row">
+                                <label>Puntata Minima Globale (€)</label>
+                                <input type="number" id="setMinBet" value="1">
+                            </div>
+                            <div class="form-row">
+                                <label>Puntata Massima Globale (€)</label>
+                                <input type="number" id="setMaxBet" value="5000">
+                            </div>
+                            <div class="form-row">
+                                <label>Limite Deposito Giornaliero (€)</label>
+                                <input type="number" id="setDepLimit" value="10000">
+                            </div>
+                            <button class="adm-btn adm-btn-primary" onclick="saveSettings()">Salva</button>
+                        </div>
+                    </div>
+                    <div class="adm-card">
+                        <div class="adm-card-header">Cambio Password Admin</div>
+                        <div class="settings-form">
+                            <div class="form-row">
+                                <label>Password Attuale</label>
+                                <input type="password" id="oldPass">
+                            </div>
+                            <div class="form-row">
+                                <label>Nuova Password</label>
+                                <input type="password" id="newPass">
+                            </div>
+                            <div class="form-row">
+                                <label>Conferma Password</label>
+                                <input type="password" id="confPass">
+                            </div>
+                            <button class="adm-btn adm-btn-primary" onclick="changeAdminPass()">Aggiorna Password</button>
+                        </div>
+                    </div>
+                    <div class="adm-card">
+                        <div class="adm-card-header">RTP per Gioco</div>
+                        <div class="settings-form" id="rtpSettings"></div>
+                    </div>
+                </div>
+            </section>
+
+        </div><!-- /adm-content -->
+    </div><!-- /adm-main -->
+</div><!-- /adminShell -->
+
+<!-- ══ MODAL UTENTE ══ -->
+<div class="modal-overlay hidden" id="userModal">
+    <div class="modal-box modal-large">
+        <div class="modal-header">
+            <span id="userModalTitle">Dettaglio Utente</span>
+            <button onclick="closeModal('userModal')">✕</button>
+        </div>
+        <div class="modal-body" id="userModalBody"></div>
+    </div>
+</div>
+
+<!-- ══ MODAL CONFERMA ══ -->
+<div class="modal-overlay hidden" id="confirmModal">
+    <div class="modal-box modal-sm">
+        <div class="modal-header">Conferma Azione <button onclick="closeModal('confirmModal')">✕</button></div>
+        <div class="modal-body">
+            <p id="confirmText" style="color:var(--text-secondary);line-height:1.6;"></p>
+        </div>
+        <div class="modal-footer">
+            <button class="adm-btn" onclick="closeModal('confirmModal')">Annulla</button>
+            <button class="adm-btn adm-btn-danger" id="confirmOkBtn">Conferma</button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div id="toastContainer" class="toast-container"></div>
+
+<script src="../scripts/admin.js"></script>
+</body>
+</html>

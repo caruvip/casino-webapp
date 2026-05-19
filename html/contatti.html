@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contatti | 777Casino</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/layout.css">
+    <link rel="stylesheet" href="../styles/contatti.css">
+    
+</head>
+<body>
+
+<div class="shell">
+    <nav class="topnav">
+        <a class="nav-logo" href="index.html">
+            <div class="nav-logo-icon">7</div>
+            <span class="nav-logo-name">777CASINO</span>
+        </a>
+        <div class="nav-links">
+            <a class="nav-link" href="index.html">Home</a>
+            <a class="nav-link" href="giochi.html">Giochi</a>
+            <a class="nav-link" href="promozioni.html">Promozioni</a>
+            <a class="nav-link" href="chi-siamo.html">Chi Siamo</a>
+            <a class="nav-link active" href="contatti.html">Contatti</a>
+        </div>
+        <div class="nav-actions" id="userBar"></div>
+    </nav>
+
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Contattaci</div>
+            <ul>
+                <li><div class="sidebar-item active"><span class="sidebar-icon">📧</span>Email</div></li>
+                <li><div class="sidebar-item"><span class="sidebar-icon">📞</span>Telefono</div></li>
+                <li><div class="sidebar-item"><span class="sidebar-icon">💬</span>Chat Live</div></li>
+            </ul>
+        </div>
+        <div class="sidebar-section" style="border-top: 1px solid var(--border);">
+            <div class="sidebar-section-label">Status VIP</div>
+        </div>
+        <div class="vip-card">
+            <div class="vip-header">
+                <span class="vip-title" id="vipLevelName">Standard</span>
+                <span class="vip-pct" id="vipPct">0%</span>
+            </div>
+            <div class="vip-track">
+                <div class="vip-fill" id="vipFill"></div>
+            </div>
+            <div class="vip-info" id="vipInfo">Gioca per guadagnare <strong>punti VIP</strong></div>
+        </div>
+        <div class="spacer"></div>
+        <div class="support-box">
+            <div class="support-label">Supporto</div>
+            <div class="support-text">Sempre online</div>
+            <button class="support-btn" onclick="alert('Chat in arrivo!')">Chat Live</button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <section class="page-hero">
+            <div class="page-hero-content">
+                <h1 class="page-hero-title">Contatti</h1>
+            </div>
+        </section>
+
+        <section class="content-section">
+            <div class="contact-grid">
+                <div class="contact-card">
+                    <div class="contact-card-title">📧 Email VIP</div>
+                    <p class="contact-card-text">
+                        Il nostro team è disponibile per rispondere a tutte le tue domande.
+                    </p>
+                    <p class="contact-card-text">
+                        <a href="mailto:vip@777casino.it">vip@777casino.it</a>
+                    </p>
+                </div>
+
+                <div class="contact-card">
+                    <div class="contact-card-title">📞 Supporto Telefonico</div>
+                    <p class="contact-card-text">
+                        Parla direttamente con il nostro team 24/7.
+                    </p>
+                    <p class="contact-card-text">
+                        <a href="tel:+393330000000">+39 333 000 0000</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2 style="font-family:'Cinzel',serif; font-size:18px; font-weight:900; color:var(--gold); margin-top:0; margin-bottom:28px; text-transform:uppercase; letter-spacing:2px;">Invia un Messaggio</h2>
+                <form>
+                    <div class="form-group">
+                        <label class="form-label" for="name">Nome Completo</label>
+                        <input type="text" id="name" class="form-input" required placeholder="Il tuo nome">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email</label>
+                        <input type="email" id="email" class="form-input" required placeholder="La tua email">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="subject">Oggetto</label>
+                        <input type="text" id="subject" class="form-input" required placeholder="Oggetto della richiesta">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="message">Messaggio</label>
+                        <textarea id="message" class="form-textarea" rows="5" required placeholder="Scrivi il tuo messaggio..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit">Invia Messaggio</button>
+                </form>
+            </div>
+        </section>
+
+        <footer style="padding: 24px 40px; border-top: 1px solid var(--border); text-align:center; margin-top:40px;">
+            <p style="font-family:'Cinzel',serif; font-size:11px; color:var(--text-muted); letter-spacing:1px;">
+                Â© 2025 777Casino.it | Supporto VIP 24/7 | Risposta in 5 minuti
+            </p>
+        </footer>
+    </main>
+
+    <footer class="ticker">
+        <div class="ticker-label"><div class="ticker-dot"></div> Live Jackpot</div>
+        <div class="ticker-amount" id="jackpotAmt">€4.290.123,82</div>
+        <div class="ticker-scroll">
+            <div class="ticker-track">
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+            </div>
+        </div>
+            </div>
+        </div>
+        <div class="ticker-18">Responsabile 18+</div>
+    </footer>
+</div>
+
+<script src="../scripts/auth.js"></script>
+<script src="../scripts/main.js"></script>
+<script>
+let jackpot = 4290123.82;
+const jackpotEl = document.getElementById('jackpotAmt');
+setInterval(() => {
+    jackpot += Math.random() * 9.5 + 0.5;
+    jackpotEl.textContent = '€' + jackpot.toLocaleString('it-IT', {
+        minimumFractionDigits: 2, maximumFractionDigits: 2
+    });
+}, 2200);
+
+(function initVip() {
+    try {
+        const user = JSON.parse(localStorage.getItem('casino_current_user'));
+        if (!user) return;
+        const levels = { standard: { name: 'Standard', pct: 15, next: 'Silver' },
+                         silver:   { name: '🥈 Silver',  pct: 45, next: 'Gold' },
+                         gold:     { name: '💎 Gold',    pct: 75, next: 'Platinum' },
+                         platinum: { name: '💎 Platinum',pct: 95, next: 'Diamond' } };
+        const l = levels[user.vipLevel] || levels.standard;
+        document.getElementById('vipLevelName').textContent = l.name;
+        document.getElementById('vipPct').textContent = l.pct + '%';
+        setTimeout(() => {
+            document.getElementById('vipFill').style.width = l.pct + '%';
+        }, 400);
+    } catch(e) {}
+})();
+
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        const user = JSON.parse(localStorage.getItem('casino_current_user'));
+        const bar = document.getElementById('userBar');
+        if (!bar) return;
+        if (user) {
+            bar.innerHTML = `
+                <div class="nav-balance">
+                    <span class="nav-balance-label">Saldo</span>
+                    <span class="nav-balance-amount" id="userBalanceNav">€0</span>
+                </div>
+                <a href="ricarica.html" class="nav-btn nav-btn-outline">Ricarica</a>
+                <a href="user.html" class="nav-btn nav-btn-outline">Profilo</a>
+                <button class="nav-btn nav-btn-outline" onclick="localStorage.removeItem('casino_current_user');location.reload()">Esci</button>
+            `;
+        } else {
+            bar.innerHTML = `
+                <a href="login.html" class="nav-btn nav-btn-outline">Accedi</a>
+                <a href="registrati.html" class="nav-btn nav-btn-solid">Registrati</a>
+            `;
+        }
+    } catch(e) {}
+});
+</script>
+</body>
+</html>

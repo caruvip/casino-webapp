@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roulette Royale | 777Casino</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/layout.css">
+    <link rel="stylesheet" href="../styles/roulette.css">
+    
+</head>
+<body>
+
+<div class="shell">
+    <nav class="topnav">
+        <a class="nav-logo" href="index.html">
+            <div class="nav-logo-icon">7</div>
+            <span class="nav-logo-name">777CASINO</span>
+        </a>
+        <div class="nav-links">
+            <a class="nav-link" href="index.html">Home</a>
+            <a class="nav-link active" href="giochi.html">Giochi</a>
+            <a class="nav-link" href="promozioni.html">Promozioni</a>
+            <a class="nav-link" href="chi-siamo.html">Chi Siamo</a>
+            <a class="nav-link" href="contatti.html">Contatti</a>
+        </div>
+        <div class="nav-actions" id="userBar"></div>
+    </nav>
+
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Categorie</div>
+            <ul>
+                <li><div class="sidebar-item" onclick="window.location.href='giochi.html'">
+                    <span class="sidebar-icon">⭐</span> Popolari
+                </div></li>
+                <li><div class="sidebar-item" onclick="window.location.href='giochi.html'">
+                    <span class="sidebar-icon">🎰</span> Slot Machine
+                </div></li>
+                <li><div class="sidebar-item active" onclick="window.location.href='giochi.html'">
+                    <span class="sidebar-icon">♠️</span> Giochi da Tavolo
+                </div></li>
+                <li><div class="sidebar-item" onclick="window.location.href='giochi.html'">
+                    <span class="sidebar-icon">🎁</span> Jackpots
+                    <span class="sidebar-badge">HOT</span>
+                </div></li>
+            </ul>
+        </div>
+        <div class="sidebar-section" style="border-top: 1px solid var(--border);">
+            <div class="sidebar-section-label" style="padding-top:0">Status VIP</div>
+        </div>
+        <div class="vip-card">
+            <div class="vip-header">
+                <span class="vip-title" id="vipLevelName">Standard</span>
+                <span class="vip-pct" id="vipPct">0%</span>
+            </div>
+            <div class="vip-track">
+                <div class="vip-fill" id="vipFill"></div>
+            </div>
+            <div class="vip-info" id="vipInfo">
+                Gioca per guadagnare <strong>punti VIP</strong> e sblocca premi.
+            </div>
+        </div>
+        <div class="spacer"></div>
+        <div class="support-box">
+            <div class="support-label">Supporto Elite</div>
+            <div class="support-text">Siamo qui 24/7</div>
+            <button class="support-btn" onclick="window.location.href='contatti.html'">Chat Live</button>
+        </div>
+    </aside>
+
+    <main class="main">
+        <div class="game-table-wrapper">
+            <div class="top-section">
+                <div class="wheel-container">
+                    <div class="pointer">▼</div>
+                    <div id="wheel" class="wheel">
+                        <img src="../images/roulette.png" alt="Roulette Wheel">
+                    </div>
+                    <div id="ball-container" class="ball-container">
+                        <div id="ball" class="ball"></div>
+                    </div>
+                </div>
+                <div class="info-panel">
+                    <div class="display-box">
+                        <div id="winning-number-display" class="win-display">--</div>
+                    </div>
+                    <div class="stats-box">
+                        <p>SALDO: <span id="bank-value" class="gold">---</span></p>
+                        <p>PUNTATA: <span id="current-bet" class="gold">0</span></p>
+                    </div>
+                    <div id="message-area" class="message-area">Piazza le tue puntate</div>
+                </div>
+            </div>
+            <div class="bottom-section">
+                <div class="chips-panel">
+                    <div class="chip" data-value="5" onclick="selectChip(5)">5</div>
+                    <div class="chip" data-value="25" onclick="selectChip(25)">25</div>
+                    <div class="chip" data-value="50" onclick="selectChip(50)">50</div>
+                    <div class="chip" data-value="100" onclick="selectChip(100)">100</div>
+                    <div class="chip all-in" onclick="selectChip('all-in')">ALL</div>
+                </div>
+                <div class="betting-table-container">
+                    <div id="betting-board" class="betting-board">
+                        <div class="bet-spot number-0 green" data-id="0" onclick="placeBet('0', 35)">0<div class="bet-overlay"></div></div>
+                        <div class="bet-spot col-bet" data-id="col3" style="grid-row: 1; grid-column: 14;" onclick="placeBet('col3', 2)">2:1<div class="bet-overlay"></div></div>
+                        <div class="bet-spot col-bet" data-id="col2" style="grid-row: 2; grid-column: 14;" onclick="placeBet('col2', 2)">2:1<div class="bet-overlay"></div></div>
+                        <div class="bet-spot col-bet" data-id="col1" style="grid-row: 3; grid-column: 14;" onclick="placeBet('col1', 2)">2:1<div class="bet-overlay"></div></div>
+                        <div class="bet-spot doz-bet" data-id="1st12" style="grid-row: 4; grid-column: 2 / 6;" onclick="placeBet('1st12', 2)">1st 12<div class="bet-overlay"></div></div>
+                        <div class="bet-spot doz-bet" data-id="2nd12" style="grid-row: 4; grid-column: 6 / 10;" onclick="placeBet('2nd12', 2)">2nd 12<div class="bet-overlay"></div></div>
+                        <div class="bet-spot doz-bet" data-id="3rd12" style="grid-row: 4; grid-column: 10 / 14;" onclick="placeBet('3rd12', 2)">3rd 12<div class="bet-overlay"></div></div>
+                        <div class="bet-spot simple-bet" data-id="1-18" style="grid-row: 5; grid-column: 2 / 4;" onclick="placeBet('1-18', 1)">1-18<div class="bet-overlay"></div></div>
+                        <div class="bet-spot simple-bet" data-id="even" style="grid-row: 5; grid-column: 4 / 6;" onclick="placeBet('even', 1)">PARI<div class="bet-overlay"></div></div>
+                        <div class="bet-spot simple-bet red" data-id="red" style="grid-row: 5; grid-column: 6 / 8;" onclick="placeBet('red', 1)">ROSSO<div class="bet-overlay"></div></div>
+                        <div class="bet-spot simple-bet black" data-id="black" style="grid-row: 5; grid-column: 8 / 10;" onclick="placeBet('black', 1)">NERO<div class="bet-overlay"></div></div>
+                        <div class="bet-spot simple-bet" data-id="odd" style="grid-row: 5; grid-column: 10 / 12;" onclick="placeBet('odd', 1)">DISPARI<div class="bet-overlay"></div></div>
+                        <div class="bet-spot simple-bet" data-id="19-36" style="grid-row: 5; grid-column: 12 / 14;" onclick="placeBet('19-36', 1)">19-36<div class="bet-overlay"></div></div>
+                    </div>
+                </div>
+                <div class="controls-panel">
+                    <button id="undo-btn" class="ctrl-btn" onclick="undoLastBet()" disabled>↩ UNDO</button>
+                    <button id="rebet-btn" class="ctrl-btn" onclick="rebet()" disabled>↺ RIPUNTA</button>
+                    <button id="double-btn" class="ctrl-btn" onclick="doubleBets()" disabled>x2 RADDOPPIA</button>
+                    <button id="spin-btn" class="spin-btn" onclick="spinWheel()">GIRA LA RUOTA</button>
+                    <button id="clear-btn" class="ctrl-btn red-btn" onclick="clearBets()" disabled>✖ PULISCI</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="ticker">
+        <div class="ticker-label">
+            <div class="ticker-dot"></div>
+            Live Jackpot
+        </div>
+        <div class="ticker-amount" id="jackpotAmt">€4.290.123,82</div>
+        <div class="ticker-scroll">
+            <div class="ticker-track">
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+            </div>
+        </div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+            </div>
+        </div>
+        <div class="ticker-18">Responsabile 18+</div>
+    </footer>
+</div>
+
+<script src="../scripts/auth.js"></script>
+<script src="../scripts/main.js"></script>
+<script src="../scripts/roulette.js"></script>
+<script>
+let jackpot = 4290123.82;
+const jackpotEl = document.getElementById('jackpotAmt');
+setInterval(() => {
+    jackpot += Math.random() * 9.5 + 0.5;
+    jackpotEl.textContent = '€' + jackpot.toLocaleString('it-IT', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+}, 2200);
+(function initVip() {
+    try {
+        const user = JSON.parse(localStorage.getItem('casino_current_user'));
+        if (!user) return;
+        const levels = { standard: { name: 'Standard', pct: 15, next: 'Silver' }, silver: { name: '🥈 Silver', pct: 45, next: 'Gold' }, gold: { name: '💎 Gold', pct: 75, next: 'Platinum' }, platinum: { name: '💎 Platinum', pct: 95, next: 'Diamond' } };
+        const l = levels[user.vipLevel] || levels.standard;
+        document.getElementById('vipLevelName').textContent = l.name;
+        document.getElementById('vipPct').textContent = l.pct + '%';
+        document.getElementById('vipInfo').innerHTML = `Mancano punti per il livello <strong>${l.next}</strong>`;
+        setTimeout(() => { document.getElementById('vipFill').style.width = l.pct + '%'; }, 400);
+    } catch(e) {}
+})();
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        const user = JSON.parse(localStorage.getItem('casino_current_user'));
+        const bar = document.getElementById('userBar');
+        if (!bar) return;
+        if (user) {
+            bar.innerHTML = `<div style="display:flex;flex-direction:column;align-items:flex-end;line-height:1.2;"><span style="font-family:'Cinzel',serif;font-size:15px;font-weight:900;color:var(--gold);">€${(user.balance || 0).toLocaleString('it-IT',{minimumFractionDigits:2})}</span><span style="font-size:9px;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;">Saldo Reale</span></div><a href="ricarica.html" class="nav-btn nav-btn-outline">+ Deposita</a><div style="display:flex;align-items:center;gap:7px;padding:5px 12px 5px 5px;border-radius:50px;background:var(--bg-elevated);border:1px solid var(--border-gold);cursor:pointer;" onclick="window.location.href='user.html'"><div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#800000,#cc0000);border:1px solid var(--gold-dim);display:flex;align-items:center;justify-content:center;font-size:13px;">👤</div><span style="font-family:'Cinzel',serif;font-size:12px;font-weight:700;color:var(--gold-dim);">${user.username}</span><span style="font-size:10px;color:var(--text-muted);">▾</span></div><button class="nav-btn nav-btn-outline" onclick="localStorage.removeItem('casino_current_user');location.reload()">Esci</button>`;
+        } else {
+            bar.innerHTML = `<a href="login.html" class="nav-btn nav-btn-outline">Accedi</a><a href="registrati.html" class="nav-btn nav-btn-solid">Registrati</a>`;
+        }
+    } catch(e) {}
+});
+</script>
+</body>
+</html>

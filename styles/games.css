@@ -1,0 +1,350 @@
+/**
+ * games-responsive.css
+ * Media queries per rendere tutti i giochi utilizzabili su mobile.
+ * Includi questo file DOPO i CSS specifici di ogni gioco.
+ *
+ * <link rel="stylesheet" href="../../styles/games-responsive.css">
+ */
+
+/* ─── Variabili globali per i giochi ─────────────────────────────────────── */
+:root {
+    --game-max-width: 1100px;
+    --game-padding: clamp(12px, 3vw, 40px);
+    --hud-font-size: clamp(13px, 2vw, 16px);
+    --chip-size: clamp(48px, 7vw, 72px);
+    --card-width: clamp(50px, 8vw, 80px);
+    --card-height: clamp(72px, 11.5vw, 115px);
+}
+
+/* ─── Layout base gioco ──────────────────────────────────────────────────── */
+.game-wrapper {
+    max-width: var(--game-max-width);
+    margin: 0 auto;
+    padding: var(--game-padding);
+    box-sizing: border-box;
+}
+
+/* ─── HUD saldo / puntata (comune a tutti i giochi) ──────────────────────── */
+.game-hud,
+#hud,
+.hud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    font-size: var(--hud-font-size);
+    padding: 10px var(--game-padding);
+}
+
+/* ─── ROULETTE ────────────────────────────────────────────────────────────── */
+
+/* Contenitore tavolo roulette con scroll orizzontale su schermi piccoli */
+#betting-board-container,
+.roulette-board-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+}
+
+/* Griglia puntate roulette: larghezza minima fissa, poi si adatta */
+#betting-board {
+    min-width: 520px;   /* Garantisce leggibilità della griglia */
+    width: max-content;
+}
+
+/* Ruota roulette responsive */
+#wheel-canvas,
+.roulette-canvas {
+    width: min(360px, 90vw) !important;
+    height: min(360px, 90vw) !important;
+    display: block;
+    margin: 0 auto;
+}
+
+/* Layout roulette: ruota sopra, griglia sotto su mobile */
+.roulette-layout {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* Fiches chips */
+.chip,
+.bet-chip {
+    width: var(--chip-size);
+    height: var(--chip-size);
+    font-size: clamp(11px, 1.5vw, 14px);
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+@media (max-width: 600px) {
+    .chip-row,
+    .chips-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+    }
+}
+
+/* ─── BLACKJACK ───────────────────────────────────────────────────────────── */
+
+/* Tavolo blackjack responsive */
+#blackjack-table,
+.bj-table {
+    width: 100%;
+    max-width: 700px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+/* Mani dealer/giocatore */
+#dealer-cards-el,
+#player-cards-el,
+.hand-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(4px, 1vw, 10px);
+    justify-content: center;
+    min-height: calc(var(--card-height) + 10px);
+}
+
+/* Carte */
+.card,
+.playing-card {
+    width: var(--card-width);
+    height: var(--card-height);
+    font-size: clamp(14px, 2.5vw, 22px);
+    border-radius: clamp(4px, 0.8vw, 8px);
+    flex-shrink: 0;
+}
+
+/* Pulsanti azione blackjack */
+#actions-area,
+.bj-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    padding: 12px var(--game-padding);
+}
+
+#actions-area .btn,
+.bj-actions .btn {
+    flex: 1 1 80px;
+    max-width: 140px;
+    min-height: 44px;
+    font-size: clamp(12px, 1.8vw, 15px);
+    padding: 8px 12px;
+    touch-action: manipulation;
+}
+
+/* Area puntata con fiches */
+#betting-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    padding: 12px;
+}
+
+@media (max-width: 480px) {
+    /* Fiches più piccole su mobile per stare su una riga */
+    #betting-area img.fiches,
+    .fiche {
+        width: 52px !important;
+        height: 52px !important;
+    }
+
+    /* Mostra le mani in verticale su schermi molto piccoli */
+    #player-hands-el {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+/* ─── SLOT MACHINE ────────────────────────────────────────────────────────── */
+
+/* Wrapper generale slot */
+#slot-machine,
+.slot-wrapper {
+    max-width: min(800px, 95vw);
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+/* Reels container */
+#reels-container,
+.reels {
+    display: flex;
+    gap: clamp(4px, 1vw, 12px);
+    justify-content: center;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px 4px;
+}
+
+/* Singola reel */
+.reel {
+    flex-shrink: 0;
+    width: clamp(60px, 13vw, 110px);
+}
+
+/* Simboli nella reel */
+.symbol,
+.reel-cell {
+    width: clamp(60px, 13vw, 110px);
+    height: clamp(60px, 13vw, 110px);
+    font-size: clamp(28px, 6vw, 60px);
+}
+
+/* Controlli slot */
+#slot-controls,
+.slot-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    padding: 12px var(--game-padding);
+}
+
+#slot-controls label,
+.slot-controls label {
+    font-size: clamp(12px, 1.8vw, 14px);
+}
+
+#bet-input,
+.bet-input {
+    width: clamp(60px, 15vw, 90px);
+    font-size: clamp(14px, 2vw, 16px);
+    padding: 6px 8px;
+    text-align: center;
+}
+
+/* Pulsante Spin */
+#spin-btn,
+.spin-btn {
+    min-width: 120px;
+    min-height: 48px;
+    font-size: clamp(14px, 2vw, 18px);
+    padding: 10px 24px;
+    touch-action: manipulation;
+}
+
+/* Linee di pagamento info */
+#paylines-display,
+.paylines-info {
+    font-size: clamp(11px, 1.5vw, 13px);
+    text-align: center;
+    padding: 8px;
+    overflow-x: auto;
+}
+
+@media (max-width: 400px) {
+    /* Riduci ulteriormente su smartphone piccoli */
+    .reel {
+        width: 52px;
+    }
+    .symbol,
+    .reel-cell {
+        width: 52px;
+        height: 52px;
+        font-size: 24px;
+    }
+}
+
+/* ─── POKER ──────────────────────────────────────────────────────────────── */
+
+#poker-table,
+.poker-wrapper {
+    max-width: min(900px, 98vw);
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+/* Community cards */
+#community-cards,
+.community-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: clamp(4px, 1vw, 8px);
+    justify-content: center;
+}
+
+/* Mano giocatore */
+#player-hand,
+.player-hand {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+}
+
+/* Pulsanti azione poker */
+#poker-actions,
+.poker-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+
+#poker-actions .btn,
+.poker-actions .btn {
+    flex: 1 1 80px;
+    max-width: 130px;
+    min-height: 44px;
+    touch-action: manipulation;
+}
+
+/* ─── Bottoni generici gioco — target touch minimo 44px ─────────────────── */
+.btn,
+button[class*="btn"],
+.game-button {
+    min-height: 44px;
+    min-width: 44px;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+}
+
+/* ─── Messaggi stato gioco ───────────────────────────────────────────────── */
+#message-el,
+.game-message {
+    font-size: clamp(14px, 2.5vw, 20px);
+    text-align: center;
+    padding: 10px var(--game-padding);
+    min-height: 32px;
+}
+
+/* ─── Utilities ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+    /* Nasconde elementi opzionali su tablet */
+    .hide-mobile { display: none !important; }
+
+    /* Stack verticale dei pannelli affiancati */
+    .side-by-side {
+        flex-direction: column !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Nasconde elementi extra su mobile */
+    .hide-xs { display: none !important; }
+
+    /* Testo ridotto per sezioni informativi */
+    .info-text {
+        font-size: 12px;
+    }
+}
+
+/* ─── Accessibilità: focus visibile ──────────────────────────────────────── */
+:focus-visible {
+    outline: 2px solid #FFD700;
+    outline-offset: 2px;
+}
