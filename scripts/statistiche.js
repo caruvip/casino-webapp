@@ -106,13 +106,22 @@ function buildBalanceChart(user) {
         return;
     }
 
+    // Profitto cumulativo partita per partita
+    let cumulative = 0;
+    const cumulativeData = history.map(h => {
+        cumulative += (h.profit !== undefined && h.profit !== null)
+            ? +h.profit
+            : (+(h.payout || 0) - +(h.bet || 0));
+        return +cumulative.toFixed(2);
+    });
+
     new Chart(canvas, {
         type: 'line',
         data: {
             labels: history.map((_, i) => `#${i + 1}`),
             datasets: [{
-                label: 'Saldo (€)',
-                data: history.map(h => h.balance ?? 0),
+                label: 'Profitto cumulativo (€)',
+                data: cumulativeData,
                 borderColor: '#FFD700',
                 backgroundColor: 'rgba(255,215,0,0.08)',
                 borderWidth: 2,
@@ -187,17 +196,18 @@ function buildHistoryTable(user) {
     }
 
     tbody.innerHTML = history.map(h => {
-        const profit = h.profit ?? 0;
+        const profit = (h.profit !== undefined && h.profit !== null) ? +h.profit : (+(h.payout || 0) - +(h.bet || 0));
         const color  = profit > 0 ? '#22c55e' : profit < 0 ? '#ef4444' : '#888';
         const sign   = profit > 0 ? '+' : '';
         const game   = sanitize((h.game || 'altro').charAt(0).toUpperCase() + (h.game || 'altro').slice(1));
+        const balanceCell = h.balance != null ? formatCurrency(h.balance) : '<span style="color:#555">—</span>';
         return `<tr>
-            <td>${formatDate(h.date)}</td>
+            <td>${formatDate(h.date || h.played_at)}</td>
             <td>${game}</td>
             <td>${formatCurrency(h.bet)}</td>
             <td>${formatCurrency(h.payout)}</td>
             <td style="color:${color};font-weight:500">${sign}${formatCurrency(profit)}</td>
-            <td>${formatCurrency(h.balance)}</td>
+            <td>${balanceCell}</td>
         </tr>`;
     }).join('');
 }
