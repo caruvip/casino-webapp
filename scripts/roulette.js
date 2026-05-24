@@ -1,12 +1,11 @@
-document.addEventListener('DOMContentLoaded', () => {
-    initGame();
-});
+document.addEventListener('authReady', initGame);
 
 // --- STATO DEL GIOCO ---
-let currentUser = JSON.parse(localStorage.getItem("casino_current_user"));
-let bankValue = currentUser ? currentUser.balance : 0;
+let bankValue = (typeof getBalanceLocal === 'function') ? getBalanceLocal() : 0;
 let currentBetTotal = 0;
 let selectedChipValue = 5;
+let _tavoloConfig = { limite_min: 5, limite_max: 1000 };
+let _sessionStart = null;
 
 // Gestione Puntate
 let bets = {}; 
@@ -22,11 +21,24 @@ const WHEEL_NUMBERS = [
 // Mappatura Colori per logica vincita
 const RED_NUMS = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36];
 
-function initGame() {
-    if(!currentUser) { 
-        alert("Accedi per giocare!"); 
-        window.location.href = "login.html"; 
-        return; 
+async function initGame() {
+    const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
+    if (!user) {
+        alert("Accedi per giocare!");
+        window.location.href = "login.html";
+        return;
+    }
+    if (typeof syncBalanceOnLoad === 'function') {
+        syncBalanceOnLoad().then(b => { bankValue = b; updateHUD(); });
+    }
+    if (typeof getTavoloConfig === 'function') {
+        _tavoloConfig = await getTavoloConfig('Roulette');
+        if (_tavoloConfig?.attivo === false) {
+            alert("Il tavolo Roulette è momentaneamente chiuso.");
+            window.location.href = "giochi.html";
+            return;
+        }
+        if (typeof applyTavoloUI === 'function') applyTavoloUI(_tavoloConfig);
     }
     generateNumbersGrid();
     updateHUD();
@@ -71,9 +83,11 @@ function selectChip(val) {
 // --- LOGICA PUNTATA ---
 function placeBet(betId, payoutRatio, amountOverride = null) {
     let amount = (amountOverride !== null) ? amountOverride : (selectedChipValue === 'all-in' ? bankValue : selectedChipValue);
-    
+
     if(amount > bankValue) { message("Saldo insufficiente!"); return; }
     if(amount <= 0) return;
+    if(amount < _tavoloConfig.limite_min) { message(`Min bet: €${_tavoloConfig.limite_min}`); return; }
+    if(!_sessionStart) _sessionStart = Date.now();
 
     bankValue -= amount;
     currentBetTotal += amount;
@@ -225,30 +239,36 @@ function resolveGame(n) {
         if(won) totalWin += amt * bet.payout + amt;
     }
     
+    // savedBet = quanto il giocatore ha puntato in questo giro (già detratto da bankValue)
+    const savedBet = currentBetTotal;
     bankValue += totalWin;
-    
+
     // Aggiorna Display Numero
     const winDisp = document.getElementById('winning-number-display');
     winDisp.innerText = n;
     const isRed = RED_NUMS.includes(n);
     winDisp.style.backgroundColor = n === 0 ? '#006600' : (isRed ? '#d40000' : '#111');
-    
-    if(totalWin > 0) message(`VINTO €${totalWin}!`);
-    else message(`Uscito ${n}.`);
-    
-    // Pulisci
+
+    if (totalWin > 0) message(`VINTO €${totalWin.toFixed(2)}!`);
+    else message(`Uscito ${n}. Ritenta!`);
+
+    // Pulisci tavolo
     bets = {};
     betHistoryStack = [];
     currentBetTotal = 0;
     document.querySelectorAll('.bet-overlay').forEach(o => o.classList.remove('active'));
-    
-    saveData();
-    updateHUD();
-}
 
-function saveData() {
-    currentUser.balance = bankValue;
-    localStorage.setItem("casino_current_user", JSON.stringify(currentUser));
+    // Sincronizza col DB via balance.js:
+    // profit = totalWin - savedBet (può essere negativo se si perde)
+    if (typeof recordGame === 'function') {
+        const duration = _sessionStart ? Math.round((Date.now() - _sessionStart) / 1000) : 0;
+        recordGame({ game: 'Roulette', bet: savedBet, payout: totalWin, duration }).then(b => {
+            if (b !== null) { bankValue = b; updateHUD(); }
+        });
+        _sessionStart = null;
+    }
+
+    updateHUD();
 }
 
 function updateHUD() {

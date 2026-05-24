@@ -1,45 +1,31 @@
-﻿/**
- * auth.js — Sistema di autenticazione centralizzato
- * 
- * Modalità: localStorage (demo) → sostituire _authBackend con Supabase in produzione.
- * 
- * Funzionalità:
- *  - Registrazione con verifica età 18+
- *  - Login / Logout
- *  - Aggiornamento UI automatico (userBar)
- *  - Rate limiting login lato client (anti-brute force base)
- *  - Redirect automatico per pagine protette
- */
-
 'use strict';
 
-// ─── Costanti ─────────────────────────────────────────────────────────────────
-const SESSION_KEY   = 'casino_current_user';
-const USERS_KEY     = 'casino_users';
-const LOGIN_ATTEMPTS_KEY = 'casino_login_attempts';
-const MAX_ATTEMPTS  = 5;
-const LOCKOUT_MS    = 5 * 60 * 1000; // 5 minuti
+/**
+ * auth.js — Autenticazione via Supabase Auth
+ * Dipende da: supabase-client.js (_sb globale)
+ */
 
-// ─── Rate limiting (anti-brute force lato client) ─────────────────────────────
+const LOGIN_ATTEMPTS_KEY = 'casino_login_attempts';
+const MAX_ATTEMPTS       = 5;
+const LOCKOUT_MS         = 5 * 60 * 1000;
+
+/* ── Cache in-memoria sessione corrente ───────────────────────────────────── */
+let _sessionUser = null; // { id, username, email, balance, vipLevel, status }
+
+/* ── Rate limiting login ──────────────────────────────────────────────────── */
 function _getAttempts() {
     try { return JSON.parse(localStorage.getItem(LOGIN_ATTEMPTS_KEY)) || { count: 0, last: 0 }; }
     catch { return { count: 0, last: 0 }; }
 }
-
 function _recordAttempt(success) {
+    if (success) { localStorage.removeItem(LOGIN_ATTEMPTS_KEY); return; }
     const data = _getAttempts();
-    if (success) {
-        localStorage.removeItem(LOGIN_ATTEMPTS_KEY);
-        return;
-    }
-    const now = Date.now();
-    // Reset se passato il lockout
+    const now  = Date.now();
     if (now - data.last > LOCKOUT_MS) data.count = 0;
-    data.count += 1;
+    data.count++;
     data.last = now;
     localStorage.setItem(LOGIN_ATTEMPTS_KEY, JSON.stringify(data));
 }
-
 function _isLockedOut() {
     const data = _getAttempts();
     if (data.count < MAX_ATTEMPTS) return false;
@@ -47,32 +33,15 @@ function _isLockedOut() {
     return remaining > 0 ? Math.ceil(remaining / 1000) : false;
 }
 
-// ─── Storage backend (localStorage — sostituire con Supabase per produzione) ──
-function _getUsers() {
-    try { return JSON.parse(localStorage.getItem(USERS_KEY)) || []; }
-    catch { return []; }
+/* ── Helpers ──────────────────────────────────────────────────────────────── */
+function _sanitize(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
 }
-
-function _saveUsers(users) {
-    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+function _formatCurrency(amount) {
+    return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(amount);
 }
-
-function _getSession() {
-    try { return JSON.parse(localStorage.getItem(SESSION_KEY)); }
-    catch { return null; }
-}
-
-function _saveSession(user) {
-    localStorage.setItem(SESSION_KEY, JSON.stringify(user));
-}
-
-function _clearSession() {
-    localStorage.removeItem(SESSION_KEY);
-}
-
-// ─── Utility ──────────────────────────────────────────────────────────────────
-
-/** Calcola l'età in anni dalla data di nascita (formato YYYY-MM-DD) */
 function _calcAge(birthdateStr) {
     const birth = new Date(birthdateStr);
     const today = new Date();
@@ -82,218 +51,191 @@ function _calcAge(birthdateStr) {
     return age;
 }
 
-/** Hash semplice (solo per demo localStorage — in produzione usare bcrypt lato server) */
-async function _hashPassword(password) {
-    const enc = new TextEncoder().encode(password + 'casino_salt_2025');
-    const buf = await crypto.subtle.digest('SHA-256', enc);
-    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
-}
+/* ── Carica profilo da Supabase ───────────────────────────────────────────── */
+async function _loadProfile(userId) {
+    const { data, error } = await _sb
+        .from('profiles')
+        .select('username, email, balance, vip_level, status')
+        .eq('id', userId)
+        .single();
 
-/** Sanitizza una stringa per prevenire XSS */
-function _sanitize(str) {
-    const div = document.createElement('div');
-    div.textContent = str;
-    return div.innerHTML;
-}
+    if (error || !data) { _sessionUser = null; return null; }
 
-/** Formatta il saldo come valuta italiana */
-function _formatCurrency(amount) {
-    return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(amount);
-}
-
-// ─── API pubblica ──────────────────────────────────────────────────────────────
-
-/**
- * Restituisce l'utente loggato, o null.
- */
-function getCurrentUser() {
-    return _getSession();
-}
-
-/**
- * Registra un nuovo utente.
- * @returns {Promise<{ok:boolean, error?:string}>}
- */
-async function register({ username, password, email, birthdate }) {
-    // Validazione input
-    if (!username?.trim() || !password || !birthdate) {
-        return { ok: false, error: 'Compila tutti i campi obbligatori.' };
-    }
-    if (username.trim().length < 3) {
-        return { ok: false, error: 'Il nome utente deve avere almeno 3 caratteri.' };
-    }
-    if (password.length < 6) {
-        return { ok: false, error: 'La password deve avere almeno 6 caratteri.' };
-    }
-    if (_calcAge(birthdate) < 18) {
-        return { ok: false, error: 'Devi avere almeno 18 anni per registrarti.' };
-    }
-
-    const users = _getUsers();
-    const uname = username.trim().toLowerCase();
-
-    if (users.find(u => u.username.toLowerCase() === uname)) {
-        return { ok: false, error: 'Nome utente già in uso.' };
-    }
-    if (email && users.find(u => u.email?.toLowerCase() === email.toLowerCase())) {
-        return { ok: false, error: 'Email già registrata.' };
-    }
-
-    const hash = await _hashPassword(password);
-    const newUser = {
-        id:               crypto.randomUUID?.() || Date.now().toString(36),
-        username:         username.trim(),
-        email:            email?.trim() || null,
-        passwordHash:     hash,
-        balance:          1000,    // Bonus benvenuto
-        createdAt:        new Date().toISOString(),
-        lastLogin:        null,
-        vipLevel:         'standard',
-        stats: { gamesPlayed: 0, gamesWon: 0, totalWon: 0, totalLost: 0 },
-        history:          [],
+    _sessionUser = {
+        id:       userId,
+        username: data.username,
+        email:    data.email    ?? '',
+        balance:  data.balance  ?? 0,
+        vipLevel: data.vip_level ?? 'standard',
+        status:   data.status   ?? 'active',
     };
+    return _sessionUser;
+}
 
-    users.push(newUser);
-    _saveUsers(users);
-    return { ok: true };
+/* ── API pubblica ─────────────────────────────────────────────────────────── */
+
+function getCurrentUser() { return _sessionUser; }
+
+/**
+ * Verifica la sessione Supabase e popola _sessionUser.
+ * Chiamata all'avvio di ogni pagina.
+ */
+async function checkSession() {
+    const { data: { session } } = await _sb.auth.getSession();
+    if (!session) { _sessionUser = null; return null; }
+    return _loadProfile(session.user.id);
 }
 
 /**
- * Effettua il login.
- * @returns {Promise<{ok:boolean, user?:object, error?:string}>}
+ * Login via Supabase Auth (email + password).
  */
-async function login({ username, password }) {
-    // Rate limiting
+async function login({ email, password }) {
     const lockout = _isLockedOut();
-    if (lockout) {
-        return { ok: false, error: `Troppi tentativi. Riprova tra ${lockout} secondi.` };
-    }
+    if (lockout) return { ok: false, error: `Troppi tentativi. Riprova tra ${lockout} secondi.` };
+    if (!email?.trim() || !password) return { ok: false, error: 'Inserisci email e password.' };
 
-    if (!username?.trim() || !password) {
-        return { ok: false, error: 'Inserisci nome utente e password.' };
-    }
+    const { data, error } = await _sb.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+    });
 
-    const users = _getUsers();
-    const uname = username.trim().toLowerCase();
-    const user  = users.find(u => u.username.toLowerCase() === uname);
-
-    if (!user) {
+    if (error) {
         _recordAttempt(false);
         return { ok: false, error: 'Credenziali non valide.' };
     }
 
-    const hash = await _hashPassword(password);
-    if (user.passwordHash !== hash) {
-        // Supporto legacy: confronto password in chiaro per account vecchi
-        if (user.password && user.password !== password) {
-            _recordAttempt(false);
-            return { ok: false, error: 'Credenziali non valide.' };
-        } else if (!user.password) {
-            _recordAttempt(false);
-            return { ok: false, error: 'Credenziali non valide.' };
-        }
-        // Migra la password al formato hash
-        user.passwordHash = hash;
-        delete user.password;
-    }
-
-    // Aggiorna lastLogin
-    user.lastLogin = new Date().toISOString();
-    const idx = users.findIndex(u => u.username.toLowerCase() === uname);
-    users[idx] = user;
-    _saveUsers(users);
-    _saveSession(user);
     _recordAttempt(true);
-
-    return { ok: true, user };
+    await _loadProfile(data.user.id);
+    return { ok: true, user: _sessionUser };
 }
 
 /**
- * Effettua il logout e reindirizza.
- * @param {string} redirectTo  URL di destinazione (default: '../index.html')
+ * Registrazione via Supabase Auth.
  */
-function logout(redirectTo = null) {
-    _clearSession();
-    const path = redirectTo || (location.pathname.includes('/giochi') ? '../index.html' : 'index.html');
+async function register({ username, password, email, birthdate }) {
+    if (!username?.trim() || !password || !email?.trim() || !birthdate)
+        return { ok: false, error: 'Compila tutti i campi obbligatori.' };
+    if (username.trim().length < 3)
+        return { ok: false, error: 'Il nome utente deve avere almeno 3 caratteri.' };
+    if (password.length < 6)
+        return { ok: false, error: 'La password deve avere almeno 6 caratteri.' };
+    if (_calcAge(birthdate) < 18)
+        return { ok: false, error: 'Devi avere almeno 18 anni per registrarti.' };
+
+    // Controlla blocco registrazioni
+    const { data: blk } = await _sb
+        .from('impostazioni_sistema')
+        .select('valore')
+        .eq('chiave', 'blocco_registrazioni')
+        .single();
+    if (blk?.valore === '1')
+        return { ok: false, error: 'Le registrazioni sono temporaneamente sospese.' };
+
+    // Controlla username già in uso
+    const { data: existing } = await _sb
+        .from('profiles')
+        .select('id')
+        .eq('username', username.trim())
+        .maybeSingle();
+    if (existing) return { ok: false, error: 'Nome utente già in uso.' };
+
+    const { data, error } = await _sb.auth.signUp({
+        email: email.trim(),
+        password,
+        options: {
+            data: { username: username.trim(), birthdate },
+        },
+    });
+
+    if (error) return { ok: false, error: error.message };
+
+    // Supabase può richiedere conferma email
+    if (data.user && !data.session) {
+        return { ok: true, message: 'Controlla la tua email per confermare la registrazione.' };
+    }
+
+    return { ok: true, message: 'Registrazione completata! Bonus di €1.000 accreditato.' };
+}
+
+/**
+ * Logout: termina la sessione Supabase.
+ */
+async function logout(redirectTo = null) {
+    await _sb.auth.signOut();
+    _sessionUser = null;
+    const path = redirectTo || (location.pathname.includes('/html/') ? 'index.html' : 'html/index.html');
     window.location.href = path;
 }
 
 /**
- * Aggiorna la userBar nella pagina corrente.
- * Cerca un elemento con id="userBar" e lo popola.
+ * Reindirizza al login se non autenticato.
  */
+async function requireAuth(loginPath) {
+    const user = await checkSession();
+    if (!user) {
+        window.location.href = loginPath || (location.pathname.includes('/html/') ? 'login.html' : 'html/login.html');
+        return null;
+    }
+    return user;
+}
+
+/* ── userBar UI ───────────────────────────────────────────────────────────── */
 function updateAuthUI() {
     const bar = document.getElementById('userBar');
     if (!bar) return;
 
-    const user = _getSession();
+    const isHtml = location.pathname.includes('/html/');
+    const user = _sessionUser;
+
     if (user) {
+        const profilePath  = isHtml ? 'user.html'     : 'html/user.html';
+        const rechargePath = isHtml ? 'ricarica.html' : 'html/ricarica.html';
         bar.innerHTML = `
-            <div class="user-bar-inner">
-                <span class="user-bar-name">
-                    <i class="ti ti-user-circle"></i>
-                    ${_sanitize(user.username)}
-                </span>
-                <span class="user-bar-balance">
-                    ${_formatCurrency(user.balance)}
-                </span>
-                <a href="${_resolveProfilePath()}" class="user-bar-link">Profilo</a>
-                <button class="user-bar-btn" onclick="authLogout()">Esci</button>
+            <div class="nav-balance">
+                <span class="nav-balance-label">Saldo</span>
+                <span class="nav-balance-amount">${_formatCurrency(user.balance)}</span>
             </div>
-        `;
+            <a href="${rechargePath}" class="nav-btn nav-btn-outline">+ Deposita</a>
+            <a href="${profilePath}"  class="nav-btn nav-btn-outline">${_sanitize(user.username)}</a>
+            <button class="nav-btn nav-btn-outline" onclick="authLogout()">Esci</button>`;
     } else {
+        const base = isHtml ? '' : 'html/';
         bar.innerHTML = `
-            <div class="user-bar-inner">
-                <a href="${_resolveLoginPath()}" class="user-bar-link">Accedi</a>
-                <a href="${_resolveRegisterPath()}" class="user-bar-btn">Registrati</a>
-            </div>
-        `;
+            <a href="${base}login.html"      class="nav-btn nav-btn-outline">Accedi</a>
+            <a href="${base}registrati.html" class="nav-btn nav-btn-solid">Registrati</a>`;
     }
 }
 
-/** Risolve i percorsi in base alla profondità della pagina corrente */
-function _resolveDepth() {
-    return location.pathname.includes('/giochi') ? '../' : './';
-}
-function _resolveLoginPath()    { return _resolveDepth() + 'login.html'; }
-function _resolveRegisterPath() { return _resolveDepth() + 'registrati.html'; }
-function _resolveProfilePath()  { return _resolveDepth() + 'user.html'; }
-
-/**
- * Reindirizza al login se l'utente non è loggato.
- * Da chiamare all'inizio delle pagine di gioco.
- */
-function requireAuth(loginPath) {
-    if (!_getSession()) {
-        window.location.href = loginPath || _resolveLoginPath();
-        return null;
-    }
-    return _getSession();
-}
-
-// ─── Compatibilità globale (window) per script inline ─────────────────────────
-// Permette di chiamare authLogout() da onclick inline
+/* ── Compatibilità globale ────────────────────────────────────────────────── */
 window.authLogout = () => logout();
 
-// ─── Init automatico ──────────────────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+/* ── Init automatico ad ogni pagina ──────────────────────────────────────── */
+document.addEventListener('DOMContentLoaded', async () => {
+    await checkSession();
     updateAuthUI();
+    document.dispatchEvent(new CustomEvent('authReady', { detail: { user: _sessionUser } }));
 
-    // Aggiorna la UI quando il saldo cambia (evento da balance.js)
-    document.addEventListener('balanceUpdate', () => updateAuthUI());
+    document.addEventListener('balanceUpdate', (e) => {
+        if (_sessionUser && e.detail?.balance !== undefined) {
+            _sessionUser.balance = e.detail.balance;
+        }
+        updateAuthUI();
+    });
 
-    // Gestione form login (se presente)
+    // Form login
     const loginForm = document.getElementById('loginForm');
     if (loginForm) {
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn    = loginForm.querySelector('button[type="submit"]');
-            const errEl  = document.getElementById('loginError');
-            const uname  = document.getElementById('loginUser')?.value;
-            const pass   = document.getElementById('loginPass')?.value;
+            const btn   = loginForm.querySelector('button[type="submit"]');
+            const errEl = document.getElementById('loginError');
+            const email = document.getElementById('loginUser')?.value;
+            const pass  = document.getElementById('loginPass')?.value;
 
             if (btn) btn.disabled = true;
-            const result = await login({ username: uname, password: pass });
+            if (errEl) errEl.textContent = '';
+
+            const result = await login({ email, password: pass });
             if (btn) btn.disabled = false;
 
             if (result.ok) {
@@ -305,24 +247,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Gestione form registrazione (se presente)
+    // Form registrazione
     const regForm = document.getElementById('regForm');
     if (regForm) {
         regForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn    = regForm.querySelector('button[type="submit"]');
-            const errEl  = document.getElementById('regError');
-            const uname  = document.getElementById('reguser')?.value;
-            const pass   = document.getElementById('regpass')?.value;
-            const email  = document.getElementById('regemail')?.value;
-            const birth  = document.getElementById('regbirth')?.value;
+            const btn   = regForm.querySelector('button[type="submit"]');
+            const errEl = document.getElementById('regError');
+            const uname = document.getElementById('reguser')?.value;
+            const pass  = document.getElementById('regpass')?.value;
+            const email = document.getElementById('regemail')?.value;
+            const birth = document.getElementById('regbirth')?.value;
 
             if (btn) btn.disabled = true;
+            if (errEl) errEl.textContent = '';
+
             const result = await register({ username: uname, password: pass, email, birthdate: birth });
             if (btn) btn.disabled = false;
 
             if (result.ok) {
-                alert('Registrazione completata! Bonus di €1.000 accreditato. Ora puoi accedere.');
+                alert(result.message || 'Registrazione completata!');
                 window.location.href = 'login.html';
             } else {
                 if (errEl) errEl.textContent = result.error;
@@ -331,12 +275,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Pulsante logout (id="logoutBtn")
+    // Pulsante logout
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
-        logoutBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            logout();
-        });
+        logoutBtn.addEventListener('click', (e) => { e.preventDefault(); logout(); });
     }
 });

@@ -26,7 +26,11 @@ const PLAYER_IDS = ['player-0', 'player-1', 'player-2', 'player-3', 'player-4'];
 
 // --- INIZIALIZZAZIONE ---
 
-document.addEventListener("DOMContentLoaded", () => {
+let _tavoloPoker = { limite_min: 5, limite_max: 1000 };
+let _pokerSessionStart = null;
+let _pokerHandStartChips = 0;
+
+document.addEventListener("authReady", async () => {
     if (typeof getCurrentUser !== 'function') return;
     const user = getCurrentUser();
     if (!user) {
@@ -34,7 +38,23 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = "login.html";
         return;
     }
-    initTable(user);
+    if (typeof getTavoloConfig === 'function') {
+        _tavoloPoker = await getTavoloConfig('Poker');
+        if (_tavoloPoker?.attivo === false) {
+            alert("Il tavolo Poker è momentaneamente chiuso.");
+            window.location.href = "giochi.html";
+            return;
+        }
+        if (typeof applyTavoloUI === 'function') applyTavoloUI(_tavoloPoker);
+    }
+    if (typeof syncBalanceOnLoad === 'function') {
+        syncBalanceOnLoad().then(b => {
+            if (b !== null) user.balance = b;
+            initTable(user);
+        });
+    } else {
+        initTable(user);
+    }
 });
 
 function initTable(user) {
@@ -44,7 +64,7 @@ function initTable(user) {
         { id: 0, name: botNames[0], chips: 1000, hand: [], folded: false, bet: 0, totalWagered: 0, isHuman: false, elId: 'player-0' },
         { id: 1, name: botNames[1], chips: 1200, hand: [], folded: false, bet: 0, totalWagered: 0, isHuman: false, elId: 'player-1' },
         { id: 2, name: botNames[2], chips: 800,  hand: [], folded: false, bet: 0, totalWagered: 0, isHuman: false, elId: 'player-2' },
-        { id: 3, name: user.username, chips: user.balance, hand: [], folded: false, bet: 0, totalWagered: 0, isHuman: true,  elId: 'player-3' },
+        { id: 3, name: user.username, chips: (typeof getBalanceLocal === 'function' ? getBalanceLocal() : user.balance), hand: [], folded: false, bet: 0, totalWagered: 0, isHuman: true,  elId: 'player-3' },
         { id: 4, name: botNames[3], chips: 1500, hand: [], folded: false, bet: 0, totalWagered: 0, isHuman: false, elId: 'player-4' }
     ];
 
@@ -91,6 +111,8 @@ function startNewHand() {
         window.location.href = "user.html";
         return;
     }
+    _pokerHandStartChips = human.chips;
+    _pokerSessionStart = Date.now();
 
     // Reset UI
     for(let i=0; i<5; i++) {
@@ -425,35 +447,24 @@ function showdown() {
 
 function endRound(winners) {
     let names = "";
+    const human = gameState.players[3];
+
     winners.forEach(w => {
         updatePlayerChipsUI(w);
         document.getElementById(w.elId).style.boxShadow = "0 0 30px #FFD700";
         showActionBubble(w, "WIN!");
         names += w.name + " ";
-        
-        if (w.isHuman) {
-            const u = getCurrentUser();
-            const prev = u.balance;
-            const net = w.chips - prev;
-            if (typeof updateGameStats === 'function') updateGameStats("Texas Hold'em", net);
-            u.balance = w.chips;
-            localStorage.setItem("casino_current_user", JSON.stringify(u));
-        }
     });
 
-    // Se l'umano non è tra i vincitori e ha scommesso, aggiorna stats (perdita)
-    const human = gameState.players[3];
-    if (!winners.includes(human) && human.totalWagered > 0) {
-        const u = getCurrentUser();
-        // La perdita è già stata scalata dal balance durante le puntate
-        // Dobbiamo solo registrare la statistica se vogliamo, ma auth.js lo fa col balance
-        // Assicuriamoci che il balance sia salvato
-        u.balance = human.chips;
-        localStorage.setItem("casino_current_user", JSON.stringify(u));
-        // Nota: updateGameStats gestisce anche perdite se passiamo numero negativo?
-        // Nel tuo auth.js, calcola il delta. 
-        // Qui calcoliamo il delta tra inizio mano e fine mano.
-        // Per semplicità, salviamo solo.
+    // Sincronizza saldo DB via recordGame (unico aggiornamento, evita doppio conteggio)
+    if (typeof recordGame === 'function') {
+        const humanPlayer = gameState.players.find(p => p.isHuman);
+        if (humanPlayer) {
+            const duration = _pokerSessionStart ? Math.round((Date.now() - _pokerSessionStart) / 1000) : 0;
+            const bet    = humanPlayer.totalWagered || 0;
+            const payout = Math.max(0, humanPlayer.chips - _pokerHandStartChips + bet);
+            recordGame({ game: 'Poker', bet, payout, duration });
+        }
     }
 
     log(`Vince: ${names}`);

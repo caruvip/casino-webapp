@@ -1,96 +1,68 @@
 /**
  * admin.js — 777Casino Admin Panel
- * Credenziali salvate nel database (default: admin / admin)
- * Completamente collegato al backend PHP e database MySQL (no localStorage)
+ * Dipende da: supabase-client.js (_sb globale)
+ * Auth: Supabase Auth + admin_users table
  */
 
 'use strict';
 
-/* ════════════════════════════════════════════════════
-   COSTANTI & CONFIG
-   ════════════════════════════════════════════════════ */
-const ADMIN_API = '../php/admin_api.php';
-const ADMIN_SESSION_KEY = 'casino_admin_session';
-
 const GAMES = [
-    { name: 'Blackjack', rtp: 99.5, icon: '🃏' },
-    { name: 'Roulette',  rtp: 97.3, icon: '🎡' },
-    { name: 'Slot 777',  rtp: 96.0, icon: '🎰' },
-    { name: 'Poker',     rtp: 98.5, icon: '🤠' },
-    { name: 'Rocket Cash', rtp: 97.0, icon: '🚀' },
+    { name: 'Blackjack',    rtp: 99.5, icon: '🃏' },
+    { name: 'Roulette',     rtp: 97.3, icon: '🎡' },
+    { name: 'Slot 777',     rtp: 96.0, icon: '🎰' },
+    { name: 'Poker',        rtp: 98.5, icon: '🤠' },
+    { name: 'Rocket Cash',  rtp: 97.0, icon: '🚀' },
 ];
 
-let globalUsers = [];
+let globalUsers        = [];
 let globalTransactions = [];
-let globalBonuses = [];
-let globalSettings = {};
-
-/* ════════════════════════════════════════════════════
-   API WRAPPER
-   ════════════════════════════════════════════════════ */
-async function adminApiCall(action, payload = {}) {
-    try {
-        const body = { action, ...payload };
-        const response = await fetch(ADMIN_API, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body)
-        });
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        if (!data.ok && data.unauthorized) {
-            adminLogoutLocal();
-            return null;
-        }
-        return data;
-    } catch (e) {
-        console.error("[Admin API] Call failed:", e);
-        toast("Errore di connessione al server backend", "error");
-        return null;
-    }
-}
+let globalBonuses      = [];
+let globalSettings     = {};
 
 /* ════════════════════════════════════════════════════
    AUTH
    ════════════════════════════════════════════════════ */
 async function adminLogin() {
-    const user = document.getElementById('adminUser').value.trim();
-    const pass = document.getElementById('adminPass').value;
+    const email = document.getElementById('adminUser').value.trim();
+    const pass  = document.getElementById('adminPass').value;
     const errEl = document.getElementById('loginError');
+    if (!email || !pass) { errEl.textContent = '⚠ Inserisci email e password'; return; }
 
-    if (!user || !pass) { errEl.textContent = '⚠ Inserisci username e password'; return; }
-
-    const res = await adminApiCall('login', { username: user, password: pass });
-    if (!res || !res.ok) {
-        errEl.textContent = '✗ ' + (res?.error || 'Credenziali non valide');
+    const { data, error } = await _sb.auth.signInWithPassword({ email, password: pass });
+    if (error || !data.session) {
+        errEl.textContent = '✗ Credenziali non valide';
         return;
     }
 
-    // Salva sessione admin
-    const session = { username: user, loginAt: new Date().toISOString() };
-    localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(session));
+    const { data: isAdmin } = await _sb.rpc('check_admin');
+    if (!isAdmin) {
+        await _sb.auth.signOut();
+        errEl.textContent = '✗ Account non autorizzato come admin';
+        return;
+    }
 
-    document.getElementById('loginScreen').classList.add('hidden');
-    document.getElementById('adminShell').classList.remove('hidden');
-    document.getElementById('sidebarAdminName').textContent = user;
-
-    toast("Login effettuato con successo", "success");
+    const username = data.user.user_metadata?.username || email.split('@')[0];
+    _showAdminPanel(username);
+    toast('Login effettuato con successo', 'success');
     initPanel();
 }
 
 async function adminLogout() {
-    await adminApiCall('logout');
-    adminLogoutLocal();
+    await _sb.auth.signOut();
+    _hideAdminPanel();
 }
 
-function adminLogoutLocal() {
-    localStorage.removeItem(ADMIN_SESSION_KEY);
+function _showAdminPanel(username) {
+    document.getElementById('loginScreen').classList.add('hidden');
+    document.getElementById('adminShell').classList.remove('hidden');
+    document.getElementById('sidebarAdminName').textContent = username;
+}
+
+function _hideAdminPanel() {
     document.getElementById('adminShell').classList.add('hidden');
     document.getElementById('loginScreen').classList.remove('hidden');
-    document.getElementById('adminUser').value = '';
-    document.getElementById('adminPass').value = '';
+    document.getElementById('adminUser').value  = '';
+    document.getElementById('adminPass').value  = '';
     document.getElementById('loginError').textContent = '';
 }
 
@@ -110,24 +82,30 @@ async function refreshAllData() {
         populateUsers(),
         populateTransactions(),
         populateBonuses(),
+        populateAdminChat(),
+        populateTavoli(),
         populateMaintenance(),
         populateLogs(),
-        populateSettings()
+        populateSettings(),
     ]);
 }
 
-/* Auto-restore sessione admin al caricamento pagina */
 window.addEventListener('DOMContentLoaded', async () => {
-    const res = await adminApiCall('check_session');
-    if (res && res.ok) {
-        document.getElementById('loginScreen').classList.add('hidden');
-        document.getElementById('adminShell').classList.remove('hidden');
-        document.getElementById('sidebarAdminName').textContent = res.username;
-        initPanel();
+    const { data: { session } } = await _sb.auth.getSession();
+    if (session) {
+        const { data: isAdmin } = await _sb.rpc('check_admin');
+        if (isAdmin) {
+            const username = session.user.user_metadata?.username || session.user.email.split('@')[0];
+            _showAdminPanel(username);
+            initPanel();
+        } else {
+            await _sb.auth.signOut();
+            _hideAdminPanel();
+        }
     } else {
-        adminLogoutLocal();
+        _hideAdminPanel();
     }
-    // Enter key sul login
+
     document.getElementById('adminPass').addEventListener('keydown', e => {
         if (e.key === 'Enter') adminLogin();
     });
@@ -142,9 +120,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 function startClock() {
     const el = document.getElementById('topbarTime');
     if (!el) return;
-    const tick = () => {
-        el.textContent = new Date().toLocaleTimeString('it-IT');
-    };
+    const tick = () => { el.textContent = new Date().toLocaleTimeString('it-IT'); };
     tick();
     setInterval(tick, 1000);
 }
@@ -153,41 +129,46 @@ function startClock() {
    NAVIGATION
    ════════════════════════════════════════════════════ */
 const SECTION_TITLES = {
-    dashboard:    ['Overview', 'Dashboard / Overview'],
-    users:        ['Utenti', 'Dashboard / Utenti'],
-    transactions: ['Transazioni', 'Dashboard / Transazioni'],
-    bonuses:      ['Bonus', 'Dashboard / Bonus'],
-    analytics:    ['Analisi Giochi', 'Dashboard / Analytics'],
-    revenue:      ['Revenue', 'Dashboard / Revenue'],
-    maintenance:  ['Manutenzione', 'Dashboard / Manutenzione'],
-    logs:         ['Activity Log', 'Dashboard / Logs'],
-    settings:     ['Impostazioni', 'Dashboard / Impostazioni'],
+    dashboard:    ['Overview',              'Dashboard / Overview'],
+    live:         ['🔴 Live Feed',          'Dashboard / Live Feed'],
+    users:        ['Utenti',               'Dashboard / Utenti'],
+    transactions: ['Transazioni',          'Dashboard / Transazioni'],
+    bonuses:      ['Bonus',               'Dashboard / Bonus'],
+    chat:         ['💬 Chat Live',          'Dashboard / Chat Live'],
+    analytics:    ['Analisi Giochi',      'Dashboard / Analytics'],
+    revenue:      ['Revenue',             'Dashboard / Revenue'],
+    tavoli:       ['Tavoli',              'Dashboard / Tavoli'],
+    maintenance:  ['Manutenzione',        'Dashboard / Manutenzione'],
+    logs:         ['Activity Log',        'Dashboard / Logs'],
+    settings:     ['Impostazioni',        'Dashboard / Impostazioni'],
 };
 
 function showSection(id) {
     document.querySelectorAll('.adm-section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('.adm-nav-item').forEach(n => n.classList.remove('active'));
-    
-    const targetSec = document.getElementById('sec-' + id);
-    if (targetSec) targetSec.classList.add('active');
+
+    const sec = document.getElementById('sec-' + id);
+    if (sec) sec.classList.add('active');
 
     const titles = SECTION_TITLES[id] || [id, id];
-    const titleEl = document.getElementById('pageTitle');
+    const titleEl      = document.getElementById('pageTitle');
     const breadcrumbEl = document.getElementById('pageBreadcrumb');
-    if (titleEl) titleEl.textContent = titles[0];
+    if (titleEl)      titleEl.textContent      = titles[0];
     if (breadcrumbEl) breadcrumbEl.textContent = titles[1];
 
-    // Attiva link nav
     document.querySelectorAll('.adm-nav-item').forEach(n => {
-        if (n.getAttribute('onclick')?.includes(`'${id}'`)) {
-            n.classList.add('active');
-        }
+        if (n.getAttribute('onclick')?.includes(`'${id}'`)) n.classList.add('active');
     });
 
-    // Aggiorna specifici al cambio sezione
     if (id === 'analytics') drawCharts();
     if (id === 'revenue')   drawRevenueChart();
     if (id === 'logs')      populateLogs();
+    if (id === 'tavoli')    populateTavoli();
+
+    if (id === 'live') startLivePolling();
+    else stopLivePolling();
+
+    if (id === 'chat') populateAdminChat();
 }
 
 function fmt(n) {
@@ -202,22 +183,21 @@ function fmtDate(iso) {
    DASHBOARD
    ════════════════════════════════════════════════════ */
 async function populateDashboard() {
-    const data = await adminApiCall('get_dashboard');
-    if (!data) return;
+    const { data, error } = await _sb.rpc('get_admin_dashboard');
+    if (error || !data) return;
 
-    document.getElementById('kpiUsers').textContent   = data.kpiUsers;
-    document.getElementById('kpiUsersDelta').textContent = `+${Math.floor(Math.random()*3)} oggi`;
-    document.getElementById('kpiRevenue').textContent  = fmt(data.kpiRevenue);
-    document.getElementById('kpiRevenueDelta').textContent = `GGR Totale`;
-    document.getElementById('kpiBets').textContent    = data.kpiBets.toLocaleString();
-    document.getElementById('kpiOnline').textContent  = data.kpiOnline;
+    document.getElementById('kpiUsers').textContent        = data.kpiUsers;
+    document.getElementById('kpiUsersDelta').textContent   = `+0 oggi`;
+    document.getElementById('kpiRevenue').textContent      = fmt(data.kpiRevenue);
+    document.getElementById('kpiRevenueDelta').textContent = 'GGR Totale';
+    document.getElementById('kpiBets').textContent         = (data.kpiBets || 0).toLocaleString();
+    document.getElementById('kpiOnline').textContent       = data.kpiOnline;
 
     const badgeUsers = document.getElementById('badgeUsers');
     if (badgeUsers) badgeUsers.textContent = data.kpiUsers;
 
-    // Renderizza attività recente da DB
     const list = document.getElementById('activityList');
-    if (list) {
+    if (list && data.activity) {
         list.innerHTML = data.activity.map(e => `
             <div class="activity-item type-${e.type}">
                 <span class="activity-user">@${e.user}</span>
@@ -226,63 +206,54 @@ async function populateDashboard() {
             </div>`).join('');
     }
 
-    // Renderizza top giochi
-    const max = Math.max(...data.gamesVolume.map(g => g.vol), 1);
+    const gamesVolume = data.gamesVolume || [];
+    const max = Math.max(...gamesVolume.map(g => g.vol), 1);
     const el = document.getElementById('topGamesList');
     if (el) {
-        el.innerHTML = data.gamesVolume.sort((a,b) => b.vol - a.vol).map(g => {
+        el.innerHTML = gamesVolume.sort((a, b) => b.vol - a.vol).map(g => {
             const icon = GAMES.find(x => x.name.toLowerCase() === g.name.toLowerCase())?.icon || '🎮';
-            const pct = Math.round(g.vol/max*100);
+            const pct  = Math.round(g.vol / max * 100);
             return `
             <div class="tg-item">
                 <span class="tg-name">${icon} ${g.name}</span>
-                <div class="tg-bar-wrap">
-                    <div class="tg-bar" style="width:${pct}%"></div>
-                </div>
+                <div class="tg-bar-wrap"><div class="tg-bar" style="width:${pct}%"></div></div>
                 <span class="tg-pct">${fmt(g.vol)}</span>
             </div>`;
         }).join('');
     }
 
-    // Renderizza VIP bars
+    const vipCounts = data.vipCounts || {};
     const total = data.kpiUsers || 1;
     const vipEl = document.getElementById('vipBars');
     if (vipEl) {
-        vipEl.innerHTML = Object.entries(data.vipCounts).map(([k, v]) => `
+        vipEl.innerHTML = Object.entries(vipCounts).map(([k, v]) => `
             <div class="vip-bar-item">
-                <span class="vip-bar-label">${k.charAt(0).toUpperCase()+k.slice(1)}</span>
+                <span class="vip-bar-label">${k.charAt(0).toUpperCase() + k.slice(1)}</span>
                 <div class="vip-bar-wrap">
-                    <div class="vip-bar-fill vip-bar-${k}" style="width:${Math.round(v/total*100)}%"></div>
+                    <div class="vip-bar-fill vip-bar-${k}" style="width:${Math.round(v / total * 100)}%"></div>
                 </div>
                 <span class="vip-bar-count">${v}</span>
             </div>`).join('');
     }
 
-    // Renderizza avvisi
-    const alerts = [
-        { type: 'info',  title: 'Database MySQL',  text: 'Connesso e operativo su localhost.' },
-        { type: 'info',  title: 'Sicurezza sessione', text: 'Cookie di sessione admin attivi.' }
-    ];
-    if (data.kpiOnline > 0) {
-        alerts.push({ type: 'warn', title: `${data.kpiOnline} Utenti Online`, text: 'Monitoraggio sessioni attivo.' });
-    }
     const alertsList = document.getElementById('alertsList');
     if (alertsList) {
-        alertsList.innerHTML = alerts.map(a => `
-            <div class="alert-item ${a.type}">
-                <span class="alert-icon">${a.type==='warn'?'⚠️':'ℹ️'}</span>
-                <div class="alert-text"><strong>${a.title}</strong> — ${a.text}</div>
-            </div>`).join('');
+        alertsList.innerHTML = `
+            <div class="alert-item info">
+                <span class="alert-icon">ℹ️</span>
+                <div class="alert-text"><strong>Database Supabase</strong> — Connesso e operativo.</div>
+            </div>
+            <div class="alert-item info">
+                <span class="alert-icon">ℹ️</span>
+                <div class="alert-text"><strong>Auth System</strong> — Sessioni JWT attive.</div>
+            </div>`;
     }
 }
 
-/* Attività live: ogni 10 secondi esegue il polling per aggiornare il pannello */
 function startLiveActivity() {
     setInterval(async () => {
         const activeSec = document.querySelector('.adm-section.active');
-        if (activeSec && activeSec.id === 'sec-dashboard') {
-            await populateDashboard();
-        }
+        if (activeSec?.id === 'sec-dashboard') await populateDashboard();
     }, 10000);
 }
 
@@ -290,15 +261,14 @@ function startLiveActivity() {
    UTENTI
    ════════════════════════════════════════════════════ */
 async function populateUsers(filter = 'all', search = '') {
-    const res = await adminApiCall('get_users');
-    if (!res) return;
-    globalUsers = res.users;
+    const { data, error } = await _sb.rpc('get_admin_users');
+    if (error || !data) return;
+    globalUsers = data;
 
     let filtered = [...globalUsers];
     if (filter === 'active') filtered = filtered.filter(u => u.status !== 'banned');
     if (filter === 'banned') filtered = filtered.filter(u => u.status === 'banned');
-    if (filter === 'vip')    filtered = filtered.filter(u => ['gold','platinum'].includes(u.vipLevel));
-    
+    if (filter === 'vip')    filtered = filtered.filter(u => ['gold', 'platinum'].includes(u.vipLevel));
     if (search) {
         const q = search.toLowerCase();
         filtered = filtered.filter(u => u.username?.toLowerCase().includes(q) || u.email?.toLowerCase().includes(q));
@@ -308,15 +278,13 @@ async function populateUsers(filter = 'all', search = '') {
     if (tbody) {
         tbody.innerHTML = filtered.map((u, i) => `
             <tr>
-                <td><span style="font-family:var(--font-mono);color:var(--text-secondary);">#${u.id || i+1}</span></td>
+                <td><span style="font-family:var(--font-mono);color:var(--text-secondary);">#${i + 1}</span></td>
                 <td>
                     <div style="font-weight:600;">${u.username}</div>
                     <div style="font-size:11px;color:var(--text-secondary);">${u.email || '—'}</div>
                 </td>
                 <td style="color:var(--text-secondary);">${u.email || '—'}</td>
-                <td>
-                    <span style="font-family:var(--font-mono);font-weight:700;color:var(--accent);">${fmt(u.balance)}</span>
-                </td>
+                <td><span style="font-family:var(--font-mono);font-weight:700;color:var(--accent);">${fmt(u.balance)}</span></td>
                 <td><span class="badge badge-${u.vipLevel || 'standard'}">${(u.vipLevel || 'standard').toUpperCase()}</span></td>
                 <td><span style="font-family:var(--font-mono);">${u.stats?.gamesPlayed || 0}</span></td>
                 <td><span class="badge badge-${u.status === 'banned' ? 'banned' : 'active'}">${u.status === 'banned' ? 'Bannato' : 'Attivo'}</span></td>
@@ -327,7 +295,7 @@ async function populateUsers(filter = 'all', search = '') {
                         <button class="tbl-btn gold" onclick="giveBonus('${u.username}')">Bonus</button>
                         ${u.status === 'banned'
                             ? `<button class="tbl-btn green" onclick="toggleBan('${u.username}', 'active')">Sbanna</button>`
-                            : `<button class="tbl-btn red" onclick="toggleBan('${u.username}', 'banned')">Banna</button>`}
+                            : `<button class="tbl-btn red"   onclick="toggleBan('${u.username}', 'banned')">Banna</button>`}
                     </div>
                 </td>
             </tr>`).join('');
@@ -342,22 +310,30 @@ function filterUsers() {
 }
 
 async function toggleBan(username, newStatus) {
-    const res = await adminApiCall('update_user', { username, subAction: 'set_status', status: newStatus });
-    if (res && res.ok) {
+    const { data, error } = await _sb.rpc('admin_update_user', {
+        p_username: username, p_action: 'set_status', p_value: newStatus
+    });
+    if (!error && data?.ok) {
         toast(`Utente ${username} ${newStatus === 'banned' ? 'bannato' : 'sbannato'}`, newStatus === 'banned' ? 'error' : 'success');
         await populateUsers();
         await populateDashboard();
+    } else {
+        toast('Errore: impossibile modificare lo stato utente', 'error');
     }
 }
 
 async function giveBonus(username) {
     const amount = parseFloat(prompt(`Importo bonus per @${username} (€):`));
     if (!amount || isNaN(amount) || amount <= 0) return;
-    const res = await adminApiCall('update_user', { username, subAction: 'give_bonus', amount });
-    if (res && res.ok) {
+    const { data, error } = await _sb.rpc('admin_update_user', {
+        p_username: username, p_action: 'give_bonus', p_value: String(amount)
+    });
+    if (!error && data?.ok) {
         toast(`Bonus di ${fmt(amount)} assegnato a @${username}`, 'success');
         await populateUsers();
         await populateDashboard();
+    } else {
+        toast('Errore: impossibile assegnare il bonus — ' + (error?.message || 'operazione fallita'), 'error');
     }
 }
 
@@ -366,7 +342,7 @@ function openUserModal(username) {
     if (!u) return;
     document.getElementById('userModalTitle').textContent = `Utente: @${u.username}`;
     const winRate = u.stats?.gamesPlayed ? Math.round(u.stats.gamesWon / u.stats.gamesPlayed * 100) : 0;
-    
+
     document.getElementById('userModalBody').innerHTML = `
         <div class="user-detail-grid">
             <div class="user-detail-item"><div class="udl">Username</div><div class="udv">@${u.username}</div></div>
@@ -378,12 +354,12 @@ function openUserModal(username) {
             <div class="user-detail-item"><div class="udl">Win Rate</div><div class="udv" style="color:var(--green)">${winRate}%</div></div>
             <div class="user-detail-item"><div class="udl">Partite Giocate</div><div class="udv">${u.stats?.gamesPlayed || 0}</div></div>
             <div class="user-detail-item"><div class="udl">Totale Vinto</div><div class="udv" style="color:var(--green)">${fmt(u.stats?.totalWon)}</div></div>
-            <div class="user-detail-item"><div class="udl">Totale Perso</div><div class="udv" style="color:var(--red)">${fmt(u.stats?.totalLost)}</div></div>
+            <div class="user-detail-item"><div class="udl">Totale Scommesso</div><div class="udv" style="color:var(--red)">${fmt(u.stats?.totalLost)}</div></div>
             <div class="user-detail-item"><div class="udl">Profitto Casino</div><div class="udv" style="color:var(--accent)">${fmt((u.stats?.totalLost || 0) - (u.stats?.totalWon || 0))}</div></div>
         </div>
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;">
             <button class="adm-btn adm-btn-primary" onclick="giveBonus('${u.username}');closeModal('userModal')">💰 Assegna Bonus</button>
-            <button class="adm-btn ${u.status === 'banned' ? 'adm-btn-primary' : 'adm-btn-danger'}" onclick="toggleBan('${u.username}', '${u.status === 'banned' ? 'active' : 'banned'}');closeModal('userModal')">
+            <button class="adm-btn ${u.status === 'banned' ? 'adm-btn-primary' : 'adm-btn-danger'}" onclick="toggleBan('${u.username}','${u.status === 'banned' ? 'active' : 'banned'}');closeModal('userModal')">
                 ${u.status === 'banned' ? '✅ Sbanna' : '🚫 Banna'}
             </button>
             <button class="adm-btn" onclick="setUserBalance('${u.username}')">✏️ Modifica Saldo</button>
@@ -396,51 +372,51 @@ function openUserModal(username) {
 async function setUserBalance(username) {
     const amount = parseFloat(prompt(`Nuovo saldo per @${username} (€):`));
     if (isNaN(amount) || amount < 0) return;
-    const res = await adminApiCall('update_user', { username, subAction: 'set_balance', amount });
-    if (res && res.ok) {
+    const { data, error } = await _sb.rpc('admin_update_user', {
+        p_username: username, p_action: 'set_balance', p_value: String(amount)
+    });
+    if (!error && data?.ok) {
         toast(`Saldo di @${username} aggiornato a ${fmt(amount)}`, 'success');
         closeModal('userModal');
         await populateUsers();
         await populateDashboard();
+    } else {
+        toast('Errore: impossibile modificare il saldo — ' + (error?.message || 'operazione fallita'), 'error');
     }
 }
 
 async function setUserVip(username) {
     const level = prompt(`Livello VIP per @${username} (standard/silver/gold/platinum):`);
-    const valid = ['standard','silver','gold','platinum'];
-    if (!valid.includes(level)) return;
-    const res = await adminApiCall('update_user', { username, subAction: 'set_vip', level });
-    if (res && res.ok) {
+    if (!['standard', 'silver', 'gold', 'platinum'].includes(level)) return;
+    const { data, error } = await _sb.rpc('admin_update_user', {
+        p_username: username, p_action: 'set_vip', p_value: level
+    });
+    if (!error && data?.ok) {
         toast(`VIP di @${username} aggiornato a ${level}`, 'success');
         closeModal('userModal');
         await populateUsers();
+    } else {
+        toast('Errore: impossibile modificare il livello VIP — ' + (error?.message || 'operazione fallita'), 'error');
     }
 }
 
 async function deleteUser(username) {
     if (!confirm(`Eliminare definitivamente l'utente @${username}?`)) return;
-    const res = await adminApiCall('update_user', { username, subAction: 'delete' });
-    if (res && res.ok) {
+    const { data, error } = await _sb.rpc('admin_update_user', {
+        p_username: username, p_action: 'delete'
+    });
+    if (!error && data?.ok) {
         toast(`Account @${username} eliminato`, 'error');
         closeModal('userModal');
         await populateUsers();
         await populateDashboard();
+    } else {
+        toast('Errore: impossibile eliminare l\'utente — ' + (error?.message || 'operazione fallita'), 'error');
     }
 }
 
 async function openCreateUser() {
-    const username = prompt('Nuovo username:');
-    if (!username?.trim()) return;
-    const pass = prompt('Password:') || 'demo123';
-    const balance = parseFloat(prompt('Saldo iniziale (€):') || '1000') || 1000;
-    const res = await adminApiCall('create_user', { username: username.trim(), password: pass, balance });
-    if (res && res.ok) {
-        toast(`Utente @${username} creato`, 'success');
-        await populateUsers();
-        await populateDashboard();
-    } else {
-        toast(res?.error || 'Errore creazione utente', 'error');
-    }
+    toast('Per creare un utente usa la pagina Registrati del sito.', 'info');
 }
 
 function exportUsers() {
@@ -455,17 +431,19 @@ function exportUsers() {
    TRANSAZIONI
    ════════════════════════════════════════════════════ */
 async function populateTransactions(filter = 'all', search = '') {
-    const res = await adminApiCall('get_transactions');
-    if (!res) return;
-    globalTransactions = res.transactions;
+    const { data, error } = await _sb.rpc('admin_get_transactions');
+    if (error || !data) return;
+    globalTransactions = data;
 
     let filtered = [...globalTransactions];
     if (filter !== 'all') filtered = filtered.filter(t => t.type === filter);
     if (search) {
         const q = search.toLowerCase();
-        filtered = filtered.filter(t => t.username.toLowerCase().includes(q) || String(t.amount).includes(q));
+        filtered = filtered.filter(t =>
+            t.username.toLowerCase().includes(q) || String(t.amount).includes(q)
+        );
     }
-    
+
     const tbody = document.getElementById('txTableBody');
     if (tbody) {
         tbody.innerHTML = filtered.map(t => `
@@ -473,12 +451,16 @@ async function populateTransactions(filter = 'all', search = '') {
                 <td><span style="font-family:var(--font-mono);color:var(--text-secondary);">#${t.id}</span></td>
                 <td style="font-weight:600;">@${t.username}</td>
                 <td><span class="badge badge-${t.type}">${t.type}</span></td>
-                <td><span style="font-family:var(--font-mono);font-weight:700;color:${t.type==='withdrawal'?'var(--red)':'var(--green)'};">${t.type==='withdrawal'?'-':'+'} ${fmt(t.amount)}</span></td>
+                <td><span style="font-family:var(--font-mono);font-weight:700;color:${t.type === 'prelievo' ? 'var(--red)' : 'var(--green)'};">
+                    ${t.type === 'prelievo' ? '-' : '+'} ${fmt(t.amount)}</span></td>
                 <td><span class="badge badge-${t.status}">${t.status}</span></td>
                 <td style="color:var(--text-secondary);font-size:12px;">${fmtDate(t.date)}</td>
                 <td>
                     <div class="tbl-actions">
-                        ${t.status==='pending' ? `<button class="tbl-btn green" onclick="approveTx(${t.id})">Approva</button><button class="tbl-btn red" onclick="rejectTx(${t.id})">Rifiuta</button>` : '<span style="color:var(--text-muted);font-size:11px;">—</span>'}
+                        ${t.status === 'pending'
+                            ? `<button class="tbl-btn green" onclick="approveTx(${t.id})">Approva</button>
+                               <button class="tbl-btn red"   onclick="rejectTx(${t.id})">Rifiuta</button>`
+                            : '<span style="color:var(--text-muted);font-size:11px;">—</span>'}
                     </div>
                 </td>
             </tr>`).join('');
@@ -493,20 +475,24 @@ function filterTransactions() {
 }
 
 async function approveTx(id) {
-    const res = await adminApiCall('update_transaction', { id, status: 'completed' });
-    if (res && res.ok) {
+    const { data, error } = await _sb.rpc('admin_update_transaction', { p_id: id, p_status: 'completed' });
+    if (!error && data?.ok) {
         toast('Transazione approvata', 'success');
         await populateTransactions();
         await populateDashboard();
+    } else {
+        toast('Errore: impossibile approvare la transazione — ' + (error?.message || 'operazione fallita'), 'error');
     }
 }
 
 async function rejectTx(id) {
-    const res = await adminApiCall('update_transaction', { id, status: 'failed' });
-    if (res && res.ok) {
+    const { data, error } = await _sb.rpc('admin_update_transaction', { p_id: id, p_status: 'failed' });
+    if (!error && data?.ok) {
         toast('Transazione rifiutata', 'error');
         await populateTransactions();
         await populateDashboard();
+    } else {
+        toast('Errore: impossibile rifiutare la transazione — ' + (error?.message || 'operazione fallita'), 'error');
     }
 }
 
@@ -522,9 +508,12 @@ function exportTransactions() {
    BONUS
    ════════════════════════════════════════════════════ */
 async function populateBonuses() {
-    const res = await adminApiCall('get_bonuses');
-    if (!res) return;
-    globalBonuses = res.bonuses;
+    const { data, error } = await _sb
+        .from('bonuses')
+        .select('*')
+        .order('created_at', { ascending: false });
+    if (error) return;
+    globalBonuses = data || [];
 
     const grid = document.getElementById('bonusGrid');
     if (grid) {
@@ -538,10 +527,10 @@ async function populateBonuses() {
                 <div class="bonus-card-meta">
                     Scadenza: ${b.expiry || 'Nessuna'}<br>
                     Utilizzi: ${b.uses}<br>
-                    Stato: <strong style="color:${b.active?'var(--green)':'var(--red)'}">${b.active?'Attivo':'Disattivo'}</strong>
+                    Stato: <strong style="color:${b.active ? 'var(--green)' : 'var(--red)'}">${b.active ? 'Attivo' : 'Disattivo'}</strong>
                 </div>
                 <div class="bonus-card-actions">
-                    <button class="adm-btn" onclick="sendBonusToAll(${b.id})">📤 Invia a tutti</button>
+                    <button class="adm-btn" onclick="sendBonusToAll(${b.amount})">📤 Invia a tutti</button>
                     <button class="adm-btn adm-btn-danger" onclick="deleteBonus(${b.id})">🗑️</button>
                 </div>
             </div>`).join('');
@@ -554,44 +543,45 @@ async function createBonus() {
     const name   = document.getElementById('bName').value;
     const amount = parseFloat(document.getElementById('bAmount').value);
     const type   = document.getElementById('bType').value;
-    const expiry = document.getElementById('bExpiry').value;
+    const expiry = document.getElementById('bExpiry').value || null;
     if (!name || !amount) { toast('Compila tutti i campi', 'error'); return; }
-    const res = await adminApiCall('create_bonus', { name, type, amount, expiry });
-    if (res && res.ok) {
+
+    const { error } = await _sb.from('bonuses').insert({ name, type, amount, expiry });
+    if (!error) {
         closeModal('bonusModal');
         await populateBonuses();
         toast(`Bonus "${name}" creato`, 'success');
+    } else {
+        toast('Errore: impossibile creare il bonus — ' + (error?.message || 'operazione fallita'), 'error');
     }
 }
 
 async function deleteBonus(id) {
     if (!confirm('Eliminare questo bonus?')) return;
-    const res = await adminApiCall('delete_bonus', { id });
-    if (res && res.ok) {
+    const { error } = await _sb.from('bonuses').delete().eq('id', id);
+    if (!error) {
         await populateBonuses();
         toast('Bonus eliminato', 'success');
+    } else {
+        toast('Errore: impossibile eliminare il bonus — ' + (error?.message || 'operazione fallita'), 'error');
     }
 }
 
-async function sendBonusToAll(id) {
-    const res = await adminApiCall('send_bonus', { id });
-    if (res && res.ok) {
-        await populateBonuses();
+async function sendBonusToAll(amount) {
+    const { data, error } = await _sb.rpc('admin_send_mass_bonus', { p_amount: amount });
+    if (!error && data?.ok) {
         await populateUsers();
         await populateDashboard();
-        toast('Bonus inviato a tutti gli utenti', 'success');
+        toast(`Bonus ${fmt(amount)} inviato a tutti gli utenti`, 'success');
+    } else {
+        toast('Errore: impossibile inviare il bonus di massa — ' + (error?.message || 'operazione fallita'), 'error');
     }
 }
 
 async function sendMassBonus() {
     const amount = parseFloat(prompt('Importo bonus di massa (€):'));
     if (!amount || amount <= 0) return;
-    const res = await adminApiCall('send_mass_bonus', { amount });
-    if (res && res.ok) {
-        await populateUsers();
-        await populateDashboard();
-        toast(`Bonus ${fmt(amount)} inviato a tutti`, 'success');
-    }
+    await sendBonusToAll(amount);
 }
 
 /* ════════════════════════════════════════════════════
@@ -607,13 +597,11 @@ function drawCharts() {
 function drawGamesBarChart() {
     const canvas = document.getElementById('gamesChart');
     if (!canvas) return;
-    const ctx  = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d');
     const W = canvas.offsetWidth || 600;
     const H = 260;
-    canvas.width  = W;
-    canvas.height = H;
+    canvas.width = W; canvas.height = H;
 
-    // Popola dati reali o fallback
     const data = GAMES.map(g => {
         const uCount = globalUsers.reduce((acc, u) => acc + (u.stats?.gamesPlayed || 0), 0);
         return {
@@ -623,28 +611,22 @@ function drawGamesBarChart() {
     });
     const max    = Math.max(...data.map(d => d.value), 1);
     const barW   = (W - 80) / data.length - 12;
-    const colors = ['#e8b84b','#4be8a0','#4b9fe8','#a04be8','#e84b4b','#4be8e8'];
+    const colors = ['#e8b84b', '#4be8a0', '#4b9fe8', '#a04be8', '#e84b4b'];
 
     ctx.clearRect(0, 0, W, H);
-
-    // Griglia
-    ctx.strokeStyle = 'rgba(255,255,255,0.05)';
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1;
     for (let i = 0; i <= 4; i++) {
         const y = 20 + (H - 60) * (i / 4);
         ctx.beginPath(); ctx.moveTo(60, y); ctx.lineTo(W - 10, y); ctx.stroke();
-        ctx.fillStyle = 'rgba(107,114,128,0.8)';
-        ctx.font = '10px JetBrains Mono, monospace';
+        ctx.fillStyle = 'rgba(107,114,128,0.8)'; ctx.font = '10px JetBrains Mono,monospace';
         ctx.textAlign = 'right';
-        ctx.fillText(Math.round(max * (1 - i/4)), 54, y + 4);
+        ctx.fillText(Math.round(max * (1 - i / 4)), 54, y + 4);
     }
 
-    // Barre
     data.forEach((d, i) => {
-        const x = 68 + i * (barW + 12);
-        const bH = ((d.value / max) * (H - 70));
+        const x  = 68 + i * (barW + 12);
+        const bH = (d.value / max) * (H - 70);
         const y  = H - 40 - bH;
-
         const grad = ctx.createLinearGradient(0, y, 0, H - 40);
         grad.addColorStop(0, colors[i % colors.length]);
         grad.addColorStop(1, colors[i % colors.length] + '44');
@@ -653,17 +635,10 @@ function drawGamesBarChart() {
         if (ctx.roundRect) ctx.roundRect(x, y, barW, bH, 4);
         else ctx.rect(x, y, barW, bH);
         ctx.fill();
-
-        // Valore
-        ctx.fillStyle = colors[i % colors.length];
-        ctx.font = 'bold 11px JetBrains Mono, monospace';
-        ctx.textAlign = 'center';
-        ctx.fillText(d.value, x + barW/2, y - 6);
-
-        // Label
-        ctx.fillStyle = 'rgba(107,114,128,0.9)';
-        ctx.font = '10px Space Grotesk, sans-serif';
-        ctx.fillText(d.name, x + barW/2, H - 20);
+        ctx.fillStyle = colors[i % colors.length]; ctx.font = 'bold 11px JetBrains Mono,monospace'; ctx.textAlign = 'center';
+        ctx.fillText(d.value, x + barW / 2, y - 6);
+        ctx.fillStyle = 'rgba(107,114,128,0.9)'; ctx.font = '10px Space Grotesk,sans-serif';
+        ctx.fillText(d.name, x + barW / 2, H - 20);
     });
 }
 
@@ -671,45 +646,29 @@ function drawWinLossDonut() {
     const canvas = document.getElementById('winLossChart');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    canvas.width  = 220;
-    canvas.height = 220;
+    canvas.width = 220; canvas.height = 220;
     const cx = 110, cy = 110, R = 80, r = 52;
 
-    const won  = globalUsers.reduce((s,u) => s + (u.stats?.gamesWon||0), 0);
-    const played = globalUsers.reduce((s,u) => s + (u.stats?.gamesPlayed||0), 0);
-    const lost = played - won;
-    const total = played || 1;
-    
+    const won    = globalUsers.reduce((s, u) => s + (u.stats?.gamesWon || 0), 0);
+    const played = globalUsers.reduce((s, u) => s + (u.stats?.gamesPlayed || 0), 0);
+    const total  = played || 1;
     const slices = [
-        { val: won,  color: '#4be8a0', label: `Vinte (${Math.round(won/total*100)}%)` },
-        { val: Math.max(0, lost), color: '#e84b4b', label: `Perse (${Math.round(Math.max(0, lost)/total*100)}%)` },
+        { val: won, color: '#4be8a0', label: `Vinte (${Math.round(won / total * 100)}%)` },
+        { val: Math.max(0, played - won), color: '#e84b4b', label: `Perse (${Math.round(Math.max(0, played - won) / total * 100)}%)` },
     ];
 
     ctx.clearRect(0, 0, 220, 220);
     let startAngle = -Math.PI / 2;
     slices.forEach(s => {
         const angle = (s.val / total) * Math.PI * 2;
-        ctx.beginPath();
-        ctx.moveTo(cx, cy);
-        ctx.arc(cx, cy, R, startAngle, startAngle + angle);
-        ctx.closePath();
-        ctx.fillStyle = s.color;
-        ctx.fill();
+        ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, R, startAngle, startAngle + angle);
+        ctx.closePath(); ctx.fillStyle = s.color; ctx.fill();
         startAngle += angle;
     });
-    // Hole
-    ctx.beginPath();
-    ctx.arc(cx, cy, r, 0, Math.PI*2);
-    ctx.fillStyle = '#0d1117';
-    ctx.fill();
-    // Testo centro
-    ctx.fillStyle = '#d4d8e0';
-    ctx.font = 'bold 18px Syne, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fillStyle = '#0d1117'; ctx.fill();
+    ctx.fillStyle = '#d4d8e0'; ctx.font = 'bold 18px Syne,sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillText(played.toLocaleString(), cx, cy - 8);
-    ctx.fillStyle = '#6b7280';
-    ctx.font = '10px Space Grotesk, sans-serif';
+    ctx.fillStyle = '#6b7280'; ctx.font = '10px Space Grotesk,sans-serif';
     ctx.fillText('partite', cx, cy + 10);
 
     const legend = document.getElementById('winLossLegend');
@@ -726,8 +685,8 @@ function renderGameStats() {
     const el = document.getElementById('gameStatsList');
     if (!el) return;
     el.innerHTML = GAMES.map(g => {
-        const plays = globalUsers.reduce((s,u) => s + Math.floor((u.stats?.gamesPlayed||0)*0.2), 0) + 12;
-        const profit = globalUsers.reduce((s,u) => s + ((u.stats?.totalLost||0)-(u.stats?.totalWon||0))*0.2, 0) + 5;
+        const plays  = globalUsers.reduce((s, u) => s + Math.floor((u.stats?.gamesPlayed || 0) * 0.2), 0) + 12;
+        const profit = globalUsers.reduce((s, u) => s + ((u.stats?.totalLost || 0) - (u.stats?.totalWon || 0)) * 0.2, 0) + 5;
         return `<div class="game-stat-item">
             <span class="game-stat-name">${g.icon} ${g.name}</span>
             <span class="game-stat-plays">${plays}</span>
@@ -761,32 +720,32 @@ function renderRtpList() {
    REVENUE
    ════════════════════════════════════════════════════ */
 function populateRevenue() {
-    const totalBal = globalUsers.reduce((s,u) => s + (u.balance||0), 0);
+    const totalBal = globalUsers.reduce((s, u) => s + (u.balance || 0), 0);
     const avgBal   = globalUsers.length ? totalBal / globalUsers.length : 0;
-    const ggr      = globalUsers.reduce((s,u) => s + ((u.stats?.totalLost||0)-(u.stats?.totalWon||0)), 0);
+    const ggr      = globalUsers.reduce((s, u) => s + ((u.stats?.totalLost || 0) - (u.stats?.totalWon || 0)), 0);
 
     document.getElementById('revToday').textContent  = fmt(ggr * 0.05);
     document.getElementById('revWeek').textContent   = fmt(ggr * 0.35);
     document.getElementById('revMonth').textContent  = fmt(ggr);
     document.getElementById('revAvgBal').textContent = fmt(avgBal);
 
-    // Top spenders
-    const sorted = [...globalUsers].sort((a,b) => (b.stats?.totalLost||0) - (a.stats?.totalLost||0)).slice(0,10);
+    const sorted = [...globalUsers].sort((a, b) => (b.stats?.totalLost || 0) - (a.stats?.totalLost || 0)).slice(0, 10);
     const tbody = document.getElementById('topSpendersBody');
     if (tbody) {
-        tbody.innerHTML = sorted.map((u,i) => `
+        tbody.innerHTML = sorted.map((u, i) => `
             <tr>
-                <td><strong style="color:var(--accent)">#${i+1}</strong></td>
+                <td><strong style="color:var(--accent)">#${i + 1}</strong></td>
                 <td style="font-weight:600;">@${u.username}</td>
-                <td style="font-family:var(--font-mono);">${fmt(u.stats?.totalLost||0)}</td>
-                <td style="font-family:var(--font-mono);color:var(--green);">${fmt(u.stats?.totalWon||0)}</td>
-                <td style="font-family:var(--font-mono);color:var(--accent);">${fmt((u.stats?.totalLost||0)-(u.stats?.totalWon||0))}</td>
-                <td><span class="badge badge-${u.vipLevel||'standard'}">${u.vipLevel||'standard'}</span></td>
+                <td style="font-family:var(--font-mono);">${fmt(u.stats?.totalLost || 0)}</td>
+                <td style="font-family:var(--font-mono);color:var(--green);">${fmt(u.stats?.totalWon || 0)}</td>
+                <td style="font-family:var(--font-mono);color:var(--accent);">${fmt((u.stats?.totalLost || 0) - (u.stats?.totalWon || 0))}</td>
+                <td><span class="badge badge-${u.vipLevel || 'standard'}">${u.vipLevel || 'standard'}</span></td>
             </tr>`).join('');
     }
 }
 
 function drawRevenueChart() {
+    populateRevenue();
     const canvas = document.getElementById('revenueChart');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -794,83 +753,144 @@ function drawRevenueChart() {
     const H = 280;
     canvas.width = W; canvas.height = H;
 
-    const ggr = globalUsers.reduce((s,u) => s + ((u.stats?.totalLost||0)-(u.stats?.totalWon||0)), 0);
-    const days = Array.from({length:30}, (_,i) => ({
-        label: `${i+1}`,
-        val:   Math.max(50, Math.round((ggr / 30 * (0.5 + Math.random())) * 100) / 100)
+    const ggr  = globalUsers.reduce((s, u) => s + ((u.stats?.totalLost || 0) - (u.stats?.totalWon || 0)), 0);
+    const days = Array.from({ length: 30 }, (_, i) => ({
+        label: `${i + 1}`,
+        val: Math.max(50, Math.round((ggr / 30 * (0.5 + Math.random())) * 100) / 100)
     }));
-    const max  = Math.max(...days.map(d=>d.val), 100) * 1.2;
+    const max  = Math.max(...days.map(d => d.val), 100) * 1.2;
     const padL = 60, padR = 20, padT = 20, padB = 40;
-    const gW   = W - padL - padR;
-    const gH   = H - padT - padB;
+    const gW = W - padL - padR, gH = H - padT - padB;
 
     ctx.clearRect(0, 0, W, H);
-
     ctx.strokeStyle = 'rgba(255,255,255,0.04)';
-    for (let i=0; i<=5; i++) {
-        const y = padT + gH * (i/5);
-        ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W-padR, y); ctx.stroke();
-        ctx.fillStyle = '#6b7280'; ctx.font = '10px JetBrains Mono,monospace'; ctx.textAlign='right';
-        ctx.fillText(fmt(max*(1-i/5)).replace('€','€ '), padL-6, y+4);
+    for (let i = 0; i <= 5; i++) {
+        const y = padT + gH * (i / 5);
+        ctx.beginPath(); ctx.moveTo(padL, y); ctx.lineTo(W - padR, y); ctx.stroke();
+        ctx.fillStyle = '#6b7280'; ctx.font = '10px JetBrains Mono,monospace'; ctx.textAlign = 'right';
+        ctx.fillText(fmt(max * (1 - i / 5)).replace('€', '€ '), padL - 6, y + 4);
     }
 
-    const pts = days.map((d,i) => ({
-        x: padL + (i/(days.length-1)) * gW,
-        y: padT + gH * (1 - d.val/max)
+    const pts = days.map((d, i) => ({
+        x: padL + (i / (days.length - 1)) * gW,
+        y: padT + gH * (1 - d.val / max)
     }));
-
-    const grad = ctx.createLinearGradient(0, padT, 0, padT+gH);
+    const grad = ctx.createLinearGradient(0, padT, 0, padT + gH);
     grad.addColorStop(0, 'rgba(232,184,75,0.25)');
     grad.addColorStop(1, 'rgba(232,184,75,0.0)');
-
-    ctx.beginPath();
-    ctx.moveTo(pts[0].x, padT+gH);
+    ctx.beginPath(); ctx.moveTo(pts[0].x, padT + gH);
     pts.forEach(p => ctx.lineTo(p.x, p.y));
-    ctx.lineTo(pts[pts.length-1].x, padT+gH);
-    ctx.fillStyle = grad;
-    ctx.fill();
+    ctx.lineTo(pts[pts.length - 1].x, padT + gH);
+    ctx.fillStyle = grad; ctx.fill();
 
     ctx.beginPath();
-    pts.forEach((p,i) => i===0 ? ctx.moveTo(p.x,p.y) : ctx.lineTo(p.x,p.y));
-    ctx.strokeStyle = '#e8b84b';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    pts.forEach((p, i) => i === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y));
+    ctx.strokeStyle = '#e8b84b'; ctx.lineWidth = 2; ctx.stroke();
 
-    pts.forEach((p,i) => {
+    pts.forEach((p, i) => {
         if (i % 5 === 0) {
-            ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI*2);
+            ctx.beginPath(); ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
             ctx.fillStyle = '#e8b84b'; ctx.fill();
         }
     });
-
-    days.forEach((d,i) => {
+    days.forEach((d, i) => {
         if (i % 5 === 0) {
-            ctx.fillStyle = '#6b7280'; ctx.font='10px Space Grotesk,sans-serif'; ctx.textAlign='center';
-            ctx.fillText(d.label+'gg', pts[i].x, H-10);
+            ctx.fillStyle = '#6b7280'; ctx.font = '10px Space Grotesk,sans-serif'; ctx.textAlign = 'center';
+            ctx.fillText(d.label + 'gg', pts[i].x, H - 10);
         }
     });
+}
+
+/* ════════════════════════════════════════════════════
+   TAVOLI (da casino_v1)
+   ════════════════════════════════════════════════════ */
+async function populateTavoli() {
+    const { data, error } = await _sb.rpc('admin_get_tavolo');
+    if (error || !data) return;
+
+    const tbody = document.getElementById('tavoliTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = data.map(t => `
+        <tr>
+            <td><span style="font-family:var(--font-mono);color:var(--text-secondary);">#${t.id}</span></td>
+            <td style="font-weight:600;">${t.nome_tavolo}</td>
+            <td>${t.nome_gioco}</td>
+            <td>
+                <input type="number" id="tmin_${t.id}" value="${t.limite_min}" min="1" max="10000"
+                    style="width:70px;background:var(--bg-tertiary);border:1px solid var(--border);color:var(--text-primary);padding:4px 6px;border-radius:4px;">
+            </td>
+            <td>
+                <input type="number" id="tmax_${t.id}" value="${t.limite_max}" min="1" max="100000"
+                    style="width:80px;background:var(--bg-tertiary);border:1px solid var(--border);color:var(--text-primary);padding:4px 6px;border-radius:4px;">
+            </td>
+            <td>${t.max_giocatori}</td>
+            <td>
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                    <input type="checkbox" id="tattivo_${t.id}" ${t.attivo ? 'checked' : ''}>
+                    <span class="badge badge-${t.attivo ? 'active' : 'banned'}">${t.attivo ? 'Aperto' : 'Chiuso'}</span>
+                </label>
+            </td>
+            <td>
+                <button class="tbl-btn green" onclick="updateTavolo(${t.id})">Salva</button>
+            </td>
+        </tr>`).join('');
+}
+
+async function refreshTavoli() {
+    await populateTavoli();
+    toast('Tavoli aggiornati', 'success');
+}
+
+async function updateTavolo(id) {
+    const min    = parseInt(document.getElementById(`tmin_${id}`)?.value) || 5;
+    const max    = parseInt(document.getElementById(`tmax_${id}`)?.value) || 1000;
+    const attivo = document.getElementById(`tattivo_${id}`)?.checked ?? true;
+
+    if (min >= max) { toast('Il minimo deve essere inferiore al massimo', 'error'); return; }
+
+    const { data, error } = await _sb.rpc('admin_update_tavolo', {
+        p_id: id, p_min: min, p_max: max, p_attivo: attivo
+    });
+    if (!error && data?.ok) {
+        toast(`Tavolo #${id} aggiornato`, 'success');
+        await populateTavoli();
+    } else {
+        toast('Errore aggiornamento tavolo', 'error');
+    }
 }
 
 /* ════════════════════════════════════════════════════
    MANUTENZIONE
    ════════════════════════════════════════════════════ */
 async function populateMaintenance() {
-    const res = await adminApiCall('get_maintenance');
-    if (!res) return;
+    const { data, error } = await _sb
+        .from('impostazioni_sistema')
+        .select('chiave, valore');
+    if (error) return;
 
-    document.getElementById('maintMode').checked = res.manutenzione;
-    document.getElementById('blockRegister').checked = res.blocco_registrazioni;
-    document.getElementById('blockWithdrawal').checked = res.blocco_prelievi;
-    document.getElementById('onlyVip').checked = res.solo_vip;
-    document.getElementById('maintMsg').value = res.messaggio_manutenzione;
+    const settings = {};
+    (data || []).forEach(r => { settings[r.chiave] = r.valore; });
+
+    const get = k => settings[k];
+    const maintMode = document.getElementById('maintMode');
+    if (maintMode) maintMode.checked = get('manutenzione') === '1';
+    const blockReg = document.getElementById('blockRegister');
+    if (blockReg) blockReg.checked = get('blocco_registrazioni') === '1';
+    const blockWith = document.getElementById('blockWithdrawal');
+    if (blockWith) blockWith.checked = get('blocco_prelievi') === '1';
+    const onlyVip = document.getElementById('onlyVip');
+    if (onlyVip) onlyVip.checked = get('solo_vip') === '1';
+    const maintMsg = document.getElementById('maintMsg');
+    if (maintMsg) maintMsg.value = get('messaggio_manutenzione') || '';
 
     const services = [
-        { name:'Database (MySQL)', status:'online', label:'Operativo' },
-        { name:'Auth System (DB)', status:'online', label:'Operativo' },
-        { name:'Game Engine', status:'online', label:'Operativo' },
-        { name:'Payment Gateway', status:'online', label:'Operativo' },
-        { name:'CDN / Assets', status:'online', label:'Operativo' },
-        { name:'Admin Panel', status:'online', label:'Operativo' },
+        { name: 'Database (Supabase)', status: 'online', label: 'Operativo' },
+        { name: 'Auth System (JWT)',   status: 'online', label: 'Operativo' },
+        { name: 'Game Engine',         status: 'online', label: 'Operativo' },
+        { name: 'Payment Gateway',     status: 'online', label: 'Operativo' },
+        { name: 'CDN / Assets',        status: 'online', label: 'Operativo' },
+        { name: 'Admin Panel',         status: 'online', label: 'Operativo' },
     ];
     document.getElementById('servicesList').innerHTML = services.map(s => `
         <div class="service-item">
@@ -880,53 +900,52 @@ async function populateMaintenance() {
         </div>`).join('');
 
     document.getElementById('sysInfoList').innerHTML = [
-        ['Versione', '2.1.0'],
-        ['Ambiente', 'Produzione (MySQL)'],
-        ['Utenti nel DB', res.db_users_count],
-        ['Uptime reale', res.uptime],
+        ['Versione',   '2.1.0'],
+        ['Ambiente',   'Produzione (Supabase)'],
+        ['Utenti nel DB', globalUsers.length || '—'],
         ['Browser', navigator.userAgent.split(' ').pop()],
-    ].map(([k,v]) => `<div class="sys-info-item"><span>${k}</span><span>${v}</span></div>`).join('');
+    ].map(([k, v]) => `<div class="sys-info-item"><span>${k}</span><span>${v}</span></div>`).join('');
 }
 
-async function toggleMaint() {
-    await saveMaintSettings();
-}
+async function toggleMaint() { await saveMaintSettings(); }
 
 async function saveMaintSettings() {
-    const payload = {
-        manutenzione: document.getElementById('maintMode').checked,
-        blocco_registrazioni: document.getElementById('blockRegister').checked,
-        blocco_prelievi: document.getElementById('blockWithdrawal').checked,
-        solo_vip: document.getElementById('onlyVip').checked,
-        messaggio_manutenzione: document.getElementById('maintMsg').value
+    const settings = {
+        manutenzione:          document.getElementById('maintMode').checked    ? '1' : '0',
+        blocco_registrazioni:  document.getElementById('blockRegister').checked ? '1' : '0',
+        blocco_prelievi:       document.getElementById('blockWithdrawal').checked ? '1' : '0',
+        solo_vip:              document.getElementById('onlyVip').checked      ? '1' : '0',
+        messaggio_manutenzione: document.getElementById('maintMsg').value,
     };
-    const res = await adminApiCall('save_maintenance', payload);
-    if (res && res.ok) {
+    const { data, error } = await _sb.rpc('admin_save_settings', { p_settings: settings });
+    if (!error && data?.ok) {
         toast('Impostazioni manutenzione salvate', 'success');
         await populateMaintenance();
+    } else {
+        toast('Errore: impossibile salvare le impostazioni — ' + (error?.message || 'operazione fallita'), 'error');
     }
 }
 
-function clearCache() {
-    toast('Cache sistema svuotata con successo', 'success');
-}
+function clearCache() { toast('Cache sistema svuotata con successo', 'success'); }
 
 async function resetAllBalances() {
     if (!confirm('Ripristinare il saldo di tutti gli utenti a €1.000?')) return;
-    const res = await adminApiCall('reset_all_balances');
-    if (res && res.ok) {
+    const { data, error } = await _sb.rpc('admin_reset_balances');
+    if (!error && data?.ok) {
         toast('Tutti i saldi utente resettati a €1.000', 'success');
         await refreshAllData();
+    } else {
+        toast('Errore: impossibile resettare i saldi — ' + (error?.message || 'operazione fallita'), 'error');
     }
 }
 
 async function exportFullBackup() {
     const backup = {
-        exportedAt: new Date().toISOString(),
-        users:      globalUsers,
+        exportedAt:   new Date().toISOString(),
+        users:        globalUsers,
         transactions: globalTransactions,
-        bonuses:    globalBonuses,
-        settings:   globalSettings
+        bonuses:      globalBonuses,
+        settings:     globalSettings
     };
     downloadFile(`backup_casino_${Date.now()}.json`, JSON.stringify(backup, null, 2), 'application/json');
     toast('Backup completo esportato con successo', 'success');
@@ -937,11 +956,13 @@ function confirmNukeUsers() {
     document.getElementById('confirmText').textContent =
         'Questa azione eliminerà TUTTI gli utenti dal database in modo IRREVERSIBILE. Sei sicuro?';
     document.getElementById('confirmOkBtn').onclick = async () => {
-        const res = await adminApiCall('nuke_users');
-        if (res && res.ok) {
+        const { data, error } = await _sb.rpc('admin_nuke_users');
+        if (!error && data?.ok) {
             closeModal('confirmModal');
             await refreshAllData();
             toast('Tutti gli utenti eliminati dal database', 'error');
+        } else {
+            toast('Errore: impossibile eliminare gli utenti — ' + (error?.message || 'operazione fallita'), 'error');
         }
     };
     modal.classList.remove('hidden');
@@ -951,11 +972,12 @@ function confirmNukeUsers() {
    LOGS
    ════════════════════════════════════════════════════ */
 async function populateLogs(filter = 'all') {
-    const res = await adminApiCall('get_logs');
-    if (!res) return;
-    
-    let logs = res.logs;
+    const { data, error } = await _sb.rpc('admin_get_logs');
+    if (error || !data) return;
+
+    let logs = data;
     if (filter !== 'all') logs = logs.filter(l => l.type === filter);
+
     const el = document.getElementById('logLines');
     if (el) {
         el.innerHTML = logs.map(l => {
@@ -974,17 +996,19 @@ function filterLogs() {
 
 async function clearLogs() {
     if (!confirm('Svuotare tutti i log?')) return;
-    const res = await adminApiCall('clear_logs');
-    if (res && res.ok) {
+    const { data, error } = await _sb.rpc('admin_clear_logs');
+    if (!error && data?.ok) {
         await populateLogs();
         toast('Log svuotati', 'success');
+    } else {
+        toast('Errore: impossibile svuotare i log — ' + (error?.message || 'operazione fallita'), 'error');
     }
 }
 
 async function exportLogs() {
-    const res = await adminApiCall('get_logs');
-    if (!res) return;
-    const txt = res.logs.map(l => `[${l.time}] [${l.type}] ${l.message}`).join('\n');
+    const { data, error } = await _sb.rpc('admin_get_logs');
+    if (error || !data) return;
+    const txt = data.map(l => `[${l.time}] [${l.type}] ${l.message}`).join('\n');
     downloadFile(`log_casino_${Date.now()}.txt`, txt, 'text/plain');
     toast('Log esportati con successo', 'success');
 }
@@ -993,25 +1017,33 @@ async function exportLogs() {
    IMPOSTAZIONI
    ════════════════════════════════════════════════════ */
 async function populateSettings() {
-    const res = await adminApiCall('get_settings');
-    if (!res) return;
-    globalSettings = res;
+    const { data, error } = await _sb
+        .from('impostazioni_sistema')
+        .select('chiave, valore');
+    if (error) return;
 
-    document.getElementById('setCasinoName').value = res.casino_name;
-    document.getElementById('setWelcomeBonus').value = res.welcome_bonus;
-    document.getElementById('setMinBet').value = res.min_bet;
-    document.getElementById('setMaxBet').value = res.max_bet;
-    document.getElementById('setDepLimit').value = res.dep_limit;
+    const s = {};
+    (data || []).forEach(r => { s[r.chiave] = r.valore; });
+    globalSettings = s;
 
-    // RTP settings
+    const byId = (id, key) => {
+        const el = document.getElementById(id);
+        if (el) el.value = s[key] || '';
+    };
+    byId('setCasinoName',  'casino_name');
+    byId('setWelcomeBonus', 'welcome_bonus');
+    byId('setMinBet',      'min_bet');
+    byId('setMaxBet',      'max_bet');
+    byId('setDepLimit',    'dep_limit');
+
     const rtpSettingsEl = document.getElementById('rtpSettings');
     if (rtpSettingsEl) {
         rtpSettingsEl.innerHTML = GAMES.map(g => {
-            const currentRtp = res['rtp_' + g.name] || g.rtp;
+            const currentRtp = s['rtp_' + g.name] || g.rtp;
             return `
             <div class="form-row">
                 <label>${g.icon} ${g.name}</label>
-                <input type="number" id="rtp_${g.name.replace(/\s/g,'_')}" value="${currentRtp}" min="80" max="99.9" step="0.1">
+                <input type="number" id="rtp_${g.name.replace(/\s/g, '_')}" value="${currentRtp}" min="80" max="99.9" step="0.1">
             </div>`;
         }).join('') + `<button class="adm-btn adm-btn-primary" onclick="saveRtpSettings()">Salva RTP</button>`;
     }
@@ -1019,54 +1051,346 @@ async function populateSettings() {
 
 async function saveSettings() {
     const payload = {
-        casino_name: document.getElementById('setCasinoName').value,
-        welcome_bonus: parseFloat(document.getElementById('setWelcomeBonus').value),
-        min_bet: parseFloat(document.getElementById('setMinBet').value),
-        max_bet: parseFloat(document.getElementById('setMaxBet').value),
-        dep_limit: parseFloat(document.getElementById('setDepLimit').value)
+        casino_name:   document.getElementById('setCasinoName').value,
+        welcome_bonus: document.getElementById('setWelcomeBonus').value,
+        min_bet:       document.getElementById('setMinBet').value,
+        max_bet:       document.getElementById('setMaxBet').value,
+        dep_limit:     document.getElementById('setDepLimit').value,
     };
-    const res = await adminApiCall('save_settings', payload);
-    if (res && res.ok) {
+    const { data, error } = await _sb.rpc('admin_save_settings', { p_settings: payload });
+    if (!error && data?.ok) {
         toast('Impostazioni generali salvate', 'success');
         await populateSettings();
+    } else {
+        toast('Errore: impossibile salvare le impostazioni — ' + (error?.message || 'operazione fallita'), 'error');
     }
 }
 
 async function saveRtpSettings() {
     const payload = {};
     GAMES.forEach(g => {
-        const el = document.getElementById('rtp_'+g.name.replace(/\s/g,'_'));
-        if (el) payload['rtp_'+g.name] = parseFloat(el.value);
+        const el = document.getElementById('rtp_' + g.name.replace(/\s/g, '_'));
+        if (el) payload['rtp_' + g.name] = el.value;
     });
-    const res = await adminApiCall('save_settings', payload);
-    if (res && res.ok) {
+    const { data, error } = await _sb.rpc('admin_save_settings', { p_settings: payload });
+    if (!error && data?.ok) {
         toast('RTP dei giochi salvati correttamente', 'success');
         await populateSettings();
+    } else {
+        toast('Errore: impossibile salvare i valori RTP — ' + (error?.message || 'operazione fallita'), 'error');
     }
 }
 
 async function changeAdminPass() {
-    const old = document.getElementById('oldPass').value;
-    const nw = document.getElementById('newPass').value;
+    const nw   = document.getElementById('newPass').value;
     const conf = document.getElementById('confPass').value;
     if (nw !== conf) { toast('Le password non coincidono', 'error'); return; }
-    if (nw.length < 4) { toast('Password troppo corta (min 4 caratteri)', 'error'); return; }
-    const res = await adminApiCall('change_admin_password', { oldPassword: old, newPassword: nw });
-    if (res && res.ok) {
+    if (nw.length < 6) { toast('Password troppo corta (min 6 caratteri)', 'error'); return; }
+    const { error } = await _sb.auth.updateUser({ password: nw });
+    if (!error) {
         toast('Password aggiornata con successo', 'success');
-        ['oldPass','newPass','confPass'].forEach(id => document.getElementById(id).value = '');
+        ['newPass', 'confPass'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     } else {
-        toast(res?.error || 'Errore aggiornamento password', 'error');
+        toast('Errore aggiornamento password: ' + error.message, 'error');
     }
+}
+
+/* ════════════════════════════════════════════════════
+   LIVE FEED — Real-time partite e transazioni
+   ════════════════════════════════════════════════════ */
+let _liveInterval  = null;
+let _liveChannel   = null;
+let _liveLastGameId = 0;
+let _liveLastTxId   = 0;
+
+async function refreshLiveSection() {
+    await Promise.all([refreshLiveStats(), refreshLiveGames(), refreshLiveTx()]);
+}
+
+async function refreshLiveStats() {
+    const { data, error } = await _sb.rpc('admin_get_live_stats');
+    if (error || !data) return;
+    const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
+    set('liveGames5min',     data.games_5min ?? 0);
+    set('liveRevenue5min',   fmt(data.revenue_5min ?? 0));
+    set('liveGamesToday',    data.games_today ?? 0);
+    set('liveRevenueToday',  fmt(data.revenue_today ?? 0));
+    set('liveActivePlayers', data.active_players ?? 0);
+
+    const barsEl = document.getElementById('liveGamesBars');
+    if (barsEl && data.games_by_type) {
+        const entries = Object.entries(data.games_by_type).sort((a, b) => b[1] - a[1]);
+        const max = entries[0]?.[1] || 1;
+        const icons = { 'Slot Machine': '🎰', 'Blackjack': '🃏', 'Roulette': '🎡', 'Poker': '🤠', 'Rocket Cash': '🚀' };
+        barsEl.innerHTML = entries.map(([game, cnt]) => `
+            <div class="tg-item">
+                <span class="tg-name">${icons[game] || '🎮'} ${game}</span>
+                <div class="tg-bar-wrap"><div class="tg-bar" style="width:${Math.round(cnt / max * 100)}%"></div></div>
+                <span class="tg-pct">${cnt}</span>
+            </div>`).join('') || '<div style="color:var(--text-muted);font-size:12px;padding:10px 0">Nessuna partita oggi</div>';
+    }
+}
+
+async function refreshLiveGames() {
+    const { data, error } = await _sb.rpc('admin_get_live_games', { p_limit: 40 });
+    if (error || !data) return;
+
+    const tbody = document.getElementById('liveGamesBody');
+    if (!tbody) return;
+
+    const newMaxId = data[0]?.id ?? 0;
+    const hasNew   = newMaxId > _liveLastGameId && _liveLastGameId !== 0;
+    _liveLastGameId = newMaxId;
+
+    tbody.innerHTML = data.map((r, i) => {
+        const profit = r.profit ?? 0;
+        const profitCls = profit > 0 ? 'profit-pos' : profit < 0 ? 'profit-neg' : 'profit-zero';
+        const profitTxt = profit > 0 ? `+${fmt(profit)}` : fmt(profit);
+        const isNew = hasNew && i === 0;
+        const time  = new Date(r.played_at).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        return `<tr class="${isNew ? 'live-new-row' : ''}">
+            <td style="font-weight:600">@${r.username}</td>
+            <td>${r.game}</td>
+            <td style="font-family:var(--font-mono)">${fmt(r.bet)}</td>
+            <td class="${profitCls}">${profitTxt}</td>
+            <td style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary)">${time}</td>
+        </tr>`;
+    }).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px">Nessuna partita registrata</td></tr>';
+}
+
+async function refreshLiveTx() {
+    const { data, error } = await _sb.rpc('admin_get_live_transactions', { p_limit: 30 });
+    if (error || !data) return;
+
+    const tbody = document.getElementById('liveTxBody');
+    if (!tbody) return;
+
+    const newMaxId = data[0]?.id ?? 0;
+    const hasNew   = newMaxId > _liveLastTxId && _liveLastTxId !== 0;
+    _liveLastTxId  = newMaxId;
+
+    tbody.innerHTML = data.map((t, i) => {
+        const isNew  = hasNew && i === 0;
+        const color  = t.tipo === 'prelievo' ? 'var(--red)' : 'var(--green)';
+        const sign   = t.tipo === 'prelievo' ? '-' : '+';
+        const time   = new Date(t.data).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        return `<tr class="${isNew ? 'live-new-row' : ''}">
+            <td style="font-weight:600">@${t.username}</td>
+            <td><span class="badge badge-${t.tipo}">${t.tipo}</span></td>
+            <td style="font-family:var(--font-mono);color:${color}">${sign}${fmt(t.importo)}</td>
+            <td><span class="badge badge-${t.stato}">${t.stato}</span></td>
+            <td style="font-family:var(--font-mono);font-size:11px;color:var(--text-secondary)">${time}</td>
+        </tr>`;
+    }).join('') || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:20px">Nessuna transazione</td></tr>';
+}
+
+function startLivePolling() {
+    stopLivePolling();
+    _liveLastGameId = 0;
+    _liveLastTxId   = 0;
+    refreshLiveSection();
+    _liveInterval = setInterval(refreshLiveSection, 3000);
+
+    // Supabase Realtime per aggiornamento istantaneo
+    _liveChannel = _sb.channel('admin-live-feed')
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'game_history' }, () => refreshLiveSection())
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'transazione' },  () => refreshLiveSection())
+        .subscribe();
+}
+
+function stopLivePolling() {
+    if (_liveInterval) { clearInterval(_liveInterval); _liveInterval = null; }
+    if (_liveChannel)  { _sb.removeChannel(_liveChannel); _liveChannel = null; }
+}
+
+/* ════════════════════════════════════════════════════
+   CHAT LIVE — Admin side
+   ════════════════════════════════════════════════════ */
+let _chatAdminConvId  = null;
+let _chatAdminChannel = null;
+
+async function populateAdminChat() {
+    const { data, error } = await _sb.rpc('admin_get_chat_conversations');
+    if (error || !data) return;
+
+    const list = document.getElementById('adminChatConvList');
+    const countEl = document.getElementById('chatConvCount');
+    if (countEl) countEl.textContent = `${data.length} tot.`;
+
+    const openCount = data.filter(c => c.status === 'open').length;
+    const badge = document.getElementById('badgeChat');
+    if (badge) {
+        badge.textContent = openCount;
+        badge.style.display = openCount > 0 ? '' : 'none';
+    }
+
+    if (!list) return;
+    if (!data.length) {
+        list.innerHTML = '<div style="padding:20px;text-align:center;color:var(--text-muted);font-size:12px;">Nessuna conversazione</div>';
+        return;
+    }
+
+    list.innerHTML = data.map(c => {
+        const time    = c.last_message_at ? fmtDate(c.last_message_at) : '—';
+        const preview = c.last_message ? c.last_message.slice(0, 60) + (c.last_message.length > 60 ? '…' : '') : 'Nessun messaggio';
+        const active  = c.id === _chatAdminConvId ? 'active' : '';
+        const closed  = c.status === 'closed' ? 'closed' : '';
+        return `
+            <div class="chat-conv-item ${active} ${closed}" onclick="openAdminChat('${c.id}')">
+                <div class="chat-conv-user">
+                    @${c.username || 'Utente'}
+                    <span class="chat-conv-status-badge ${c.status}">${c.status === 'open' ? 'Aperta' : 'Chiusa'}</span>
+                </div>
+                <div class="chat-conv-preview">${_escAdmin(preview)}</div>
+                <div class="chat-conv-time">${time}</div>
+            </div>`;
+    }).join('');
+}
+
+async function openAdminChat(convId) {
+    _chatAdminConvId = convId;
+
+    // Re-render list to update active state
+    await populateAdminChat();
+
+    // Load messages
+    const { data, error } = await _sb.rpc('admin_get_chat_messages', { p_conversation_id: convId });
+
+    const msgsEl  = document.getElementById('adminChatMessages');
+    const inputBar = document.getElementById('adminChatInputBar');
+    const header  = document.getElementById('adminChatThreadHeader');
+
+    if (!msgsEl) return;
+
+    // Check conversation status
+    const { data: conv } = await _sb
+        .from('chat_conversations')
+        .select('status, user_id')
+        .eq('id', convId)
+        .single();
+
+    const isOpen = conv?.status === 'open';
+
+    // Header
+    const convData = document.querySelector(`.chat-conv-item.active .chat-conv-user`);
+    if (header) {
+        header.innerHTML = `
+            <span style="font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text-primary);">
+                ${convData ? convData.firstChild.textContent.trim() : '@Utente'}
+            </span>
+            <span class="chat-conv-status-badge ${conv?.status || 'open'}" style="margin-left:8px;">
+                ${isOpen ? 'Aperta' : 'Chiusa'}
+            </span>`;
+    }
+
+    if (inputBar) inputBar.style.display = isOpen ? 'flex' : 'none';
+
+    if (error || !data) { msgsEl.innerHTML = '<div style="padding:16px;color:var(--text-muted);">Errore caricamento</div>'; return; }
+
+    msgsEl.innerHTML = '';
+    (data || []).forEach(m => _appendAdminChatMsg(m.sender_type, m.sender_name, m.message, m.created_at));
+
+    // Scroll to bottom
+    msgsEl.scrollTop = msgsEl.scrollHeight;
+
+    // Subscribe realtime for this conversation
+    _subscribeAdminChat(convId);
+}
+
+function _subscribeAdminChat(convId) {
+    if (_chatAdminChannel) _sb.removeChannel(_chatAdminChannel);
+    _chatAdminChannel = _sb.channel('admin_chat_' + convId)
+        .on('postgres_changes', {
+            event:  'INSERT',
+            schema: 'public',
+            table:  'chat_messages',
+            filter: `conversation_id=eq.${convId}`,
+        }, async (payload) => {
+            const m = payload.new;
+            _appendAdminChatMsg(m.sender_type, m.sender_name, m.message, m.created_at);
+            const msgsEl = document.getElementById('adminChatMessages');
+            if (msgsEl) msgsEl.scrollTop = msgsEl.scrollHeight;
+            await populateAdminChat();
+        })
+        .subscribe();
+}
+
+function _appendAdminChatMsg(senderType, senderName, message, createdAt) {
+    const msgsEl = document.getElementById('adminChatMessages');
+    if (!msgsEl) return;
+
+    const empty = msgsEl.querySelector('.chat-admin-empty');
+    if (empty) empty.remove();
+
+    const time = createdAt
+        ? new Date(createdAt).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
+        : new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' });
+
+    const name = senderType === 'user'
+        ? senderName || 'Utente'
+        : senderType === 'admin' ? (senderName || 'Admin') : 'Assistente';
+
+    const wrap = document.createElement('div');
+    wrap.className = `adm-chat-msg from-${senderType}`;
+    wrap.innerHTML = `
+        <div class="adm-chat-msg-name">${_escAdmin(name)}</div>
+        <div class="adm-chat-bubble">${_escAdmin(message).replace(/\n/g,'<br>')}</div>
+        <div class="adm-chat-msg-time">${time}</div>`;
+    msgsEl.appendChild(wrap);
+}
+
+async function adminSendMessage() {
+    if (!_chatAdminConvId) return;
+    const inp = document.getElementById('adminChatInput');
+    if (!inp) return;
+    const text = inp.value.trim();
+    if (!text) return;
+
+    inp.value = '';
+    const { data, error } = await _sb.rpc('admin_send_chat_message', {
+        p_conversation_id: _chatAdminConvId,
+        p_message: text,
+    });
+
+    if (error || !data?.ok) {
+        toast('Errore invio messaggio — ' + (error?.message || 'operazione fallita'), 'error');
+        inp.value = text;
+    }
+}
+
+async function adminCloseChat() {
+    if (!_chatAdminConvId) return;
+    if (!confirm('Chiudere questa conversazione?')) return;
+    const { data, error } = await _sb.rpc('admin_close_chat', { p_conversation_id: _chatAdminConvId });
+    if (!error && data?.ok) {
+        toast('Chat chiusa', 'success');
+        const inputBar = document.getElementById('adminChatInputBar');
+        if (inputBar) inputBar.style.display = 'none';
+        await populateAdminChat();
+    } else {
+        toast('Errore: impossibile chiudere la chat — ' + (error?.message || 'operazione fallita'), 'error');
+    }
+}
+
+function adminChatInputKey(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        adminSendMessage();
+    }
+}
+
+function _escAdmin(str) {
+    const d = document.createElement('div');
+    d.textContent = str || '';
+    return d.innerHTML;
 }
 
 /* ════════════════════════════════════════════════════
    NOTIFICHE
    ════════════════════════════════════════════════════ */
 const notifications = [
-    { text: '🔴 Nessun prelievo in sospeso' },
+    { text: '✅ Supabase connesso e operativo' },
     { text: '✅ Tutti i nodi di gioco sono operativi' },
-    { text: '✅ Backup automatico completato con successo' },
 ];
 
 function toggleNotifs() {
@@ -1083,7 +1407,8 @@ function clearNotifs() {
     notifications.length = 0;
     const countEl = document.getElementById('notifCount');
     if (countEl) countEl.textContent = '0';
-    document.getElementById('notifList').innerHTML = '<div class="notif-item" style="color:var(--text-muted)">Nessuna notifica</div>';
+    document.getElementById('notifList').innerHTML =
+        '<div class="notif-item" style="color:var(--text-muted)">Nessuna notifica</div>';
 }
 
 /* ════════════════════════════════════════════════════
@@ -1099,7 +1424,7 @@ function toast(message, type = 'info') {
     if (!container) return;
     const el = document.createElement('div');
     el.className = `toast ${type}`;
-    el.innerHTML = `<span>${type==='success'?'✓':type==='error'?'✕':'ℹ'}</span> ${message}`;
+    el.innerHTML = `<span>${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}</span> ${message}`;
     container.appendChild(el);
     setTimeout(() => {
         el.style.opacity = '0';
@@ -1114,13 +1439,12 @@ function toast(message, type = 'info') {
    ════════════════════════════════════════════════════ */
 function downloadFile(filename, content, mime) {
     const a = document.createElement('a');
-    a.href  = URL.createObjectURL(new Blob([content], { type: mime }));
+    a.href = URL.createObjectURL(new Blob([content], { type: mime }));
     a.download = filename;
     a.click();
     URL.revokeObjectURL(a.href);
 }
 
-// Chiudi dropdown notifiche cliccando fuori
 document.addEventListener('click', e => {
     const panel = document.getElementById('notifPanel');
     const btn   = document.querySelector('.adm-notif-btn');
@@ -1129,7 +1453,6 @@ document.addEventListener('click', e => {
     }
 });
 
-// Chiudi modali cliccando sull'overlay
 document.querySelectorAll('.modal-overlay').forEach(overlay => {
     overlay.addEventListener('click', e => {
         if (e.target === overlay) overlay.classList.add('hidden');

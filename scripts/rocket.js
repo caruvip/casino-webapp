@@ -51,17 +51,28 @@ let liveBets = [];
 /* ════════════════════════════════════════════════════════
    INIT
 ════════════════════════════════════════════════════════ */
-window.addEventListener('DOMContentLoaded', () => {
+let _tavoloRocket = { limite_min: 1, limite_max: 1000 };
+let _rocketSessionStart = null;
+
+document.addEventListener('authReady', async () => {
     canvas = document.getElementById('gameCanvas');
     ctx    = canvas.getContext('2d');
 
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
-    // Preload rocket emoji su canvas
     rocketImg = new Image(48, 48);
 
-    // Genera un po' di storia iniziale
+    if (typeof getTavoloConfig === 'function') {
+        _tavoloRocket = await getTavoloConfig('Rocket Cash');
+        if (_tavoloRocket?.attivo === false) {
+            alert("Il tavolo Rocket Cash è momentaneamente chiuso.");
+            window.location.href = "giochi.html";
+            return;
+        }
+        if (typeof applyTavoloUI === 'function') applyTavoloUI(_tavoloRocket);
+    }
+
     for (let i = 0; i < 12; i++) {
         historyData.push(generateCrashPoint());
     }
@@ -194,8 +205,11 @@ function doCrash() {
 
     if (betPlaced && !cashedOut) {
         setBetResult('❌ Perso €' + betAmount.toFixed(2), 'loss');
-        // Il DB era già aggiornato al piazzamento. Registra la perdita.
-        recordGame({ game: 'Rocket Cash', bet: betAmount, payout: 0 });
+        const _duration = _rocketSessionStart ? Math.round((Date.now() - _rocketSessionStart) / 1000) : 0;
+        _rocketSessionStart = null;
+        if (typeof recordGame === 'function') {
+            recordGame({ game: 'Rocket Cash', bet: betAmount, payout: 0, duration: _duration });
+        }
         saveGameResult(false, currentMult, -betAmount);
     }
 
@@ -225,10 +239,11 @@ function doCashout() {
     setMainBtn('waiting');
     setBetResult('✅ +€' + winAmount.toFixed(2) + ' (x' + currentMult.toFixed(2) + ')', 'win');
 
-    // Accredita vincita nel DB (la puntata era già stata detratta)
-    addWin(winAmount).then(() => {
-        recordGame({ game: 'Rocket Cash', bet: betAmount, payout: winAmount });
-    });
+    const _duration = _rocketSessionStart ? Math.round((Date.now() - _rocketSessionStart) / 1000) : 0;
+    _rocketSessionStart = null;
+    if (typeof recordGame === 'function') {
+        recordGame({ game: 'Rocket Cash', bet: betAmount, payout: winAmount, duration: _duration });
+    }
     saveGameResult(true, currentMult, profit);
     updateLiveBotsCashoutMe(currentMult, winAmount);
 }
@@ -236,7 +251,7 @@ function doCashout() {
 /* ════════════════════════════════════════════════════════
    GESTIONE PULSANTE PRINCIPALE
 ════════════════════════════════════════════════════════ */
-async function handleMainButton() {
+function handleMainButton() {
     // Se in volo → CASHOUT
     if (gameState === STATE.FLYING && betPlaced && !cashedOut) {
         doCashout();
@@ -250,12 +265,18 @@ async function handleMainButton() {
     const mainBtn = document.getElementById('mainBtn');
     const amount = parseFloat(input.value);
 
-    if (isNaN(amount) || amount < 1) {
-        setBetResult('⚠ Inserisci un importo valido (min €1)', 'loss');
+    const _rMin = _tavoloRocket?.limite_min ?? 1;
+    const _rMax = _tavoloRocket?.limite_max ?? 1000;
+    if (isNaN(amount) || amount < _rMin) {
+        setBetResult(`⚠ Puntata minima: €${_rMin}`, 'loss');
+        return;
+    }
+    if (amount > _rMax) {
+        setBetResult(`⚠ Puntata massima: €${_rMax}`, 'loss');
         return;
     }
 
-    // Controlla saldo locale prima ancora di chiamare il DB
+    // Controlla saldo locale
     const localBal = getUserBalance();
     if (localBal <= 0) {
         setBetResult('⚠ Saldo insufficiente. Ricarica il conto.', 'loss');
@@ -266,43 +287,13 @@ async function handleMainButton() {
         return;
     }
 
-    // Blocca il pulsante durante l'operazione async
-    if (mainBtn) { mainBtn.disabled = true; mainBtn.textContent = '⏳ Elaborazione...'; }
-
-    try {
-        let newBalance;
-
-        if (typeof deductBet === 'function') {
-            // Usa balance.js (con sync DB)
-            const result = await deductBet(amount);
-            if (!result.ok) {
-                setBetResult('⚠ ' + (result.error || 'Saldo insufficiente'), 'loss');
-                if (mainBtn) { mainBtn.disabled = false; }
-                setMainBtn('bet');
-                return;
-            }
-            newBalance = result.balance;
-        } else {
-            // Fallback puro localStorage (file://)
-            if (localBal < amount) {
-                setBetResult('⚠ Saldo insufficiente', 'loss');
-                setMainBtn('bet');
-                return;
-            }
-            updateBalance(-amount);
-            newBalance = localBal - amount;
-        }
-
-        betAmount = amount;
-        betPlaced = true;
-        setBetResult('✔ Puntata di €' + betAmount.toFixed(2) + ' piazzata!', 'win');
-        setMainBtn('waiting');
-
-    } catch (err) {
-        console.error('[Rocket] Errore puntata:', err);
-        setBetResult('⚠ Errore. Riprova.', 'loss');
-        setMainBtn('bet');
-    }
+    // Deduci localmente per aggiornare display subito (DB sync avviene via recordGame alla fine)
+    betAmount = amount;
+    betPlaced = true;
+    _rocketSessionStart = Date.now();
+    document.dispatchEvent(new CustomEvent('balanceUpdate', { detail: { balance: localBal - amount } }));
+    setBetResult('✔ Puntata di €' + betAmount.toFixed(2) + ' piazzata!', 'win');
+    setMainBtn('waiting');
 }
 
 /* ════════════════════════════════════════════════════════
@@ -634,51 +625,36 @@ function setBetResult(text, type) {
     else el.classList.add('rp-result-neutral');
 }
 
-/* Saldo — delega a balance.js quando disponibile */
+/* Saldo — delega a balance.js */
 function getUserBalance() {
-    if (typeof getBalanceLocal === 'function') return getBalanceLocal();
-    try {
-        const user = JSON.parse(localStorage.getItem('casino_current_user'));
-        return user ? (user.balance || 0) : 0;
-    } catch { return 0; }
+    return typeof getBalanceLocal === 'function' ? getBalanceLocal() : 0;
 }
 
-function updateBalance(delta) {
-    // Mantenuta per retrocompatibilità — aggiorna solo la cache locale
-    try {
-        const user = JSON.parse(localStorage.getItem('casino_current_user'));
-        if (!user) return;
-        user.balance = Math.max(0, +((user.balance || 0) + delta).toFixed(2));
-        localStorage.setItem('casino_current_user', JSON.stringify(user));
-        document.querySelectorAll('.nav-balance-amount').forEach(el =>
-            el.textContent = '€' + user.balance.toLocaleString('it-IT', { minimumFractionDigits: 2 })
-        );
-    } catch {}
+function updateBalance(_delta) {
+    // no-op: il saldo è gestito esclusivamente da balance.js e dal DB
 }
 
 /* ════════════════════════════════════════════════════════
    VIP & JACKPOT (copiati dagli altri giochi)
 ════════════════════════════════════════════════════════ */
 function initVip() {
-    try {
-        const user = JSON.parse(localStorage.getItem('casino_current_user'));
-        if (!user) return;
-        const levels = {
-            standard: { name: 'Standard',   pct: 15, next: 'Silver'   },
-            silver:   { name: '🥈 Silver',  pct: 45, next: 'Gold'     },
-            gold:     { name: '💎 Gold',    pct: 75, next: 'Platinum' },
-            platinum: { name: '💎 Platinum',pct: 95, next: 'Diamond'  },
-        };
-        const l = levels[user.vipLevel] || levels.standard;
-        const vipName = document.getElementById('vipLevelName');
-        const vipPct  = document.getElementById('vipPct');
-        const vipFill = document.getElementById('vipFill');
-        const vipInfo = document.getElementById('vipInfo');
-        if (vipName) vipName.textContent = l.name;
-        if (vipPct)  vipPct.textContent  = l.pct + '%';
-        if (vipInfo) vipInfo.innerHTML   = `Mancano punti per il livello <strong>${l.next}</strong>`;
-        if (vipFill) setTimeout(() => { vipFill.style.width = l.pct + '%'; }, 400);
-    } catch {}
+    const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+    if (!user) return;
+    const levels = {
+        standard: { name: 'Standard',  pct: 15, next: 'Silver'   },
+        silver:   { name: 'Silver',    pct: 45, next: 'Gold'     },
+        gold:     { name: 'Gold',      pct: 75, next: 'Platinum' },
+        platinum: { name: 'Platinum',  pct: 95, next: 'Diamond'  },
+    };
+    const l = levels[user.vipLevel] || levels.standard;
+    const vipName = document.getElementById('vipLevelName');
+    const vipPct  = document.getElementById('vipPct');
+    const vipFill = document.getElementById('vipFill');
+    const vipInfo = document.getElementById('vipInfo');
+    if (vipName) vipName.textContent = l.name;
+    if (vipPct)  vipPct.textContent  = l.pct + '%';
+    if (vipInfo) vipInfo.innerHTML   = `Mancano punti per il livello <strong>${l.next}</strong>`;
+    if (vipFill) setTimeout(() => { vipFill.style.width = l.pct + '%'; }, 400);
 }
 
 function startJackpot() {

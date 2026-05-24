@@ -8,27 +8,304 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Lato:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../styles/main.css">
     <link rel="stylesheet" href="../styles/auth.css">
+    <style>
+        .container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px 20px;
+        }
+
+        .deposit-card {
+            width: 100%;
+            max-width: 480px;
+            background: linear-gradient(135deg, #1a0a0a, #0d0000);
+            border: 1px solid rgba(212,175,55,0.45);
+            border-radius: 16px;
+            padding: 40px 36px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+        }
+
+        .deposit-header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        .deposit-title {
+            font-family: 'Cinzel', serif;
+            font-size: 22px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            background: linear-gradient(180deg, #FFF7CC 0%, #FFD700 40%, #D4AF37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0 0 6px;
+        }
+
+        .deposit-subtitle {
+            font-size: 12px;
+            color: #8a8470;
+            margin: 0;
+        }
+
+        .balance-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255,215,0,0.07);
+            border: 1px solid rgba(212,175,55,0.25);
+            border-radius: 8px;
+            padding: 8px 16px;
+            margin-top: 14px;
+            font-size: 13px;
+            color: #8a8470;
+        }
+
+        .balance-badge strong {
+            color: #FFD700;
+            font-family: 'Lato', monospace;
+        }
+
+        .quick-amounts {
+            margin-bottom: 20px;
+        }
+
+        .quick-label {
+            display: block;
+            font-family: 'Cinzel', serif;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #D4AF37;
+            margin-bottom: 10px;
+        }
+
+        .quick-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .quick-btn {
+            padding: 10px 6px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(212,175,55,0.25);
+            border-radius: 7px;
+            color: #D4AF37;
+            font-family: 'Cinzel', serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.18s;
+        }
+
+        .quick-btn:hover,
+        .quick-btn.active {
+            background: rgba(212,175,55,0.12);
+            border-color: #FFD700;
+            color: #FFD700;
+            box-shadow: 0 0 10px rgba(255,215,0,0.15);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 18px 0;
+            color: #4a4840;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(212,175,55,0.12);
+        }
+
+        .row-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+
+        .secure-badges {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: #4a4840;
+        }
+
+        .secure-badge .icon {
+            font-size: 14px;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 18px;
+            color: #8a8470;
+            font-size: 13px;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: #D4AF37; }
+
+        .error-msg {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-bottom: 12px;
+            display: none;
+            padding: 10px 14px;
+            background: rgba(231,76,60,0.08);
+            border: 1px solid rgba(231,76,60,0.25);
+            border-radius: 7px;
+        }
+
+        /* Success overlay */
+        .success-overlay {
+            display: none;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .success-checkmark {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            margin: 0 auto 20px;
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 30px rgba(46,204,113,0.35);
+        }
+
+        @keyframes popIn {
+            0%   { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .success-title {
+            font-family: 'Cinzel', serif;
+            font-size: 20px;
+            font-weight: 900;
+            color: #2ecc71;
+            margin: 0 0 8px;
+        }
+
+        .success-msg {
+            color: #8a8470;
+            font-size: 14px;
+            margin: 0 0 20px;
+        }
+
+        .new-balance {
+            display: inline-block;
+            background: rgba(46,204,113,0.08);
+            border: 1px solid rgba(46,204,113,0.25);
+            border-radius: 10px;
+            padding: 12px 24px;
+            font-family: 'Cinzel', serif;
+            font-size: 22px;
+            font-weight: 900;
+            color: #2ecc71;
+            margin-bottom: 20px;
+        }
+
+        .redirect-note {
+            font-size: 12px;
+            color: #4a4840;
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="deposit-form">
-        <div class="form-header">
-            <h1>Deposito Sicuro</h1>
-            <p>🔒 Transazione crittografata a 256-bit</p>
+    <div class="deposit-card">
+
+        <!-- Header -->
+        <div class="deposit-header">
+            <h1 class="deposit-title">Ricarica Conto</h1>
+            <p class="deposit-subtitle">🔒 Transazione crittografata a 256-bit</p>
+            <div class="balance-badge" id="balanceBadge" style="display:none">
+                Saldo attuale: <strong id="currentBalanceVal">€0,00</strong>
+            </div>
         </div>
 
-        <form id="ricaricaForm" action="../php/elabora_ricarica.php" method="POST">
+        <!-- Success overlay (shown after deposit) -->
+        <div class="success-overlay" id="successOverlay">
+            <div class="success-checkmark">✓</div>
+            <h2 class="success-title">Deposito Completato!</h2>
+            <p class="success-msg" id="successMsg"></p>
+            <div class="new-balance" id="newBalanceVal"></div>
+            <p class="redirect-note">Reindirizzamento in corso…</p>
+        </div>
+
+        <!-- Deposit form -->
+        <form id="ricaricaForm">
+
+            <!-- Quick amount selector -->
+            <div class="quick-amounts">
+                <span class="quick-label">Seleziona importo rapido</span>
+                <div class="quick-grid">
+                    <button type="button" class="quick-btn" onclick="setAmount(10)">€10</button>
+                    <button type="button" class="quick-btn" onclick="setAmount(25)">€25</button>
+                    <button type="button" class="quick-btn" onclick="setAmount(50)">€50</button>
+                    <button type="button" class="quick-btn" onclick="setAmount(100)">€100</button>
+                    <button type="button" class="quick-btn" onclick="setAmount(200)">€200</button>
+                    <button type="button" class="quick-btn" onclick="setAmount(500)">€500</button>
+                </div>
+            </div>
+
+            <div class="divider">oppure inserisci manualmente</div>
+
+            <!-- Amount input -->
             <div class="form-group">
-                <label class="form-label" for="holder">Intestatario Carta</label>
+                <label class="form-label" for="importoInput">Importo (€)</label>
+                <input type="number" id="importoInput" class="form-input" placeholder="Es: 150" min="1" max="10000" required>
+            </div>
+
+            <div class="divider">dati carta</div>
+
+            <!-- Card holder -->
+            <div class="form-group">
+                <label class="form-label" for="holder">Intestatario</label>
                 <input type="text" id="holder" class="form-input" placeholder="Mario Rossi" required>
             </div>
 
+            <!-- Card number -->
             <div class="form-group">
-                <label class="form-label" for="card">Numero Carta</label>
+                <label class="form-label" for="card-number">Numero Carta</label>
                 <input type="text" id="card-number" class="form-input" placeholder="0000 0000 0000 0000" required>
             </div>
 
+            <!-- Expiry + CVV -->
             <div class="row-group">
                 <div class="form-group">
                     <label class="form-label" for="expiry">Scadenza</label>
@@ -40,41 +317,142 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label class="form-label" for="importo">Importo (€)</label>
-                <input type="number" id="importoInput" name="importo" class="form-input" placeholder="Es: 100" required>
+            <!-- Error message -->
+            <div id="depositError" class="error-msg"></div>
+
+            <!-- Limit warning -->
+            <div id="limitWarning" style="display:none;background:rgba(231,76,60,0.08);border:1px solid rgba(231,76,60,0.25);border-radius:8px;padding:14px 16px;margin-bottom:16px;font-size:13px;color:#e74c3c;">
+                <strong>⚠️ Importo troppo alto!</strong><br>
+                Il massimo per singola transazione è €10.000.
+                <button type="button" onclick="document.getElementById('limitWarning').style.display='none';document.getElementById('importoInput').value='';"
+                    style="display:block;margin-top:8px;background:none;border:1px solid rgba(231,76,60,0.4);border-radius:5px;color:#e74c3c;padding:4px 10px;cursor:pointer;font-size:12px;">
+                    Ho capito
+                </button>
             </div>
 
-            <div id="limitWarning" class="warning-box">
-                <div class="warning-title">⚠️ Importo troppo alto!</div>
-                <div class="warning-text">Il saldo massimo ricaricabile in una singola transazione è di €10.000</div>
-                <button type="button" id="hoCapitoBtn" class="btn-understand">Ho capito</button>
-            </div>
-
-            <button type="submit" class="btn-submit">Conferma Pagamento</button>
+            <button type="submit" id="submitBtn" class="btn-submit">Conferma Pagamento</button>
         </form>
 
-        <a href="user.html" class="back-link">← Annulla e torna</a>
+        <!-- Security badges -->
+        <div class="secure-badges">
+            <span class="secure-badge"><span class="icon">🔒</span> SSL 256-bit</span>
+            <span class="secure-badge"><span class="icon">🛡️</span> PCI DSS</span>
+            <span class="secure-badge"><span class="icon">✅</span> 3D Secure</span>
+        </div>
+
+        <a href="user.html" class="back-link">← Annulla e torna al profilo</a>
     </div>
 </div>
 
 <footer>
-    Â© 2025 777Casino.it | Depositi Sicuri | Pagamenti Crittografati
+    &copy; 2025 777Casino.it | Depositi Sicuri | Pagamenti Crittografati
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="../scripts/supabase-client.js"></script>
+<script src="../scripts/auth.js"></script>
+<script src="../scripts/balance.js"></script>
 <script src="../scripts/verificacarta.js"></script>
 <script>
-document.getElementById('ricaricaForm').addEventListener('submit', function(e) {
-    const importoVal = parseFloat(document.getElementById('importoInput').value);
-    if (importoVal > 10000) {
-        e.preventDefault();
-        document.getElementById('limitWarning').style.display = 'block';
+function fmt(n) {
+    return new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR' }).format(n || 0);
+}
+
+function setAmount(val) {
+    document.getElementById('importoInput').value = val;
+    document.querySelectorAll('.quick-btn').forEach(b => {
+        b.classList.toggle('active', b.textContent === '€' + val);
+    });
+}
+
+document.getElementById('importoInput').addEventListener('input', () => {
+    document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
+});
+
+document.addEventListener('authReady', async () => {
+    const user = getCurrentUser();
+    if (!user) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    // Show current balance
+    const { data } = await _sb
+        .from('profili')
+        .select('saldo')
+        .eq('id', user.id)
+        .single();
+
+    if (data) {
+        const badge = document.getElementById('balanceBadge');
+        document.getElementById('currentBalanceVal').textContent = fmt(data.saldo);
+        badge.style.display = 'inline-flex';
     }
 });
 
-document.getElementById('hoCapitoBtn').addEventListener('click', function() {
-    document.getElementById('limitWarning').style.display = 'none';
-    document.getElementById('importoInput').value = '';
+document.getElementById('ricaricaForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const importoVal = parseFloat(document.getElementById('importoInput').value);
+    const errEl      = document.getElementById('depositError');
+    const btn        = document.getElementById('submitBtn');
+
+    errEl.style.display = 'none';
+
+    if (importoVal > 10000) {
+        document.getElementById('limitWarning').style.display = 'block';
+        return;
+    }
+    if (!importoVal || importoVal <= 0) {
+        errEl.textContent = 'Inserisci un importo valido.';
+        errEl.style.display = 'block';
+        return;
+    }
+
+    const user = getCurrentUser();
+    if (!user) {
+        window.location.href = 'login.html';
+        return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Elaborazione…';
+
+    // Insert transaction directly as completed (simulated payment)
+    const { error: txError } = await _sb.from('transazione').insert({
+        user_id: user.id,
+        tipo:    'deposito',
+        importo: importoVal,
+        stato:   'completed',
+    });
+
+    if (txError) {
+        errEl.textContent = 'Errore durante la transazione. Riprova.';
+        errEl.style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = 'Conferma Pagamento';
+        return;
+    }
+
+    // Credit balance
+    const newBalance = await addToBalance(importoVal);
+
+    // Show success overlay
+    document.getElementById('ricaricaForm').style.display = 'none';
+
+    const overlay = document.getElementById('successOverlay');
+    document.getElementById('successMsg').textContent =
+        `Deposito di ${fmt(importoVal)} accreditato con successo.`;
+    document.getElementById('newBalanceVal').textContent =
+        `Nuovo saldo: ${fmt(newBalance)}`;
+    overlay.style.display = 'block';
+
+    // Update balance badge
+    const badge = document.getElementById('balanceBadge');
+    document.getElementById('currentBalanceVal').textContent = fmt(newBalance);
+    badge.style.display = 'inline-flex';
+
+    setTimeout(() => { window.location.href = 'user.html'; }, 3000);
 });
 </script>
 </body>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8">
@@ -23,8 +23,8 @@
         <p class="login-subtitle">777Casino Control Center</p>
         <div class="login-fields">
             <div class="login-field">
-                <label>Username</label>
-                <input type="text" id="adminUser" placeholder="admin" autocomplete="off">
+                <label>Email</label>
+                <input type="email" id="adminUser" placeholder="admin@casino.it" autocomplete="off">
             </div>
             <div class="login-field">
                 <label>Password</label>
@@ -71,14 +71,27 @@
                 <a class="adm-nav-item" onclick="showSection('bonuses')" href="#">
                     <span class="adm-nav-icon">◈</span> Bonus
                 </a>
+                <a class="adm-nav-item" onclick="showSection('chat')" href="#">
+                    <span class="adm-nav-icon">💬</span> Chat Live
+                    <span class="adm-nav-badge" id="badgeChat" style="display:none">0</span>
+                </a>
             </div>
             <div class="adm-nav-group">
                 <span class="adm-nav-label">Analytics</span>
+                <a class="adm-nav-item" onclick="showSection('live')" href="#">
+                    <span class="adm-nav-icon">🔴</span> Live Feed
+                </a>
                 <a class="adm-nav-item" onclick="showSection('analytics')" href="#">
                     <span class="adm-nav-icon">◉</span> Analisi Giochi
                 </a>
                 <a class="adm-nav-item" onclick="showSection('revenue')" href="#">
                     <span class="adm-nav-icon">◆</span> Revenue
+                </a>
+            </div>
+            <div class="adm-nav-group">
+                <span class="adm-nav-label">Giochi</span>
+                <a class="adm-nav-item" onclick="showSection('tavoli')" href="#">
+                    <span class="adm-nav-icon">🎰</span> Tavoli
                 </a>
             </div>
             <div class="adm-nav-group">
@@ -372,6 +385,132 @@
                 </div>
             </section>
 
+            <!-- ══ LIVE FEED ══ -->
+            <section class="adm-section" id="sec-live">
+
+                <!-- Live KPIs -->
+                <div class="live-kpi-row" style="margin-bottom:16px;">
+                    <div class="adm-card live-kpi-card">
+                        <div class="live-kpi-icon">🎮</div>
+                        <div>
+                            <div class="live-kpi-val" id="liveGames5min">0</div>
+                            <div class="live-kpi-lbl">Partite / 5 min</div>
+                        </div>
+                    </div>
+                    <div class="adm-card live-kpi-card">
+                        <div class="live-kpi-icon">💶</div>
+                        <div>
+                            <div class="live-kpi-val" id="liveRevenue5min">€ 0</div>
+                            <div class="live-kpi-lbl">GGR / 5 min</div>
+                        </div>
+                    </div>
+                    <div class="adm-card live-kpi-card">
+                        <div class="live-kpi-icon">📊</div>
+                        <div>
+                            <div class="live-kpi-val" id="liveGamesToday">0</div>
+                            <div class="live-kpi-lbl">Partite Oggi</div>
+                        </div>
+                    </div>
+                    <div class="adm-card live-kpi-card">
+                        <div class="live-kpi-icon">💰</div>
+                        <div>
+                            <div class="live-kpi-val" id="liveRevenueToday">€ 0</div>
+                            <div class="live-kpi-lbl">GGR Oggi</div>
+                        </div>
+                    </div>
+                    <div class="adm-card live-kpi-card">
+                        <div class="live-kpi-icon">🟢</div>
+                        <div>
+                            <div class="live-kpi-val" id="liveActivePlayers">0</div>
+                            <div class="live-kpi-lbl">Giocatori Attivi (30 min)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="live-two-col">
+
+                    <!-- Partite in tempo reale -->
+                    <div class="adm-card">
+                        <div class="adm-card-header">
+                            <span>Partite Recenti</span>
+                            <span class="live-badge">● LIVE</span>
+                        </div>
+                        <div class="live-feed-wrap">
+                            <table class="adm-table">
+                                <thead>
+                                    <tr>
+                                        <th>Giocatore</th>
+                                        <th>Gioco</th>
+                                        <th>Puntata</th>
+                                        <th>Esito</th>
+                                        <th>Ora</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="liveGamesBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Transazioni in tempo reale -->
+                    <div class="adm-card">
+                        <div class="adm-card-header">
+                            <span>Transazioni Recenti</span>
+                            <span class="live-badge">● LIVE</span>
+                        </div>
+                        <div class="live-feed-wrap">
+                            <table class="adm-table">
+                                <thead>
+                                    <tr>
+                                        <th>Giocatore</th>
+                                        <th>Tipo</th>
+                                        <th>Importo</th>
+                                        <th>Stato</th>
+                                        <th>Ora</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="liveTxBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Distribuzione per gioco oggi -->
+                <div class="adm-card" style="margin-top:16px;">
+                    <div class="adm-card-header">
+                        <span>Partite per Gioco (Oggi)</span>
+                        <span class="live-badge">● LIVE</span>
+                    </div>
+                    <div id="liveGamesBars" class="topgames-list"></div>
+                </div>
+
+            </section>
+
+            <!-- ══ TAVOLI ══ -->
+            <section class="adm-section" id="sec-tavoli">
+                <div class="adm-card">
+                    <div class="adm-card-header">
+                        <span>Configurazione Tavoli (casino_v1)</span>
+                        <button class="adm-btn adm-btn-primary" onclick="refreshTavoli()">↻ Aggiorna</button>
+                    </div>
+                    <table class="adm-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Nome Tavolo</th>
+                                <th>Gioco</th>
+                                <th>Min Puntata</th>
+                                <th>Max Puntata</th>
+                                <th>Max Giocatori</th>
+                                <th>Stato</th>
+                                <th>Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tavoliTableBody"></tbody>
+                    </table>
+                </div>
+            </section>
+
             <!-- ══ MANUTENZIONE ══ -->
             <section class="adm-section" id="sec-maintenance">
                 <div class="maint-grid">
@@ -396,25 +535,25 @@
                             <div class="toggle-row">
                                 <span>Blocca Nuove Registrazioni</span>
                                 <label class="toggle-switch">
-                                    <input type="checkbox" id="blockReg">
+                                    <input type="checkbox" id="blockRegister">
                                     <span class="toggle-slider"></span>
                                 </label>
                             </div>
                             <div class="toggle-row">
                                 <span>Blocca Prelievi</span>
                                 <label class="toggle-switch">
-                                    <input type="checkbox" id="blockWithd">
+                                    <input type="checkbox" id="blockWithdrawal">
                                     <span class="toggle-slider"></span>
                                 </label>
                             </div>
                             <div class="toggle-row">
                                 <span>Solo Utenti VIP</span>
                                 <label class="toggle-switch">
-                                    <input type="checkbox" id="vipOnly">
+                                    <input type="checkbox" id="onlyVip">
                                     <span class="toggle-slider"></span>
                                 </label>
                             </div>
-                            <textarea class="adm-textarea" id="maintMessage" placeholder="Messaggio di manutenzione visualizzato agli utenti…"></textarea>
+                            <textarea class="adm-textarea" id="maintMsg" placeholder="Messaggio di manutenzione visualizzato agli utenti…"></textarea>
                             <button class="adm-btn adm-btn-primary" onclick="saveMaintSettings()">Salva Impostazioni</button>
                         </div>
                     </div>
@@ -535,6 +674,44 @@
                 </div>
             </section>
 
+            <!-- ══ CHAT LIVE ══ -->
+            <section class="adm-section" id="sec-chat">
+                <div class="chat-admin-layout">
+
+                    <!-- Conversations list -->
+                    <div class="chat-admin-sidebar">
+                        <div class="chat-admin-sidebar-header">
+                            <span>Conversazioni</span>
+                            <span id="chatConvCount" style="color:var(--text-muted);font-size:12px;"></span>
+                        </div>
+                        <div class="chat-admin-conv-list" id="adminChatConvList">
+                            <div style="padding:20px;text-align:center;color:var(--text-muted);font-size:12px;">Nessuna conversazione</div>
+                        </div>
+                    </div>
+
+                    <!-- Thread view -->
+                    <div class="chat-admin-thread">
+                        <div class="chat-admin-thread-header" id="adminChatThreadHeader">
+                            <span style="color:var(--text-muted);font-size:13px;">Seleziona una conversazione</span>
+                        </div>
+                        <div class="chat-admin-messages" id="adminChatMessages">
+                            <div class="chat-admin-empty">
+                                <div style="font-size:36px;margin-bottom:12px;">💬</div>
+                                <div style="font-family:var(--font-display);font-size:13px;color:var(--text-muted);">Seleziona una conversazione per visualizzarla</div>
+                            </div>
+                        </div>
+                        <div class="chat-admin-input-bar" id="adminChatInputBar" style="display:none">
+                            <textarea class="chat-admin-input" id="adminChatInput"
+                                placeholder="Scrivi risposta…" rows="1"
+                                onkeydown="adminChatInputKey(event)"></textarea>
+                            <button class="adm-btn adm-btn-primary" onclick="adminSendMessage()" style="flex-shrink:0;height:38px;padding:0 16px;">Invia ➤</button>
+                            <button class="adm-btn adm-btn-danger" onclick="adminCloseChat()" title="Chiudi chat" style="flex-shrink:0;height:38px;padding:0 14px;">✕</button>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
         </div><!-- /adm-content -->
     </div><!-- /adm-main -->
 </div><!-- /adminShell -->
@@ -567,6 +744,8 @@
 <!-- ══ TOAST ══ -->
 <div id="toastContainer" class="toast-container"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="../scripts/supabase-client.js"></script>
 <script src="../scripts/admin.js"></script>
 </body>
 </html>

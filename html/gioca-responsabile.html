@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gioco Responsabile | 777Casino</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Lato:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../styles/main.css">
+    <link rel="stylesheet" href="../styles/layout.css">
+    <link rel="stylesheet" href="../styles/gioca-responsabile.css">
+</head>
+<body>
+
+<div class="shell">
+
+    <!-- ── TOPNAV ── -->
+    <nav class="topnav">
+        <a class="nav-logo" href="index.html">
+            <div class="nav-logo-icon">7</div>
+            <span class="nav-logo-name">777CASINO</span>
+        </a>
+        <div class="nav-links">
+            <a class="nav-link" href="index.html">Home</a>
+            <a class="nav-link" href="giochi.html">Giochi</a>
+            <a class="nav-link" href="promozioni.html">Promozioni</a>
+            <a class="nav-link" href="chi-siamo.html">Chi Siamo</a>
+            <a class="nav-link" href="contatti.html">Contatti</a>
+        </div>
+        <div class="nav-actions" id="userBar"></div>
+    </nav>
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-section-label">Legale</div>
+            <ul>
+                <li><div class="sidebar-item" onclick="window.location.href='termini.html'"><span class="sidebar-icon">📄</span>Termini e Condizioni</div></li>
+                <li><div class="sidebar-item active"><span class="sidebar-icon">🛡️</span>Gioco Responsabile</div></li>
+                <li><div class="sidebar-item" onclick="window.location.href='contatti.html'"><span class="sidebar-icon">📧</span>Contatti</div></li>
+            </ul>
+        </div>
+        <div class="sidebar-section" style="border-top:1px solid var(--border);">
+            <div class="sidebar-section-label">Strumenti</div>
+            <ul>
+                <li><div class="sidebar-item" onclick="document.getElementById('tools').scrollIntoView({behavior:'smooth'})"><span class="sidebar-icon">🔧</span>Imposta Limiti</div></li>
+                <li><div class="sidebar-item" onclick="document.getElementById('quiz').scrollIntoView({behavior:'smooth'})"><span class="sidebar-icon">📋</span>Auto-valutazione</div></li>
+                <li><div class="sidebar-item" onclick="document.getElementById('resources').scrollIntoView({behavior:'smooth'})"><span class="sidebar-icon">🆘</span>Aiuto Esterno</div></li>
+            </ul>
+        </div>
+        <div class="sidebar-section" style="border-top:1px solid var(--border);">
+            <div class="sidebar-section-label">Status VIP</div>
+        </div>
+        <div class="vip-card">
+            <div class="vip-header">
+                <span class="vip-title" id="vipLevelName">Standard</span>
+                <span class="vip-pct" id="vipPct">0%</span>
+            </div>
+            <div class="vip-track">
+                <div class="vip-fill" id="vipFill"></div>
+            </div>
+            <div class="vip-info" id="vipInfo">Gioca per guadagnare <strong>punti VIP</strong></div>
+        </div>
+        <div class="spacer"></div>
+        <div class="support-box">
+            <div class="support-label">Aiuto Immediato</div>
+            <div class="support-text">800 558 822 gratuito</div>
+            <button class="support-btn" onclick="window.location.href='contatti.html'">Parla con noi</button>
+        </div>
+    </aside>
+
+    <!-- ── MAIN ── -->
+    <main class="main">
+
+        <!-- Hero -->
+        <section class="page-hero">
+            <div class="page-hero-content">
+                <h1 class="page-hero-title">Gioco Responsabile</h1>
+                <p class="page-hero-sub">Il gioco deve essere un'esperienza di intrattenimento, non una fonte di stress o problemi. 777Casino si impegna a fornirti gli strumenti per giocare in modo consapevole e sicuro.</p>
+                <div class="hero-badge">🛡️ Proteggiamo i nostri giocatori dal 2018</div>
+            </div>
+        </section>
+
+        <!-- Emergency bar -->
+        <div class="emergency-bar">
+            <p>Hai bisogno di aiuto immediato? &nbsp;<strong>Non sei solo.</strong> Assistenza gratuita e anonima disponibile 24/7.</p>
+            <div class="phone-badge">📞 800 558 822</div>
+        </div>
+
+        <!-- ── SECTION: What is responsible gaming ── -->
+        <div class="content-section">
+            <h2 class="section-title green">Cos'è il Gioco Responsabile?</h2>
+            <p class="content-text">
+                Il gioco d'azzardo è una forma di intrattenimento legale e regolamentata. Come tutte le forme di intrattenimento, è importante fruirne con <strong>consapevolezza e controllo</strong>. Il gioco responsabile significa:
+            </p>
+            <div class="two-col">
+                <div>
+                    <p class="content-text" style="margin-bottom:10px;"><strong>✅ Giocare in modo sano significa:</strong></p>
+                    <ul style="list-style:none;padding:0;margin:0">
+                        <li style="font-size:13px;color:var(--text-secondary);padding:6px 0 6px 22px;position:relative;border-bottom:1px solid rgba(255,255,255,0.04)"><span style="position:absolute;left:0;color:#2ecc71">✓</span>Giocare con denaro che puoi permetterti di perdere</li>
+                        <li style="font-size:13px;color:var(--text-secondary);padding:6px 0 6px 22px;position:relative;border-bottom:1px solid rgba(255,255,255,0.04)"><span style="position:absolute;left:0;color:#2ecc71">✓</span>Stabilire in anticipo un budget e rispettarlo</li>
+                        <li style="font-size:13px;color:var(--text-secondary);padding:6px 0 6px 22px;position:relative;border-bottom:1px solid rgba(255,255,255,0.04)"><span style="position:absolute;left:0;color:#2ecc71">✓</span>Fare pause regolari durante le sessioni</li>
+                        <li style="font-size:13px;color:var(--text-secondary);padding:6px 0 6px 22px;position:relative;border-bottom:1px solid rgba(255,255,255,0.04)"><span style="position:absolute;left:0;color:#2ecc71">✓</span>Trattare le perdite come il costo dell'intrattenimento</li>
+                        <li style="font-size:13px;color:var(--text-secondary);padding:6px 0 6px 22px;position:relative"><span style="position:absolute;left:0;color:#2ecc71">✓</span>Mantenere il gioco separato da lavoro e famiglia</li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="content-text" style="margin-bottom:10px;"><strong>❌ Segnali di allarme da non ignorare:</strong></p>
+                    <ul style="list-style:none;padding:0;margin:0">
+                        <li style="font-size:13px;color:var(--text-secondary);padding:6px 0 6px 22px;position:relative;border-bottom:1px solid rgba(255,255,255,0.04)"><span style="position:absolute;left:0;color:#e07070">✗</span>Giocare con denaro destinato ad altre spese</li>
+                        <li style="font-size:13px;color:var(--text-secondary);padding:6px 0 6px 22px;position:relative;border-bottom:1px solid rgba(255,255,255,0.04)"><span style="position:absolute;left:0;color:#e07070">✗</span>Cercare di recuperare le perdite aumentando le puntate</li>
+                        <li style="font-size:13px;color:var(--text-secondary);padding:6px 0 6px 22px;position:relative;border-bottom:1px solid rgba(255,255,255,0.04)"><span style="position:absolute;left:0;color:#e07070">✗</span>Giocare per sfuggire a stress, ansia o depressione</li>
+                        <li style="font-size:13px;color:var(--text-secondary);padding:6px 0 6px 22px;position:relative;border-bottom:1px solid rgba(255,255,255,0.04)"><span style="position:absolute;left:0;color:#e07070">✗</span>Pensare ossessivamente al gioco durante il giorno</li>
+                        <li style="font-size:13px;color:var(--text-secondary);padding:6px 0 6px 22px;position:relative"><span style="position:absolute;left:0;color:#e07070">✗</span>Mentire a familiari o amici riguardo al gioco</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── SECTION: Tools ── -->
+        <div class="content-section" id="tools">
+            <h2 class="section-title">Strumenti di Controllo</h2>
+            <p class="content-text">777Casino mette a disposizione di tutti gli utenti strumenti gratuiti per mantenere il controllo sull'attività di gioco. Puoi attivarli in qualsiasi momento dal tuo profilo o contattando il supporto.</p>
+
+            <div class="tools-grid">
+                <div class="tool-card">
+                    <span class="tool-icon">💰</span>
+                    <div class="tool-name">Limiti di Deposito</div>
+                    <div class="tool-desc">Imposta un massimale giornaliero, settimanale o mensile per i depositi. Il limite entra in vigore immediatamente.</div>
+                </div>
+                <div class="tool-card">
+                    <span class="tool-icon">📉</span>
+                    <div class="tool-name">Limiti di Perdita</div>
+                    <div class="tool-desc">Imposta una soglia massima di perdita. Al superamento, il gioco viene bloccato automaticamente per il periodo scelto.</div>
+                </div>
+                <div class="tool-card">
+                    <span class="tool-icon">⏱️</span>
+                    <div class="tool-name">Limiti di Tempo</div>
+                    <div class="tool-desc">Ricevi un avviso dopo un certo numero di ore di gioco consecutive. Puoi impostare sessioni massime da 1 a 8 ore.</div>
+                </div>
+                <div class="tool-card">
+                    <span class="tool-icon">🌙</span>
+                    <div class="tool-name">Pausa Gioco</div>
+                    <div class="tool-desc">Sospendi temporaneamente l'accesso al tuo account per 24 ore, 7 giorni, 30 giorni o 90 giorni. I fondi rimangono al sicuro.</div>
+                </div>
+                <div class="tool-card">
+                    <span class="tool-icon">🔒</span>
+                    <div class="tool-name">Auto-esclusione</div>
+                    <div class="tool-desc">Chiudi definitivamente il tuo account con impossibilità di riapertura. Il saldo viene rimborsato. Effetto immediato.</div>
+                </div>
+                <div class="tool-card">
+                    <span class="tool-icon">👁️</span>
+                    <div class="tool-name">Storico Attività</div>
+                    <div class="tool-desc">Consulta in ogni momento la cronologia completa di gioco, depositi e prelievi nel tuo profilo personale.</div>
+                </div>
+            </div>
+
+            <!-- How to set limits -->
+            <h3 style="font-family:'Cinzel',serif;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--gold-dim);margin:0 0 16px;">Come Impostare i Limiti</h3>
+            <ol class="steps-list">
+                <li>
+                    <div class="step-num">1</div>
+                    <div class="step-content">
+                        <div class="step-title">Accedi al tuo Profilo</div>
+                        <div class="step-desc">Fai clic sull'icona del profilo in alto a destra e vai alla sezione "Impostazioni".</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="step-num">2</div>
+                    <div class="step-content">
+                        <div class="step-title">Seleziona "Gioco Responsabile"</div>
+                        <div class="step-desc">Troverai tutti gli strumenti disponibili nella tab dedicata del tuo account.</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="step-num">3</div>
+                    <div class="step-content">
+                        <div class="step-title">Configura le tue Preferenze</div>
+                        <div class="step-desc">Scegli il tipo di limite, l'importo e la durata. I limiti di riduzione entrano in vigore immediatamente.</div>
+                    </div>
+                </li>
+                <li>
+                    <div class="step-num">4</div>
+                    <div class="step-content">
+                        <div class="step-title">Conferma e Salva</div>
+                        <div class="step-desc">Riceverai una email di conferma. Le modifiche ai limiti in aumento richiedono un periodo di riflessione di 24 ore.</div>
+                    </div>
+                </li>
+            </ol>
+
+            <!-- Self-exclusion box -->
+            <div class="exclusion-box">
+                <h3>🔒 Auto-esclusione Permanente</h3>
+                <p>Se ritieni di non essere in grado di controllare il tuo gioco, l'auto-esclusione è la soluzione più sicura. Puoi richiedere la chiusura definitiva del tuo account in qualsiasi momento contattando il nostro supporto.</p>
+                <p>Una volta attivata, <strong>non sarà possibile riaprire l'account o crearne uno nuovo</strong> con gli stessi dati personali per un periodo minimo di 5 anni. Il saldo disponibile verrà rimborsato entro 72 ore.</p>
+                <p>Puoi anche registrarti nel <a href="https://www.adm.gov.it" target="_blank">Registro Nazionale degli Esclusi dal Gioco (AAMS/ADM)</a> per essere escluso da tutte le piattaforme certificate in Italia.</p>
+            </div>
+        </div>
+
+        <!-- ── SECTION: Self-assessment quiz ── -->
+        <div class="content-section" id="quiz">
+            <h2 class="section-title red">Auto-valutazione: Ho un Problema?</h2>
+            <p class="content-text">Questo breve test può aiutarti a capire il tuo rapporto con il gioco. Seleziona le affermazioni che si applicano alla tua situazione.</p>
+
+            <div class="quiz-box">
+                <div class="quiz-header">📋 Questionario di auto-valutazione — seleziona le situazioni che ti rispecchiano</div>
+                <div class="quiz-questions" id="quizQuestions">
+                    <label class="quiz-q"><input type="checkbox" class="quiz-check"> <span>Ho giocato con soldi che avevo destinato ad altro (affitto, cibo, bollette).</span></label>
+                    <label class="quiz-q"><input type="checkbox" class="quiz-check"> <span>Ho cercato di recuperare le perdite aumentando le puntate.</span></label>
+                    <label class="quiz-q"><input type="checkbox" class="quiz-check"> <span>Ho mentito a familiari o amici riguardo alle mie abitudini di gioco.</span></label>
+                    <label class="quiz-q"><input type="checkbox" class="quiz-check"> <span>Ho perso interesse in attività che prima mi piacevano a causa del gioco.</span></label>
+                    <label class="quiz-q"><input type="checkbox" class="quiz-check"> <span>Il pensiero del gioco mi distrae spesso durante il lavoro o le relazioni.</span></label>
+                    <label class="quiz-q"><input type="checkbox" class="quiz-check"> <span>Ho provato a smettere o ridurre il gioco senza riuscirci.</span></label>
+                    <label class="quiz-q"><input type="checkbox" class="quiz-check"> <span>Ho chiesto denaro in prestito per giocare o per coprire debiti di gioco.</span></label>
+                    <label class="quiz-q"><input type="checkbox" class="quiz-check"> <span>Il gioco mi provoca stati d'ansia, irritabilità o depressione quando non gioco.</span></label>
+                </div>
+                <div class="quiz-result" id="quizResult"></div>
+                <div class="quiz-footer">
+                    <button onclick="evaluateQuiz()">Valuta il mio risultato</button>
+                    <span class="quiz-note">Questo test è orientativo, non diagnostico.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── SECTION: External resources ── -->
+        <div class="content-section" id="resources">
+            <h2 class="section-title">Risorse e Aiuto Esterno</h2>
+            <p class="content-text">Se hai bisogno di supporto, esistono organizzazioni specializzate che offrono aiuto gratuito e anonimo a chi soffre di problemi legati al gioco d'azzardo.</p>
+
+            <div class="resources-grid">
+                <div class="resource-card">
+                    <div class="resource-logo">🏛️</div>
+                    <div>
+                        <div class="resource-name">ADM / AAMS</div>
+                        <div class="resource-desc">Agenzia delle Dogane e dei Monopoli — ente regolatore del gioco in Italia. Registro degli esclusi.</div>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-logo">📞</div>
+                    <div>
+                        <div class="resource-name">Helpline Gioco</div>
+                        <div class="resource-desc"><strong style="color:#e07070">800 558 822</strong> — Numero verde gratuito e anonimo, attivo 24 ore su 24, 7 giorni su 7.</div>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-logo">🏥</div>
+                    <div>
+                        <div class="resource-name">SerD / SerT</div>
+                        <div class="resource-desc">Servizi per le Dipendenze del SSN — centri pubblici gratuiti sul territorio nazionale per trattamento del GAP.</div>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-logo">🤝</div>
+                    <div>
+                        <div class="resource-name">Gamblers Anonymous</div>
+                        <div class="resource-desc">Associazione di auto-aiuto per chi soffre di dipendenza da gioco. Gruppi di supporto in tutta Italia.</div>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-logo">🌐</div>
+                    <div>
+                        <div class="resource-name">Gambling Therapy</div>
+                        <div class="resource-desc">Supporto online internazionale con chat, forum e consulenze individuali in italiano e in più lingue.</div>
+                    </div>
+                </div>
+                <div class="resource-card">
+                    <div class="resource-logo">👨‍👩‍👧</div>
+                    <div>
+                        <div class="resource-name">Sostegno ai Familiari</div>
+                        <div class="resource-desc">Gruppi di supporto per familiari e partner di giocatori problematici. Contatta il nostro supporto per essere indirizzato.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── CTA contact ── -->
+        <div class="contact-cta">
+            <div>
+                <h3>Il nostro team è qui per aiutarti</h3>
+                <p>Se hai preoccupazioni riguardo al tuo comportamento di gioco, contattaci.<br>Ogni segnalazione è trattata con massima riservatezza.</p>
+            </div>
+            <div class="cta-btns">
+                <a href="contatti.html" class="btn-green">💬 Contatta il Supporto</a>
+                <a href="termini.html" class="btn-outline-green">📄 Leggi i Termini</a>
+            </div>
+        </div>
+
+        <footer style="padding:24px 40px; border-top:1px solid var(--border); text-align:center; margin-top:8px;">
+            <p style="font-family:'Cinzel',serif; font-size:11px; color:var(--text-muted); letter-spacing:1px;">
+                &copy; 2026 777Casino.it &nbsp;|&nbsp; Gioco Responsabile 18+ &nbsp;|&nbsp; Helpline: 800 558 822
+            </p>
+        </footer>
+
+    </main>
+
+    <!-- ── TICKER ── -->
+    <footer class="ticker">
+        <div class="ticker-label"><div class="ticker-dot"></div> Live Jackpot</div>
+        <div class="ticker-amount" id="jackpotAmt">€4.290.123,82</div>
+        <div class="ticker-scroll">
+            <div class="ticker-track">
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+                <div class="ticker-item">⭐ <span class="winner">@LuckyMax</span> ha vinto <strong>€1.200</strong> su Lightning Roulette</div>
+                <div class="ticker-item">🔥 <span class="winner">@StarGamer99</span> ha vinto <strong>€3.500</strong> su Fortune 777</div>
+                <div class="ticker-item">💎 <span class="winner">@ProPlayer</span> ha vinto <strong>€850</strong> su Blackjack Classico</div>
+                <div class="ticker-item">🚀 <span class="winner">@CryptoKing</span> ha vinto <strong>€2.100</strong> su Rocket Crash</div>
+                <div class="ticker-item">🎰 <span class="winner">@NightOwl</span> ha vinto <strong>€620</strong> su Diamond Slots</div>
+            </div>
+        </div>
+        <div class="ticker-18">Responsabile 18+</div>
+    </footer>
+
+</div><!-- /shell -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="../scripts/supabase-client.js"></script>
+<script src="../scripts/auth.js"></script>
+<script src="../scripts/balance.js"></script>
+<script src="../scripts/init.js"></script>
+<script src="../scripts/main.js"></script>
+<script>
+function evaluateQuiz() {
+    const checks = document.querySelectorAll('.quiz-check');
+    const count  = Array.from(checks).filter(c => c.checked).length;
+    const result = document.getElementById('quizResult');
+
+    let cls, msg;
+    if (count === 0) {
+        cls = 'score-low';
+        msg = '<span class="score-low">Nessun segnale di allarme rilevato.</span> Continua a giocare in modo consapevole e a monitorare le tue abitudini periodicamente.';
+    } else if (count <= 2) {
+        cls = 'score-mid';
+        msg = `<span class="score-mid">${count} segnale${count > 1 ? 'i' : ''} di attenzione.</span> Prendi in considerazione l'uso dei nostri strumenti di limitazione. Valuta di parlarne con qualcuno di fiducia.`;
+    } else if (count <= 4) {
+        cls = 'score-mid';
+        msg = `<span class="score-mid">${count} segnali di attenzione.</span> Ti consigliamo di impostare limiti di deposito e sessione. Considera di contattare il nostro supporto o la helpline <strong>800 558 822</strong>.`;
+    } else {
+        msg = `<span class="score-high">${count} segnali di allarme su 8.</span> I risultati indicano possibili difficoltà nel controllo del gioco. <strong>Ti invitiamo a contattare la helpline gratuita 800 558 822</strong> o a richiedere l'auto-esclusione dal tuo profilo.`;
+    }
+
+    result.innerHTML = msg;
+    result.classList.add('visible');
+    result.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+</script>
+</body>
+</html>

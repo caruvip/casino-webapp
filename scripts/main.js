@@ -3,16 +3,8 @@
 
 // ─── Gestione bottone Login ────────────────────────────────────────────────────
 function openLoginModal() {
-    // Controlla se l'utente è già loggato
-    const currentUser = localStorage.getItem('casino_current_user');
-    
-    if (currentUser) {
-        // Se loggato, reindirizza a user.html
-        window.location.href = './user.html';
-    } else {
-        // Se non loggato, reindirizza a login.html
-        window.location.href = './login.html';
-    }
+    const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+    window.location.href = user ? './user.html' : './login.html';
 }
 
 document.addEventListener("DOMContentLoaded", () => {

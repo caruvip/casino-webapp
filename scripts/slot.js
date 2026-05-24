@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("authReady", () => {
     // --- CONFIGURAZIONE ---
     const ROWS = 3;
     const COLUMNS = 5;
@@ -82,9 +82,10 @@ document.addEventListener("DOMContentLoaded", () => {
     };
   
     // --- STATO ---
-    let currentUser = JSON.parse(localStorage.getItem("casino_current_user"));
-    let balance = currentUser ? currentUser.balance : 0;
+    let balance = (typeof getBalanceLocal === 'function') ? getBalanceLocal() : 0;
     let bet = 10;
+    let _tavoloConfig = { limite_min: 5, limite_max: 1000 };
+    let _sessionStart = null;
     let freeSpins = 0;
     let currentMultiplier = 1;
     let isSpinning = false;
@@ -149,7 +150,9 @@ document.addEventListener("DOMContentLoaded", () => {
     function adjustBet(amount) {
         if (isSpinning || freeSpins > 0) return;
         const newBet = bet + amount;
-        if (newBet >= 10 && newBet <= balance) {
+        const minB = _tavoloConfig.limite_min || 10;
+        const maxB = Math.min(_tavoloConfig.limite_max || 1000, balance);
+        if (newBet >= minB && newBet <= maxB) {
             bet = newBet;
             updateDisplay();
         }
@@ -236,12 +239,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   
     function spin() {
-        if (!currentUser) { alert("Accedi per giocare!"); return; }
+        if (!(typeof getCurrentUser === 'function' ? getCurrentUser() : null)) {
+            alert("Accedi per giocare!"); return;
+        }
         if (isSpinning) return;
         if (freeSpins === 0 && balance < bet) { alert("Saldo insufficiente!"); return; }
   
         isSpinning = true;
         spinButton.disabled = true;
+        if (!_sessionStart) _sessionStart = Date.now();
         clearHighlights();
         
         if(messageBar) {
@@ -279,24 +285,27 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!isTurbo) document.querySelectorAll('.slot-cell').forEach(cell => cell.classList.remove('spinning'));
   
             const win = checkResult(finalGrid);
-            
+            const currentBet = freeSpins > 0 ? 0 : bet; // free spin: puntata 0
+
             if (win > 0) {
                 balance += win;
-                if(messageBar) {
+                if (messageBar) {
                     messageBar.innerHTML = `<span style="color:#fff">VINTI</span> <span style="font-size:1.5rem; color:#FFD700">€${win.toFixed(2)}</span>`;
                     messageBar.classList.add("win-active");
                 }
-                if (typeof updateGameStats === "function") updateGameStats("Slot Machine", win);
             } else {
-                 if(messageBar) messageBar.textContent = freeSpins > 0 ? "Continua..." : "Ritenta!";
-                 if (freeSpins === 0 && typeof updateGameStats === "function") updateGameStats("Slot Machine", -bet);
+                if (messageBar) messageBar.textContent = freeSpins > 0 ? "Continua..." : "Ritenta!";
             }
-  
-            saveBalance();
+
+            // Sincronizza col DB via balance.js
+            if (typeof recordGame === 'function') {
+                const duration = _sessionStart ? Math.round((Date.now() - _sessionStart) / 1000) : 0;
+                recordGame({ game: 'Slot Machine', bet: currentBet, payout: win, duration }).then(b => {
+                    if (b !== null) { balance = b; updateDisplay(); }
+                });
+            }
+
             updateDisplay();
-            
-            const userBar = document.getElementById("userBar");
-            if(userBar) userBar.innerHTML = `<span>Ciao, <b>${currentUser.username}</b> | Saldo: €${balance.toFixed(0)}</span>`;
   
             isSpinning = false;
             spinButton.disabled = false;
@@ -311,21 +320,25 @@ document.addEventListener("DOMContentLoaded", () => {
         }, duration);
     }
   
-    function saveBalance() {
-        if(currentUser) {
-            currentUser.balance = balance;
-            localStorage.setItem("casino_current_user", JSON.stringify(currentUser));
-            let allUsers = JSON.parse(localStorage.getItem("casino_users")) || [];
-            let idx = allUsers.findIndex(u => u.username === currentUser.username);
-            if(idx !== -1) {
-                allUsers[idx] = currentUser;
-                localStorage.setItem("casino_users", JSON.stringify(allUsers));
-            }
+    async function init() {
+        const user = typeof getCurrentUser === 'function' ? getCurrentUser() : null;
+        if (!user) { alert("Accedi per giocare!"); window.location.href = "login.html"; return; }
+
+        if (typeof syncBalanceOnLoad === 'function') {
+            syncBalanceOnLoad().then(b => { balance = b; updateDisplay(); });
         }
-    }
-  
-    function init() {
-        if(!slotGrid) return; 
+        if (typeof getTavoloConfig === 'function') {
+            _tavoloConfig = await getTavoloConfig('Slot');
+            if (_tavoloConfig?.attivo === false) {
+                alert("Il tavolo Slot è momentaneamente chiuso.");
+                window.location.href = "giochi.html";
+                return;
+            }
+            bet = Math.max(bet, _tavoloConfig.limite_min);
+            if (typeof applyTavoloUI === 'function') applyTavoloUI(_tavoloConfig);
+        }
+
+        if(!slotGrid) return;
         slotGrid.innerHTML = "";
         slots = [];
         

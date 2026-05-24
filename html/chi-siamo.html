@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
@@ -140,58 +140,15 @@
     </footer>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="../scripts/supabase-client.js"></script>
 <script src="../scripts/auth.js"></script>
+<script src="../scripts/balance.js"></script>
+<script src="../scripts/init.js"></script>
 <script src="../scripts/main.js"></script>
 <script>
-let jackpot = 4290123.82;
-const jackpotEl = document.getElementById('jackpotAmt');
-setInterval(() => {
-    jackpot += Math.random() * 9.5 + 0.5;
-    jackpotEl.textContent = '€' + jackpot.toLocaleString('it-IT', {
-        minimumFractionDigits: 2, maximumFractionDigits: 2
-    });
-}, 2200);
 
-(function initVip() {
-    try {
-        const user = JSON.parse(localStorage.getItem('casino_current_user'));
-        if (!user) return;
-        const levels = { standard: { name: 'Standard', pct: 15, next: 'Silver' },
-                         silver:   { name: '🥈 Silver',  pct: 45, next: 'Gold' },
-                         gold:     { name: '💎 Gold',    pct: 75, next: 'Platinum' },
-                         platinum: { name: '💎 Platinum',pct: 95, next: 'Diamond' } };
-        const l = levels[user.vipLevel] || levels.standard;
-        document.getElementById('vipLevelName').textContent = l.name;
-        document.getElementById('vipPct').textContent = l.pct + '%';
-        setTimeout(() => {
-            document.getElementById('vipFill').style.width = l.pct + '%';
-        }, 400);
-    } catch(e) {}
-})();
 
-document.addEventListener('DOMContentLoaded', () => {
-    try {
-        const user = JSON.parse(localStorage.getItem('casino_current_user'));
-        const bar = document.getElementById('userBar');
-        if (!bar) return;
-        if (user) {
-            bar.innerHTML = `
-                <div class="nav-balance">
-                    <span class="nav-balance-label">Saldo</span>
-                    <span class="nav-balance-amount" id="userBalanceNav">€0</span>
-                </div>
-                <a href="ricarica.html" class="nav-btn nav-btn-outline">Ricarica</a>
-                <a href="user.html" class="nav-btn nav-btn-outline">Profilo</a>
-                <button class="nav-btn nav-btn-outline" onclick="localStorage.removeItem('casino_current_user');location.reload()">Esci</button>
-            `;
-        } else {
-            bar.innerHTML = `
-                <a href="login.html" class="nav-btn nav-btn-outline">Accedi</a>
-                <a href="registrati.html" class="nav-btn nav-btn-solid">Registrati</a>
-            `;
-        }
-    } catch(e) {}
-});
 </script>
 </body>
 </html>

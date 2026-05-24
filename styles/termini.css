@@ -1,0 +1,293 @@
+/* ──────────────────────────────────────────────────
+   termini.css  —  Terms & Conditions page
+────────────────────────────────────────────────── */
+
+/* Reset section styles from main.css */
+.shell .main { padding: 20px; }
+
+section {
+    background-color: transparent;
+    background-image: none;
+    border: none;
+    box-shadow: none;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+}
+section h2 {
+    text-align: left;
+    margin-top: 0;
+    border-bottom: none;
+    padding-bottom: 0;
+    text-shadow: none;
+    color: inherit;
+    font-size: inherit;
+}
+section p {
+    text-align: left;
+    text-shadow: none;
+    font-size: inherit;
+    line-height: inherit;
+    color: inherit;
+}
+
+/* Hero */
+.page-hero {
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    padding: 44px 40px;
+    background: linear-gradient(135deg, rgba(128,0,0,0.8) 0%, rgba(5,5,5,0.95) 60%);
+    border-bottom: 2px solid var(--border-gold);
+}
+
+.page-hero-content { max-width: 640px; }
+
+.page-hero-title {
+    font-family: 'Cinzel', serif;
+    font-size: 2.2rem;
+    font-weight: 900;
+    line-height: 1.1;
+    margin: 0 0 14px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(180deg, #FFF7CC 0%, #FFD700 35%, #D4AF37 70%, #FFD700 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.page-hero-sub {
+    font-size: 13px;
+    color: #8a8470;
+    letter-spacing: 0.5px;
+}
+
+/* Main content layout */
+.content-section {
+    padding: 36px 40px;
+    max-width: 900px;
+}
+
+/* Last updated badge */
+.meta-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 32px;
+    flex-wrap: wrap;
+}
+
+.meta-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    background: rgba(212,175,55,0.07);
+    border: 1px solid rgba(212,175,55,0.2);
+    border-radius: 20px;
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.5px;
+}
+
+.meta-tag strong { color: var(--gold-dim); }
+
+/* TOC (table of contents) */
+.toc-box {
+    background: rgba(212,175,55,0.04);
+    border: 1px solid rgba(212,175,55,0.15);
+    border-left: 3px solid var(--gold-dim);
+    border-radius: 0 10px 10px 0;
+    padding: 20px 24px;
+    margin-bottom: 36px;
+}
+
+.toc-title {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gold-dim);
+    margin-bottom: 12px;
+}
+
+.toc-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 4px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.toc-list a {
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-decoration: none;
+    display: block;
+    padding: 4px 0;
+    transition: color 0.15s;
+}
+
+.toc-list a:hover { color: var(--gold); }
+.toc-list .num { color: var(--text-muted); margin-right: 6px; font-family: 'Cinzel', serif; font-size: 11px; }
+
+/* Article sections */
+.article {
+    margin-bottom: 40px;
+    scroll-margin-top: 20px;
+}
+
+.article-title {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--gold);
+    margin-bottom: 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(212,175,55,0.12);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.article-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(212,175,55,0.1);
+    border: 1px solid rgba(212,175,55,0.3);
+    font-size: 11px;
+    font-weight: 900;
+    color: var(--gold-dim);
+    flex-shrink: 0;
+}
+
+.article p {
+    font-size: 14px;
+    line-height: 1.85;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+}
+
+.article p:last-child { margin-bottom: 0; }
+.article strong { color: var(--text-primary); font-weight: 700; }
+.article em { color: var(--gold-dim); font-style: normal; }
+
+/* Bullet lists inside articles */
+.article ul {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0 16px 0;
+}
+
+.article ul li {
+    font-size: 14px;
+    line-height: 1.75;
+    color: var(--text-secondary);
+    padding: 4px 0 4px 20px;
+    position: relative;
+}
+
+.article ul li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--gold-dim);
+    font-size: 11px;
+    top: 6px;
+}
+
+/* Highlight box */
+.highlight-box {
+    background: rgba(128,0,0,0.08);
+    border: 1px solid rgba(128,0,0,0.3);
+    border-left: 3px solid var(--accent-light);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+.highlight-box strong { color: #e07070; }
+
+/* Info box */
+.info-box {
+    background: rgba(212,175,55,0.05);
+    border: 1px solid rgba(212,175,55,0.18);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 14px 0;
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+.info-box strong { color: var(--gold-dim); }
+
+/* Divider */
+.section-divider {
+    height: 1px;
+    background: rgba(212,175,55,0.08);
+    margin: 8px 0 36px;
+}
+
+/* Contact footer strip */
+.contact-strip {
+    margin: 0 40px 40px;
+    padding: 20px 24px;
+    background: rgba(212,175,55,0.04);
+    border: 1px solid rgba(212,175,55,0.15);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.contact-strip p {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: 1.6;
+}
+
+.contact-strip a {
+    color: var(--gold-dim);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.contact-strip a:hover { color: var(--gold); }
+
+.contact-strip .btn-contact {
+    margin-left: auto;
+    padding: 9px 20px;
+    background: transparent;
+    border: 1px solid var(--border-gold);
+    border-radius: 6px;
+    color: var(--gold-dim);
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 0.15s;
+    display: inline-block;
+}
+
+.contact-strip .btn-contact:hover {
+    background: var(--gold-glow);
+    color: var(--gold);
+}
