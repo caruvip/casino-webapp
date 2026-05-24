@@ -1,20 +1,13 @@
-/* --- LAYOUT GENERALE E FIX --- */
-body {
-    display: flex;
-    flex-direction: column !important;
-    min-height: 100%;
-    background: radial-gradient(circle at center, #1a252f 0%, #000000 100%);
-    overflow-x: auto;
-    margin: 0;
-    width: 100%;
-}
+/* --- SFONDO TEMATICO --- */
+body { background: radial-gradient(circle at center, #1a252f 0%, #000000 100%); }
 
-main {
-    flex: 1;
+/* Centra il contenuto nell'area main del shell grid; permette scroll orizzontale per il tavolo da 900px */
+.main {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    padding: 40px 0;
+    justify-content: flex-start;
+    overflow-x: auto;
 }
 
 .poker-room {

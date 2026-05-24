@@ -172,7 +172,7 @@ function flyLoop(timestamp) {
     const acVal   = parseFloat(document.getElementById('autoCashoutVal').value) || 2.00;
     if (betPlaced && !cashedOut && acCheck?.checked && currentMult >= acVal) {
         doCashout();
-        return;
+        // non return: il loop continua ad animare fino al crash naturale
     }
 
     // Crash?

@@ -4,22 +4,15 @@
    ================================================
 */
 
-/* FIX LAYOUT PAGINA */
-body {
-    display: flex;
-    flex-direction: column !important;
-    min-height: 100%;
-    background-color: #1a0505;
-    margin: 0;
-    overflow-x: hidden;
-}
+/* SFONDO TEMATICO */
+body { background-color: #1a0505; }
 
-main {
-    flex: 1;
+/* Centra il contenuto nell'area main del shell grid */
+.main {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    padding: 20px 0;
+    justify-content: flex-start;
 }
 
 .slot-section {
