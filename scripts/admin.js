@@ -1236,7 +1236,7 @@ async function populateAdminChat() {
         const active  = c.id === _chatAdminConvId ? 'active' : '';
         const closed  = c.status === 'closed' ? 'closed' : '';
         return `
-            <div class="chat-conv-item ${active} ${closed}" onclick="openAdminChat('${c.id}')">
+            <div class="chat-conv-item ${active} ${closed}" onclick="openAdminChat('${c.id}', '${c.status}')">
                 <div class="chat-conv-user">
                     @${c.username || 'Utente'}
                     <span class="chat-conv-status-badge ${c.status}">${c.status === 'open' ? 'Aperta' : 'Chiusa'}</span>
@@ -1247,38 +1247,31 @@ async function populateAdminChat() {
     }).join('');
 }
 
-async function openAdminChat(convId) {
+async function openAdminChat(convId, convStatus = 'open') {
     _chatAdminConvId = convId;
 
     // Re-render list to update active state
     await populateAdminChat();
 
-    // Load messages
+    // Load messages via SECURITY DEFINER RPC (bypasses RLS)
     const { data, error } = await _sb.rpc('admin_get_chat_messages', { p_conversation_id: convId });
 
-    const msgsEl  = document.getElementById('adminChatMessages');
+    const msgsEl   = document.getElementById('adminChatMessages');
     const inputBar = document.getElementById('adminChatInputBar');
-    const header  = document.getElementById('adminChatThreadHeader');
+    const header   = document.getElementById('adminChatThreadHeader');
 
     if (!msgsEl) return;
 
-    // Check conversation status
-    const { data: conv } = await _sb
-        .from('chat_conversations')
-        .select('status, user_id')
-        .eq('id', convId)
-        .single();
+    const isOpen = convStatus === 'open';
 
-    const isOpen = conv?.status === 'open';
-
-    // Header
-    const convData = document.querySelector(`.chat-conv-item.active .chat-conv-user`);
+    // Header — username letto dal DOM dopo il re-render della lista
+    const convUserEl = document.querySelector('.chat-conv-item.active .chat-conv-user');
     if (header) {
         header.innerHTML = `
-            <span style="font-family:var(--font-display);font-size:13px;font-weight:700;color:var(--text-primary);">
-                ${convData ? convData.firstChild.textContent.trim() : '@Utente'}
+            <span style="font-family:var(--font-brand);font-size:13px;font-weight:700;color:var(--text-primary);">
+                ${convUserEl ? _escAdmin(convUserEl.firstChild.textContent.trim()) : '@Utente'}
             </span>
-            <span class="chat-conv-status-badge ${conv?.status || 'open'}" style="margin-left:8px;">
+            <span class="chat-conv-status-badge ${convStatus}" style="margin-left:8px;">
                 ${isOpen ? 'Aperta' : 'Chiusa'}
             </span>`;
     }
@@ -1290,10 +1283,9 @@ async function openAdminChat(convId) {
     msgsEl.innerHTML = '';
     (data || []).forEach(m => _appendAdminChatMsg(m.sender_type, m.sender_name, m.message, m.created_at));
 
-    // Scroll to bottom
     msgsEl.scrollTop = msgsEl.scrollHeight;
 
-    // Subscribe realtime for this conversation
+    // Realtime — ora funziona grazie alle policy RLS admin aggiunte al DB
     _subscribeAdminChat(convId);
 }
 
