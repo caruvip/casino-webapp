@@ -32,6 +32,11 @@ let playerBalance = (typeof getBalanceLocal === 'function') ? getBalanceLocal() 
 let _tavoloConfig = { limite_min: 5, limite_max: 1000 };
 let _sessionStart = null;
 
+// --- MULTIPLAYER ---
+let _multiEngine  = null;
+let _multiPlayers = [];  // [{id, username, hand, bet, done}]
+let _myMultiIdx   = -1;
+
 // --- Init ---
 async function init() {
     const user = (typeof getCurrentUser === 'function') ? getCurrentUser() : null;
@@ -53,6 +58,68 @@ async function init() {
         if (typeof applyTavoloUI === 'function') applyTavoloUI(_tavoloConfig);
     }
     updateUI();
+
+    showModePicker('blackjack', {
+        onSolo: () => { /* UI già pronta */ },
+        onMulti: (engine) => {
+            _multiEngine = engine;
+            showMultiHUD(engine);
+            _setupBlackjackMulti(engine);
+        },
+    });
+}
+
+function _setupBlackjackMulti(engine) {
+    // Host distribuisce: ricevi stato iniziale round
+    engine.on('bj_round_start', ({ deckSeed, hands, dealerCard }) => {
+        // Ricostruisci mazzo con lo stesso seed
+        deck = _seededDeck(deckSeed);
+        const user = getCurrentUser();
+        const me   = hands.find(h => h.id === user.id);
+        if (!me) return;
+
+        playerHands     = [me.hand];
+        playerBets      = [me.bet];
+        dealerHand      = [dealerCard, { hidden: true }];
+        activeHandIndex = 0;
+        isRoundOver     = false;
+        _multiPlayers   = hands;
+
+        bettingArea.classList.add('hidden');
+        actionsArea.classList.remove('hidden');
+        updateGameState();
+    });
+
+    // Ricevi risultato azione di un altro giocatore (per HUD)
+    engine.on('bj_player_done', ({ id, username }) => {
+        _updateMultiHUDTurn(username + ' finito');
+    });
+
+    // Host annuncia risultato banco
+    engine.on('bj_dealer_result', ({ dealerFinal }) => {
+        dealerHand = dealerFinal;
+        updateGameState();
+        endRoundLogic();
+    });
+}
+
+function _seededDeck(seed) {
+    const suits  = ['♥','♦','♣','♠'];
+    const values = ['2','3','4','5','6','7','8','9','10','J','Q','K','A'];
+    let d = [];
+    suits.forEach(s => values.forEach(v => d.push({ suit: s, value: v })));
+    let rng = seed;
+    for (let i = d.length - 1; i > 0; i--) {
+        rng = (rng * 1664525 + 1013904223) & 0xffffffff;
+        const j = Math.abs(rng) % (i + 1);
+        [d[i], d[j]] = [d[j], d[i]];
+    }
+    return d;
+}
+
+function _updateMultiHUDTurn(label) {
+    const el = document.querySelector('.lby-hud');
+    if (el) el.title = label;
 }
 
 // --- Gestori eventi ---
@@ -64,7 +131,10 @@ bettingArea.addEventListener("click", (e) => {
     }
 });
 
-confirmBetBtn.addEventListener("click", () => { if (!confirmBetBtn.disabled) startNewRound(); });
+confirmBetBtn.addEventListener("click", () => {
+    if (confirmBetBtn.disabled) return;
+    if (_multiEngine) { _multiStartRound(); } else { startNewRound(); }
+});
 clearBtn.addEventListener("click",      () => { if (!clearBtn.disabled) clearBets(); });
 
 hitBtn.addEventListener("click",    () => actionHandler(performHitLogic));
@@ -90,6 +160,51 @@ function placeBetChip(amount) {
     currentBet += amount;
     playerBalance -= amount;
     updateUI();
+}
+
+// --- Round Multiplayer ---
+async function _multiStartRound() {
+    if (currentBet === 0) return;
+    const user = getCurrentUser();
+
+    if (_multiEngine.isHost()) {
+        // Host raccoglie le puntate di tutti (solo la propria per ora, gli altri faranno lo stesso)
+        const deckSeed = Math.floor(Math.random() * 0xffffffff);
+        const d = _seededDeck(deckSeed);
+        let di = 0;
+        const drawFromSeed = () => d[di++];
+
+        // Distribuisce 2 carte a tutti i giocatori presenti
+        const players = _multiEngine.getPlayers();
+        const hands   = players.map(p => ({
+            id:       p.id,
+            username: p.username,
+            hand:     [drawFromSeed(), drawFromSeed()],
+            bet:      currentBet,
+        }));
+        const dealerCard = drawFromSeed();
+
+        _multiEngine.broadcast('bj_round_start', { deckSeed, hands, dealerCard });
+
+        // Applica anche per l'host stesso
+        deck       = d.slice(di);
+        const me   = hands.find(h => h.id === user.id);
+        playerHands     = me ? [me.hand] : [[drawFromSeed(), drawFromSeed()]];
+        playerBets      = [currentBet];
+        dealerHand      = [dealerCard, { hidden: true }];
+        activeHandIndex = 0;
+        isRoundOver     = false;
+        _multiPlayers   = hands;
+        _sessionStart   = Date.now();
+        bettingArea.classList.add('hidden');
+        actionsArea.classList.remove('hidden');
+        updateGameState();
+    } else {
+        // Non-host: comunica la puntata all'host e attende bj_round_start
+        _multiEngine.broadcast('bj_player_bet', { id: user.id, bet: currentBet });
+        messageEl.textContent = 'Puntata inviata. Attendi l\'host…';
+        confirmBetBtn.disabled = true;
+    }
 }
 
 // --- Round ---
@@ -307,14 +422,13 @@ function calculateSum(hand) {
 function renderCard(card, container) {
     const div = document.createElement("div");
     div.className = "card";
-    div.innerText = card.value + card.suit;
     div.classList.add(['♥','♦'].includes(card.suit) ? 'red-card' : 'black-card');
+    div.innerHTML = `<div class="card-tl">${card.value}<br><small>${card.suit}</small></div><div class="card-center">${card.suit}</div>`;
     container.appendChild(div);
 }
 function renderHiddenCard(container) {
     const div = document.createElement("div");
     div.className = "card hidden-card";
-    div.innerText = "?";
     container.appendChild(div);
 }
 

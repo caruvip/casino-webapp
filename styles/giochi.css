@@ -1,16 +1,28 @@
+/* ── GIOCHI PAGE ─────────────────────────────────────────────── */
+
+.section-wrap {
+    padding: 28px 32px 10px;
+}
+.section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-gold);
+    padding-bottom: 14px;
 }
 .section-title {
     font-family: 'Cinzel', serif;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     color: var(--gold);
-    text-shadow: 0 0 20px rgba(255,215,0,0.2);
+    text-shadow: 0 0 16px rgba(255,215,0,0.18);
 }
 .section-link {
     font-family: 'Cinzel', serif;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -19,33 +31,39 @@
     transition: color 0.15s;
 }
 .section-link:hover { color: var(--gold); }
+
+/* ── GRIGLIA GIOCHI ─────────────────────────────────────────── */
 .games-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(155px, 1fr));
-    gap: 14px;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 16px;
     padding: 0 32px 32px;
 }
+
 .game-card {
-    border-radius: 12px;
-    background: linear-gradient(145deg, #1a1a1a, #0d0d0d);
+    border-radius: 14px;
+    background: linear-gradient(145deg, #181818, #0e0e0e);
     border: 1px solid var(--border-gold);
     overflow: hidden;
     cursor: pointer;
     position: relative;
     transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5);
 }
 .game-card:hover {
-    transform: translateY(-4px);
+    transform: translateY(-5px);
     border-color: rgba(212,175,55,0.7);
-    box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 20px rgba(255,215,0,0.1);
+    box-shadow: 0 12px 36px rgba(0,0,0,0.7), 0 0 24px rgba(255,215,0,0.08);
 }
+
+/* Thumbnail */
 .game-thumb {
     width: 100%;
-    aspect-ratio: 4/3;
+    aspect-ratio: 4 / 3;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 42px;
+    font-size: 46px;
     position: relative;
     overflow: hidden;
 }
@@ -53,42 +71,58 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(0deg, rgba(5,5,5,0.85) 0%, transparent 55%);
+    background: linear-gradient(0deg, rgba(5,5,5,0.88) 0%, transparent 55%);
 }
+
+/* Colori sfondo per ogni gioco */
 .t-slot      { background: linear-gradient(135deg, #1a0a4a, #3b1aa8); }
 .t-roulette  { background: linear-gradient(135deg, #0d4a1a, #1a8a35); }
 .t-blackjack { background: linear-gradient(135deg, #4a0a0a, #8a1515); }
 .t-poker     { background: linear-gradient(135deg, #1a2a4a, #1a508a); }
 .t-rocket    { background: linear-gradient(135deg, #1a0a00, #5a2a00); }
+
+/* Badge RTP */
 .game-rtp {
     position: absolute;
     top: 8px;
     right: 8px;
     z-index: 2;
     font-family: 'Cinzel', serif;
-    font-size: 9px;
+    font-size: 8px;
     font-weight: 700;
     letter-spacing: 0.5px;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.75);
     color: var(--gold);
-    padding: 3px 7px;
+    padding: 3px 8px;
     border-radius: 20px;
     border: 1px solid rgba(212,175,55,0.3);
 }
-.game-info { padding: 10px 12px 14px; }
+
+/* Info sotto il thumb */
+.game-info {
+    padding: 10px 13px 14px;
+}
 .game-name {
     font-family: 'Cinzel', serif;
     font-size: 12px;
     font-weight: 900;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
     color: var(--text-primary);
     margin-bottom: 3px;
+    text-transform: uppercase;
 }
-.game-provider { font-size: 10px; color: var(--text-muted); }
+.game-provider {
+    font-size: 10px;
+    color: var(--text-secondary);
+    font-family: 'Lato', sans-serif;
+    letter-spacing: 0.3px;
+}
+
+/* Overlay hover */
 .game-overlay {
     position: absolute;
     inset: 0;
-    background: rgba(128,0,0,0.2);
+    background: rgba(128,0,0,0.18);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -98,16 +132,18 @@
 }
 .game-card:hover .game-overlay { opacity: 1; }
 .game-play {
-    padding: 8px 22px;
+    padding: 8px 24px;
     background: linear-gradient(180deg, #FFD700 0%, #D4AF37 100%);
     color: #2a0000;
     font-family: 'Cinzel', serif;
     font-size: 11px;
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    border-radius: 4px;
+    letter-spacing: 1.5px;
+    border-radius: 6px;
     border: none;
     cursor: pointer;
     box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+    transition: background 0.15s, transform 0.12s;
 }
+.game-play:hover { background: linear-gradient(180deg, #ffe84d 0%, #e6c520 100%); transform: scale(1.04); }

@@ -7,6 +7,9 @@ let selectedChipValue = 5;
 let _tavoloConfig = { limite_min: 5, limite_max: 1000 };
 let _sessionStart = null;
 
+// --- MULTIPLAYER ---
+let _multiEngine = null;
+
 // Gestione Puntate
 let bets = {}; 
 let betHistoryStack = [];
@@ -42,6 +45,22 @@ async function initGame() {
     }
     generateNumbersGrid();
     updateHUD();
+
+    showModePicker('roulette', {
+        onSolo: () => { /* gioco già pronto */ },
+        onMulti: (engine) => {
+            _multiEngine = engine;
+            showMultiHUD(engine);
+            engine.on('spin_result', ({ winNum }) => _applySpinResult(winNum));
+
+            // Solo l'host può girare la ruota
+            const spinBtn = document.getElementById('spin-btn');
+            if (spinBtn && !engine.isHost()) {
+                spinBtn.textContent = '⏳ Attendi il croupier';
+                spinBtn.disabled = true;
+            }
+        },
+    });
 }
 
 function generateNumbersGrid() {
@@ -167,50 +186,54 @@ function clearBets() {
 }
 
 // --- SPIN & CALCOLO VINCITA ---
+function _applySpinResult(winNum) {
+    const spinBtn = document.getElementById('spin-btn');
+    if (spinBtn) spinBtn.disabled = true;
+    lastRoundBets = JSON.parse(JSON.stringify(bets));
+    message("Rien ne va plus!");
+
+    const sliceDeg     = 360 / 37;
+    const index        = WHEEL_NUMBERS.indexOf(winNum);
+    const targetAngle  = 360 - (index * sliceDeg);
+    const finalRotation = 360 * 10 + targetAngle;
+    const wheel = document.getElementById('wheel');
+    const ball  = document.getElementById('ball-container');
+    wheel.style.transition = "transform 4s cubic-bezier(0.15, 0, 0.2, 1)";
+    ball.style.transition  = "transform 4s cubic-bezier(0.15, 0, 0.2, 1)";
+    wheel.style.transform  = `rotate(${finalRotation}deg)`;
+    ball.style.transform   = `rotate(-${360 * 3}deg)`;
+    setTimeout(() => {
+        resolveGame(winNum);
+        if (spinBtn) spinBtn.disabled = false;
+        setTimeout(() => {
+            wheel.style.transition = "none";
+            wheel.style.transform  = `rotate(${targetAngle}deg)`;
+            ball.style.transition  = "none";
+            ball.style.transform   = "rotate(0deg)";
+        }, 1000);
+    }, 4000);
+}
+
 function spinWheel() {
     if(currentBetTotal === 0) { message("Punta qualcosa!"); return; }
-    
+
     const spinBtn = document.getElementById('spin-btn');
     spinBtn.disabled = true;
     lastRoundBets = JSON.parse(JSON.stringify(bets));
-    
+
     message("Rien ne va plus!");
 
     // 1. Determina Numero Vincente
     const winNum = Math.floor(Math.random() * 37);
-    
-    // 2. Calcola Rotazione
-    const sliceDeg = 360 / 37;
-    const index = WHEEL_NUMBERS.indexOf(winNum);
-    const targetAngle = 360 - (index * sliceDeg);
-    const extraSpins = 360 * 10;
-    const finalRotation = extraSpins + targetAngle;
-    
-    const wheel = document.getElementById('wheel');
-    const ball = document.getElementById('ball-container');
-    
-    // Reset transizioni per sicurezza
-    wheel.style.transition = "transform 4s cubic-bezier(0.15, 0, 0.2, 1)";
-    ball.style.transition = "transform 4s cubic-bezier(0.15, 0, 0.2, 1)";
-    
-    // Applica Rotazioni
-    wheel.style.transform = `rotate(${finalRotation}deg)`;
-    ball.style.transform = `rotate(-${360 * 3}deg)`; 
 
-    // 3. Risolvi gioco alla fine dell'animazione
-    setTimeout(() => { 
-        resolveGame(winNum); 
-        spinBtn.disabled = false;
-        
-        // Reset silenzioso
-        setTimeout(() => {
-            wheel.style.transition = "none";
-            wheel.style.transform = `rotate(${targetAngle}deg)`;
-            ball.style.transition = "none";
-            ball.style.transform = "rotate(0deg)";
-        }, 1000);
-
-    }, 4000);
+    // In multiplayer: l'host trasmette il risultato a tutti (incluso sé stesso)
+    if (_multiEngine) {
+        _multiEngine.broadcast('spin_result', { winNum });
+        return;
+    }
+    
+    // Solo: anima e risolvi localmente
+    _applySpinResult(winNum);
 }
 
 function resolveGame(n) {

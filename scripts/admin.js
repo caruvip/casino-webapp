@@ -74,6 +74,7 @@ async function initPanel() {
     showSection('dashboard');
     await refreshAllData();
     startLiveActivity();
+    _startAdminChatGlobalSubscription();
 }
 
 async function refreshAllData() {
@@ -1206,12 +1207,48 @@ function stopLivePolling() {
 /* ════════════════════════════════════════════════════
    CHAT LIVE — Admin side
    ════════════════════════════════════════════════════ */
-let _chatAdminConvId  = null;
-let _chatAdminChannel = null;
+let _chatAdminConvId      = null;
+let _chatAdminChannel     = null;
+let _chatAdminGlobalChannel = null;
+
+function _startAdminChatGlobalSubscription() {
+    if (_chatAdminGlobalChannel) _sb.removeChannel(_chatAdminGlobalChannel);
+
+    _chatAdminGlobalChannel = _sb.channel('admin_chat_global')
+        .on('postgres_changes', {
+            event:  'INSERT',
+            schema: 'public',
+            table:  'chat_conversations',
+        }, async () => {
+            await populateAdminChat();
+        })
+        .on('postgres_changes', {
+            event:  'INSERT',
+            schema: 'public',
+            table:  'chat_messages',
+        }, async () => {
+            await populateAdminChat();
+        })
+        .on('postgres_changes', {
+            event:  'UPDATE',
+            schema: 'public',
+            table:  'chat_conversations',
+        }, async () => {
+            await populateAdminChat();
+        })
+        .subscribe();
+}
 
 async function populateAdminChat() {
     const { data, error } = await _sb.rpc('admin_get_chat_conversations');
-    if (error || !data) return;
+    if (error || !data) {
+        const chatSection = document.getElementById('sec-chat');
+        if (chatSection && !chatSection.classList.contains('hidden')) {
+            toast('Errore caricamento chat: ' + (error?.message || 'risposta vuota'), 'error');
+        }
+        console.error('[admin chat]', error);
+        return;
+    }
 
     const list = document.getElementById('adminChatConvList');
     const countEl = document.getElementById('chatConvCount');

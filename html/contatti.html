@@ -91,35 +91,36 @@
 
             <div class="form-section">
                 <h2 style="font-family:'Cinzel',serif; font-size:18px; font-weight:900; color:var(--gold); margin-top:0; margin-bottom:28px; text-transform:uppercase; letter-spacing:2px;">Invia un Messaggio</h2>
-                <form>
+                <div id="form-feedback" style="display:none; padding:14px 18px; border-radius:8px; margin-bottom:20px; font-size:14px;"></div>
+                <form id="contactForm">
                     <div class="form-group">
                         <label class="form-label" for="name">Nome Completo</label>
-                        <input type="text" id="name" class="form-input" required placeholder="Il tuo nome">
+                        <input type="text" id="name" name="nome" class="form-input" required placeholder="Il tuo nome">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label" for="email">Email</label>
-                        <input type="email" id="email" class="form-input" required placeholder="La tua email">
+                        <input type="email" id="email" name="email" class="form-input" required placeholder="La tua email">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label" for="subject">Oggetto</label>
-                        <input type="text" id="subject" class="form-input" required placeholder="Oggetto della richiesta">
+                        <input type="text" id="subject" name="oggetto" class="form-input" required placeholder="Oggetto della richiesta">
                     </div>
 
                     <div class="form-group">
                         <label class="form-label" for="message">Messaggio</label>
-                        <textarea id="message" class="form-textarea" rows="5" required placeholder="Scrivi il tuo messaggio..."></textarea>
+                        <textarea id="message" name="messaggio" class="form-textarea" rows="5" required placeholder="Scrivi il tuo messaggio..."></textarea>
                     </div>
 
-                    <button type="submit" class="btn-submit">Invia Messaggio</button>
+                    <button type="submit" class="btn-submit" id="submitBtn">Invia Messaggio</button>
                 </form>
             </div>
         </section>
 
         <footer style="padding: 24px 40px; border-top: 1px solid var(--border); text-align:center; margin-top:40px;">
             <p style="font-family:'Cinzel',serif; font-size:11px; color:var(--text-muted); letter-spacing:1px;">
-                Â© 2025 777Casino.it | Supporto VIP 24/7 | Risposta in 5 minuti
+                Â© 2025 777Casino.it | Supporto VIP 24/7 | Risposta in 5 minuti | <a href="termini.html" style="color:var(--text-muted);text-decoration:none;">Termini e Condizioni</a>
             </p>
         </footer>
     </main>
@@ -154,8 +155,48 @@
 <script src="../scripts/init.js"></script>
 <script src="../scripts/main.js"></script>
 <script>
+document.getElementById('contactForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
 
+    const btn = document.getElementById('submitBtn');
+    const feedback = document.getElementById('form-feedback');
+    btn.disabled = true;
+    btn.textContent = 'Invio in corso...';
+    feedback.style.display = 'none';
 
+    const formData = new FormData(this);
+
+    try {
+        const res = await fetch('../php/contatti.php', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+
+        if (data.ok) {
+            feedback.style.background = 'rgba(0,200,100,0.15)';
+            feedback.style.border = '1px solid rgba(0,200,100,0.4)';
+            feedback.style.color = '#00c864';
+            feedback.textContent = data.message;
+            this.reset();
+        } else {
+            const msgs = data.errors ? data.errors.join(' ') : (data.error || 'Errore sconosciuto.');
+            feedback.style.background = 'rgba(220,50,50,0.15)';
+            feedback.style.border = '1px solid rgba(220,50,50,0.4)';
+            feedback.style.color = '#ff6b6b';
+            feedback.textContent = msgs;
+        }
+    } catch (err) {
+        feedback.style.background = 'rgba(220,50,50,0.15)';
+        feedback.style.border = '1px solid rgba(220,50,50,0.4)';
+        feedback.style.color = '#ff6b6b';
+        feedback.textContent = 'Errore di rete. Riprova più tardi.';
+    }
+
+    feedback.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Invia Messaggio';
+});
 </script>
 </body>
 </html>

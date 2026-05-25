@@ -48,6 +48,8 @@ let rocketImg = null;
 const FAKE_PLAYERS = ['Marco_R', 'LuckyMax', 'Star99', 'ProGamer', 'VIPKing', 'CoolBet', 'NightOwl', 'AceHigh'];
 let liveBets = [];
 
+/* (multiplayer rimosso - solo modalità singolo) */
+
 /* ════════════════════════════════════════════════════════
    INIT
 ════════════════════════════════════════════════════════ */
@@ -80,9 +82,9 @@ document.addEventListener('authReady', async () => {
     renderLiveList(false);
     renderStats();
 
-    startWaiting();
     initVip();
     startJackpot();
+    startWaiting();
 });
 
 /* ─── Resize canvas ─── */
@@ -120,7 +122,6 @@ function startWaiting() {
     liveBets    = [];
 
     crashPoint = generateCrashPoint();
-
     setMultDisplay('Prossimo round tra ' + countdown + 's', 'state-waiting');
     setMainBtn('bet');
     setBetResult('', 'neutral');
@@ -133,7 +134,6 @@ function startWaiting() {
         setMultDisplay('Prossimo round tra ' + countdown + 's', 'state-waiting');
         if (countdown <= 0) {
             clearInterval(countdownTimer);
-            // Simula piazzata di altri giocatori
             simulateLiveBets();
             startFlying();
         }
@@ -246,6 +246,17 @@ function doCashout() {
     }
     saveGameResult(true, currentMult, profit);
     updateLiveBotsCashoutMe(currentMult, winAmount);
+
+}
+
+function _addLivePlayerEvent(username, mult, amount) {
+    const list = document.getElementById('live-list');
+    if (!list) return;
+    const row = document.createElement('div');
+    row.className = 'live-item live-win';
+    row.innerHTML = `<span class="live-name">@${username}</span><span class="live-mult">${mult.toFixed(2)}x</span><span class="live-amount">+€${amount.toFixed(2)}</span>`;
+    list.prepend(row);
+    setTimeout(() => row.remove(), 8000);
 }
 
 /* ════════════════════════════════════════════════════════
